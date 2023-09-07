@@ -4,8 +4,9 @@
 # Contributors:
   - Bianca Magalotti
   - Emanuele Franceschini
-  - Akram
+  - Akram Benmrit
   - Tommaso Rabino
+  - Colin Tan
 ---
 
 # Preliminary Research Questions
