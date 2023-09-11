@@ -514,3 +514,111 @@ cat('Now, there is only', length(char_cols), 'column in character format and it 
 ```
 
 
+\section{Manage Amenities Variable}
+Within the dataset, the 'amenities' column serves as a character variable, cataloging the services offered by individual listings to their tenants, encompassing amenities such as "Air Conditioning," "Elevator," "Refrigerator," and "Wifi." To systematically determine the presence or absence of these specific services within each apartment, a structured sequence of operations was undertaken:
+
+\begin{enumerate}
+  \item[\Roman{enumi}I.] \textbf{Data Pre-Procesing:} Data preprocessing is necessary to convert the 'amenities' column into a format suitable for analysis.
+    \begin{enumerate}
+      \item[\alph{enumii}] Conversion to Word Lists: The code starts by converting the \texttt{amenities} column of JSON-like text into a list of words. This step is essential to prepare the data for further analysis.
+      \item[\alph{enumii}] Combining Word Lists: All the word lists from the 'amenities' column are combined into a single list named 'all\_words.' This consolidation simplifies the subsequent frequency analysis.
+\end{enumerate}
+  \item[\Roman{enumi}II.] \textbf{Amenity Frequency Analysis:} Filtering frequently occurring amenities focuses the analysis on the most relevant data, preventing an overwhelming number of binary columns.
+    \begin{enumerate}
+      \item[\alph{enumii}] Counting Amenities: The code calculates the frequency of each unique amenity in the 'all\_words' list, resulting in 'amenity\_counts.' This step provides insights into how often each amenity appears in the dataset.
+      \item[\alph{enumii}] Filtering Common Amenities: Frequency-Based Filtering: To optimize the utility of the generated binary columns, a thoughtful filtering process was executed. Specifically, amenities appearing at least 10,000 times were selected for binary column creation. This selection criterion was chosen to prioritize commonly offered amenities while simplifying the dataset's structure and avoiding the creation of an excessively large number of binary columns. Before filtering, the number of newly created columns was over 13,000, making the dataset not suitable for further analysis. We also tried to include amenities that appeared in less than 10 listings, but even then the number of new columns created would have been more than 11,000. 
+    \end{enumerate}
+  \item[\Roman{enumi}III.] \textbf{Amenity Binary Column Creation:} The 'check\_amenity' function streamlines the process of determining amenity presence, by providing clear indicators of amenity presence or absence in each listing.
+    \begin{enumerate}
+      \item[\alph{enumii}] Amenity Presence Check Function: A custom function, 'check\_amenity,' is defined. This function checks whether a specific amenity is present in the 'amenities' column of each listing. It returns "YES" if the amenity is found and "NO" if it's not.
+      \item[\alph{enumii}] Creating Binary Columns: For each amenity that met the filtering criteria, a new binary column is created. The column name is derived from the amenity name with spaces, colons, and hyphens removed and replaced by underscores.
+    \end{enumerate}
+\end{enumerate}
+      
+      
+```{r}
+# Convert the column from JSON-like text to a list of words
+word_lists <- lapply(raw_data$amenities, function(x) fromJSON(x, simplifyVector = TRUE))
+
+# Combine all word lists into one
+all_words <- unlist(word_lists)
+
+# Calculate the frequency of each unique amenity
+amenity_counts <- table(all_words)
+
+# Filter amenities that appear at least 10000 times
+selected_amenities <- names(amenity_counts[amenity_counts >= 10000])
+
+# Create a function to check if an amenity is present
+check_amenity <- function(amenities, amenity_name) {
+  as.factor(ifelse(str_detect(amenities, paste0('(?i)', amenity_name)), "YES", "NO"))
+}
+
+# Create a new column for each unique amenity with spaces, colons, and hyphens removed and replaced by underscores
+for (amenity in selected_amenities) {
+  col_name <- gsub("[:\\- ]", "_", amenity, perl = TRUE)  # Remove colons, hyphens, and spaces and replace with underscores
+  raw_data <- raw_data %>%
+    mutate(!!col_name := check_amenity(amenities, amenity))
+}
+```
+
+
+```{r, echo=FALSE}
+rm(word_lists, all_words, amenity, amenity_counts, col_name, selected_amenities, check_amenity)
+```
+
+
+The following is an example of the newly created columns:
+```{r, echo=FALSE}
+# Select the columns you want to display
+selected_cols <- head(raw_data, 5) %>%
+  dplyr::select("Air_conditioning":"Bathtub")
+
+# Create a gt table
+t4 <- gt(selected_cols)
+
+# Apply styling to the table headers (making them bold)
+t4 <- t4 %>%
+  tab_header(
+    title = "Selected Columns",
+    subtitle = "Example of newly created columns from amenities"
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  )
+
+# Print the table
+t4
+
+# Remove the table object if needed
+rm(t4, selected_cols)
+```
+
+
+Now that the utilization of the \texttt{amenities} variable has been completed (resulting in its transformation into a set of boolean variables in 'factor' format), it is advisable to remove it from the dataset. This action aligns with the earlier decision to eliminate all variables in 'character' format.
+
+```{r}
+raw_data <- raw_data %>% dplyr::select(-amenities)
+```
+
+At this point, it becomes evident that there are no remaining variables in 'character' format. Consequently, it can be affirmed that the final objective has been successfully achieved.   
+
+```{r}
+char_cols <- raw_data %>% 
+  select_if(is.character) %>% 
+  names()
+cat('Now, there are', length(char_cols), 'column in character format.')
+```
+
+```{r, echo=FALSE}
+rm(char_cols)
+```
+
+
+
+
+
+
+
+
