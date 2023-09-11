@@ -83,6 +83,18 @@ for (name in dataset_names) {
 }
 
 
+#Save merged dataset
+save_if_not_exists <- function(data, file_path) {
+  if (!file.exists(file_path)) {
+    save(data, file = file_path)
+    cat("File saved successfully:", file_path, "\n")
+  } else {
+    cat("File already exists:", file_path, "\n")
+  }
+}
+
+save_if_not_exists(merged_data, "../../data/dataset1/dataset1.R")
+
 
 rm(dataset_names, name)
 
