@@ -67,6 +67,7 @@ library(tidyverse) #A "Package of Packages" for Data manipulation and visualizat
 library(dplyr) #Data frame manipulations (select, slice, etc.
 library(kableExtra) #Building fancy tables.
 library(knitr)
+library(jsonlite) #For Amenities Columns Creation
 
 #PLOT PACKAGES:
 library(ggplot2) #Building fancy plots.
@@ -80,7 +81,7 @@ library(gt) #Latex tables
 
 
 ```{r, echo=FALSE}
-load("../../data/dataset1/italian_AirBnb_listings.RData")
+load("../../data/dataset1/dataset1.R")
 ```
 
 
@@ -112,7 +113,7 @@ In this document, the data manipulation procedures applied to the original datas
 Code for showing the number of columns that contains only missing values:
 
 ```{r}
-cols_to_remove <- sapply(data_merged, function(x) all(is.na(x)))
+cols_to_remove <- sapply(merged_data, function(x) all(is.na(x)))
 indices <- which(unlist(cols_to_remove))
 names_list <- names(cols_to_remove)[indices]
 cat('There are only', length(names_list), 'columns with only missing values')
@@ -125,7 +126,7 @@ cat('Names of columns with only missing values:', names_list)
 
 Code for removing columns with only missing values: 
 ```{r}
-raw_data <- data_merged %>%
+raw_data <- merged_data %>%
   select(-which(cols_to_remove))
 ```
 
