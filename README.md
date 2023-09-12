@@ -14,8 +14,6 @@
 <span style="font-size: 18px"> __RESEARCH QUESTIONS__ </span>:
 
 * __Regression Model__: Can we develop a predictive model that can help Airbnb hosts set the optimal rental prices for their listings?
-* __Exploratory Data Analysis__: How can we use exploratory data analysis to help Airbnb hosts understand the critical factors that influence the price of their listings?
-
 
 ---
 ---
