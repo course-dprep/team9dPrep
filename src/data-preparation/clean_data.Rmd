@@ -130,6 +130,9 @@ raw_data <- merged_data %>%
   select(-which(cols_to_remove))
 ```
 
+```{r, include=FALSE}
+rm(merged_data)
+```
 
 As can be seen from the output below, once `calendar_updated` and `bathroom` have been removed, there are no other columns containing only NAs. 
 
@@ -615,6 +618,122 @@ cat('Now, there are', length(char_cols), 'column in character format.')
 ```{r, echo=FALSE}
 rm(char_cols)
 ```
+
+
+
+
+
+
+
+
+
+\section{Manage Missing Values}
+After completing all the intended data cleaning operations, the removal of observations containing missing values (i.e., NAs) is warranted.
+
+This step holds significance as many regression model functions in R are incompatible with observations featuring missing values. Furthermore, eliminating missing values, if a sufficient number of observations remain, generally enhances model performance.
+
+\textbf{Inspecting the number of missing values:} First, the following code was used to determine the number of rows having at least one missing value: 
+```{r}
+cat('Now, there are', sum(!complete.cases(raw_data)), 'rows with at least 1 NAs regarding the variables we chose to maintain in the dataset')
+```
+
+\textbf{Missing Values per Variable Dataframe:} The subsequent code was employed to generate a two-column dataframe called 'missing_data'. Its first column contains the variable names from the 'raw_data' dataset, while the second column displays the number of missing values for each variable.
+
+```{r}
+missing_data <- raw_data %>%
+  summarize_all(~ sum(is.na(.))) %>%
+  gather() %>%
+  rename(variable = key, missing_values = value)
+
+missing_data <- missing_data %>%
+  filter(missing_values > 0) %>%
+  arrange(desc(missing_values)) 
+
+missing_data$variable <- reorder(missing_data$variable, missing_data$missing_values)
+```
+
+Below is an excerpt from the previously generated dataframe 'missing_data', displaying the first five rows. This dataset will be utilized in the subsequent section for building the plot "Number of Missing Values per Variable".
+```{r, include=FALSE}
+t5 <- head(missing_data, 5) %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Table of Missing Values",
+    subtitle = "Number of Missing Values by Variable",
+  )
+```
+
+```{r}
+t5
+```
+
+
+\textbf{Plot of Missing Values per Variable:} The subsequent plot illustrates the number of missing values per variable:
+```{r, include=FALSE}
+p5 <- ggplot(data = missing_data, aes(x = variable, y = missing_values, fill = missing_values)) +
+  geom_bar(stat = "identity") +
+  scale_fill_gradient(low = "#FEFBBD", high = "darkblue") +
+  geom_label(aes(label = missing_values), fill = "#666666", col = "white", size = 3) +
+  labs(title = "Number of Missing Values per Variable",
+       subtitle = "Data collected from Listings dataset",
+       x = "Variables",
+       y = "Number of Missing Values") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", vjust = 1, hjust = 0.5, colour = "black"),
+        plot.subtitle = element_text(size = 12, lineheight = 0.8, vjust = 1, hjust = 0.5, colour = "black"),
+        axis.title = element_text(size = 14, colour = "black"),
+        axis.text = element_text(size = 8, colour = "black"),
+        panel.grid.major = element_line(color = "gray", size = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white")) +
+  coord_flip()
+```
+
+```{r}
+p5
+```
+
+```{r, include=FALSE}
+rm(t5, p5, missing_data)
+```
+
+
+By inspecting the plot, it is possible to notice that: 
+
+\begin{itemize}
+  \item Numeric Variables:
+    \begin{itemize}
+      \item The majority of variables with missing values are in 'numeric' format.
+      \item Most of these belong to the "review-related" variables.
+      \item Other numeric variables containing missing values include 'bathroom,' 'bedrooms,' 'beds,' and more.
+    \end{itemize}
+  \item Date Variables:
+    \begin{itemize}
+      \item Three variables are in 'date' format: 'last\_review,' 'first\_review,' and 'host\_since.'
+    \end{itemize}
+  \item Categorical Variables:
+    \begin{itemize}
+      \item Two variables are in 'factor' format: 'host\_acceptance\_rate\_percentage' and 'host\_response\_time\_percentage.'
+    \end{itemize}
+\end{itemize} 
+
+
+
+
+\textbf{Managing Missing Values:} Initially, an attempt was made to impute the median and the mean (of the respective variables) for all missing values within the 'numeric' and 'date' variables. However, this imputation approach led to a notable decline in the regression model's performance.
+
+Therefore, as a final decision, the choice was made to eliminate all observations containing missing data from the dataset, since the number of observations remained in the dataset was sufficient. 
+
+The following code shows how to remove those observations from the dataset:
+```{r}
+raw_data <- na.omit(raw_data)
+cat('Now, there are', sum(!complete.cases(raw_data)), 'rows with NAs in the dataset')
+```
+
 
 
 
