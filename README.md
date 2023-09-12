@@ -17,13 +17,6 @@
 * __Exploratory Data Analysis__: How can we use exploratory data analysis to help Airbnb hosts understand the critical factors that influence the price of their listings?
 
 
-# Preliminary Project Objectives
-<span style="font-size: 18px"> __GOALS__ </span>:
-
-* __Regression Model__: Model, train and evaluate an __XGBoost Regression Model__ that will enables hosts to set the optimal rental prices for their listings, taking into account almost all the variables present in the dataset, as well as some additional variables created in the next section of the project for the purpose of strengthen the potential of the model.
-* __Exploratory Data Analysis__: Utilize the insights offered by our regression model, along with insights provided by other data analysis techniques such as correlograms, features-importance plots, and scatterplots, to help hosts comprehend __the critical factors that influence the price of their listings__.
-
-
 ---
 ---
 ---
