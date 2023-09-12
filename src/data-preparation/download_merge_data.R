@@ -98,8 +98,6 @@ save_if_not_exists(merged_data, "../../data/dataset1/dataset1.R")
 
 rm(dataset_names, name)
 
-#jfdklav/jdf/
-
 
 ###############################################################
 #############       DELETING ZIP FILES           ##############
