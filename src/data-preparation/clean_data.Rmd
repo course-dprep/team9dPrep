@@ -65,17 +65,12 @@ knitr::opts_chunk$set(tidy = FALSE,
 #GENERAL PACKAGES:
 library(tidyverse) #A "Package of Packages" for Data manipulation and visualization (includes magrittr, lubridate, purrr, tidyr, etc.).
 library(dplyr) #Data frame manipulations (select, slice, etc.
-library(kableExtra) #Building fancy tables.
-library(knitr)
 library(jsonlite) #For Amenities Columns Creation
 
 #PLOT PACKAGES:
 library(ggplot2) #Building fancy plots.
-library(ggcorrplot) #Building fancy Correlograms.
 library(ggthemes) #Themes for ggplots (e.g. "solarized").
 library(scales) #Scaling and formatting ggplots (e.g. scale_fill_gradient()).
-library(leaflet) #Building interactive Map
-library(ggExtra) #Building "marginal" plots
 library(gt) #Latex tables
 ```
 
@@ -675,7 +670,7 @@ t5
 ```{r, include=FALSE}
 p5 <- ggplot(data = missing_data, aes(x = variable, y = missing_values, fill = missing_values)) +
   geom_bar(stat = "identity") +
-  scale_fill_gradient(low = "#FEFBBD", high = "darkblue") +
+  scale_fill_gradient(low = "#FEFBBD", high = "darkgreen") +
   geom_label(aes(label = missing_values), fill = "#666666", col = "white", size = 3) +
   labs(title = "Number of Missing Values per Variable",
        subtitle = "Data collected from Listings dataset",
@@ -734,6 +729,147 @@ raw_data <- na.omit(raw_data)
 cat('Now, there are', sum(!complete.cases(raw_data)), 'rows with NAs in the dataset')
 ```
 
+
+\section{Managing Factor Variables}
+The purpose of this section is to explore and manage the variables in factor format present in the dataset.
+
+\subsection{Property\_Type}
+As indicated in the table below, the variable texttt{property\_type} exhibits some levels with a notably low frequency of observations.
+(We have selected and displayed only 10 random levels as an example, recognizing that the \texttt{property\_type} variable comprises more than 25 levels with fewer than four observations each.)
+```{r, include=FALSE}
+grouped_data <- raw_data %>%
+  dplyr::group_by(property_type) %>%
+  summarise(count=n())%>%
+  arrange(count)%>%
+  filter(count <= 4)
+
+t6 <- head(grouped_data, 10) %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Table of Grouped Data",
+    subtitle = "Count by Property Type (<= 4 Occurrences)",
+  )
+```
+
+```{r}
+t6
+```
+
+To optimize the computational efficiency of our regression model in predicting listing prices, the decision was made to eliminate \texttt{property\_type} levels containing fewer than four observations. 
+
+The following is the code used to accomplish the aformentioned task.
+```{r}
+levels_to_remove <- grouped_data %>%
+  pull(property_type)
+
+raw_data <- anti_join(raw_data, data.frame(property_type = levels_to_remove), by = "property_type")
+
+levels_to_drop <- levels(raw_data$property_type)[table(raw_data$property_type) == 0]
+
+raw_data$property_type <- droplevels(raw_data$property_type, levels_to_drop)
+
+
+```
+
+```{r, include=FALSE}
+rm(grouped_data, levels_to_drop, levels_to_remove, t6)
+```
+
+
+
+\subsection{Neighbourhood\_cleansed}
+In a manner similar to the previous step, the table below illustrates that the \texttt{neighbourhood\_cleansed} variable exhibits several levels with a notably low frequency of observations. (We have selected and displayed only 10 random levels as an example, recognizing that the \texttt{neighbourhood\_cleansed} variable comprises more than 250 levels with fewer than four observations each.)
+```{r}
+grouped_data <- raw_data %>% 
+  dplyr::group_by(neighbourhood_cleansed) %>% 
+  dplyr::summarize(count = n()) %>%
+  dplyr::arrange(count) %>%
+  dplyr::filter(count <= 4)
+
+t7 <- head(grouped_data, 10) %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Table of Grouped Data",
+    subtitle = "Count by Property Type (<= 4 Occurrences)",
+  )
+```
+
+```{r}
+t7
+```
+
+Therefore, as done before for the texttt{property\_type} variable, in order to reduce the computational time required by our regression model to predict listings prices, we decided to remove the \texttt{neighbourhood\_cleansed} levels with less than 4 observations. 
+
+```{r}
+levels_to_remove <- grouped_data %>%
+  pull(neighbourhood_cleansed)
+
+raw_data <- anti_join(raw_data, data.frame(neighbourhood_cleansed = levels_to_remove), by = "neighbourhood_cleansed")
+
+levels_to_drop <- levels(raw_data$neighbourhood_cleansed)[table(raw_data$neighbourhood_cleansed) == 0]
+
+raw_data$neighbourhood_cleansed <- droplevels(raw_data$neighbourhood_cleansed, levels_to_drop)
+
+```
+
+```{r, include=FALSE}
+rm(levels_to_remove, grouped_data, levels_to_drop, t7)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r, include=FALSE}
+#Save merged dataset
+save_if_not_exists <- function(data, file_path) {
+  if (!file.exists(file_path)) {
+    save(data, file = file_path)
+    cat("File saved successfully:", file_path, "\n")
+  } else {
+    cat("File already exists:", file_path, "\n")
+  }
+}
+
+save_if_not_exists(raw_data, "../../gen/data-preparation/output/cleaned_data.R")
+
+```
 
 
 
