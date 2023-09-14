@@ -464,7 +464,7 @@ The decision to replace "N/A" with "0%" was founded on the realization that thes
 raw_data <- raw_data %>%
   mutate_at(vars(host_response_rate, host_acceptance_rate), ~gsub("N/A", "0%", .)) %>%
   mutate_at(vars(host_response_rate, host_acceptance_rate), ~as.numeric(gsub("%", "", .))) %>%
-  rename(host_response_time_percentage = host_response_rate, host_acceptance_rate_percentage = host_acceptance_rate)
+  rename(host_response_rate_percentage = host_response_rate, host_acceptance_rate_percentage = host_acceptance_rate)
 ```
 
 \textbf{Numeric Variables 2:} The processing of the bathrooms_text variable encompassed multiple steps. Initially, extraneous text was eliminated, retaining only the actual number of bathrooms. Subsequently, the column underwent a conversion to a numeric format. Finally, the variable name was changed to "bathroom."
@@ -723,8 +723,126 @@ cat('Now, there are', sum(!complete.cases(raw_data)), 'rows with NAs in the data
 \section{Managing Factor Variables}
 The purpose of this section is to explore and manage the variables in factor format present in the dataset.
 
+\subsection{Preliminary Step}
+The initial procedural step involves the application of the \texttt{droplevels} function to factor variables within the dataset. As missing value-containing observations have been previously removed, there is a possibility that certain factor variables may now contain vacant levels, which should be eliminated as well. The subsequent code demonstrates this process, initially identifying all factor variables within the dataset, and subsequently, applying the \texttt{droplevels} function to each of them by using the \texttt{lapply} function.
+
+```{r}
+# Identify factor variables in the dataset
+factor_vars <- sapply(raw_data, is.factor)
+
+# Apply droplevels to all factor variables
+raw_data[factor_vars] <- lapply(raw_data[factor_vars], droplevels)
+```
+
+```{r, include=FALSE}
+rm(factor_vars)
+```
+
+
+\subsection{Host\_response\_time}
+In the context of the variable \texttt{host\_response\_time}, despite the previous removal of all observations with missing values within the dataset, it's noteworthy that there are still 15276 observations containing a value equal to \texttt{N\/A}.
+
+```{r}
+# Count the number of observations for each level of the "host_response_time" variable
+table(raw_data$host_response_time)
+```
+
+This code is used to filter and remove observations that contain a value equal \texttt{N\/A} in the \texttt{host\_response\_time} variable, effectively cleaning the dataset from these particular instances.
+
+```{r}
+# Remove observations with "empty strings"N/A" in the "host_response_time" variable
+raw_data <- raw_data %>%
+  filter(host_response_time != "N/A")
+```
+
+Finally, the "N/A" level from the \texttt{host\_response\_time} variable is removed to ensure that it no longer appears in the levels of the factor variable, making the dataset more concise and accurate.
+```{r}
+# Remove the "empty cell" level from the host_is_superhost variable
+raw_data$host_response_time <- droplevels(raw_data$host_response_time)
+```
+
+It is possible to notice that the \texttt{host\_response\_time} variable has now only four levels. 
+```{r}
+# Count the number of observations for each level of the "host_is_superhost" variable
+table(raw_data$host_response_time)
+```
+
+\subsection{Host\_is\_superhost}
+Similarly as before, in the context of the variable \texttt{host\_is\_superhost}, despite the previous removal of all observations with missing values within the dataset, it's noteworthy that there are still 4724 empty cells. This happens because the consideration of empty cells (empty strings) as missing values varies based on the data setup in R. Typically, R treats missing values as NA or NULL, while empty strings are regarded as valid data, not missing. Consequently, empty strings within your dataset are not automatically categorized as missing values.
+
+It is possible to verify this by using the following code, which counts the number of observations for each level of the "host_is_superhost" variable.
+
+```{r}
+# Count the number of observations for each level of the "host_is_superhost" variable
+table(raw_data$host_is_superhost)
+```
+
+This code is used to filter and remove observations that contain empty strings in the \texttt{host\_is\_superhost}  variable. By executing this code, we eliminate rows where the \texttt{host\_is\_superhost}  value is an empty string, effectively cleaning the dataset from these particular instances.
+
+```{r}
+# Remove observations with empty strings in the "host_is_superhost" variable
+raw_data <- raw_data %>%
+  filter(host_is_superhost != "")
+```
+
+Finally, the "empty cell" level from the \texttt{host\_is\_superhost} variable was removed to ensure that it no longer appears in the levels of the factor variable, making the dataset more concise and accurate.
+```{r}
+# Remove the "empty cell" level from the host_is_superhost variable
+raw_data$host_is_superhost <- droplevels(raw_data$host_is_superhost)
+```
+
+It is possible to notice that the \texttt{host\_is\_superhost} variable has now only two levels. 
+```{r}
+# Count the number of observations for each level of the "host_is_superhost" variable
+table(raw_data$host_is_superhost)
+```
+
+
+
+
+
+
+
+\subsection{Host\_verifications}
+Initially, the \texttt{host\_verifications}  variable held values containing square brackets and apostrophes, potentially hindering subsequent analysis. Utilizing the \texttt{gsub} function, those special characters were eliminated from the variable's values. Furthermore, it's worth noting that the use of \texttt{gsub} automatically transformed the variable into a \texttt{character} format, necessitating a subsequent conversion back to \texttt{factor}.
+
+```{r}
+# Remove all characters except for letters and words from the host_verifications variable
+raw_data$host_verifications <- gsub("[^a-zA-Z ]", "", raw_data$host_verifications)
+
+# Convert host_verifications to factor
+raw_data$host_verifications <- as.factor(raw_data$host_verifications)
+```
+
+As before, regarding the variable \texttt{host\_verifications}, despite the previous removal of all observations with missing values within the dataset, it's noteworthy that there are still 25 empty cells.
+```{r}
+# Count the number of observations for each level of the "host_is_superhost" variable
+table(raw_data$host_verifications)
+```
+
+This code is used to filter and remove observations that contain empty strings in the \texttt{host\_verifications} variable. By executing this code, we eliminate rows where the \texttt{host\_verifications} value is an empty string, effectively cleaning the dataset from these particular instances.
+
+```{r}
+# Remove observations with empty strings in the "host_is_superhost" variable
+raw_data <- raw_data %>%
+  filter(host_verifications != "")
+```
+
+Finally, the "empty cell" level from the \texttt{host\_verifications} variable was removed to ensure that it no longer appears in the levels of the factor variable, making the dataset more concise and accurate.
+```{r}
+# Remove the "empty cell" level from the host_is_superhost variable
+raw_data$host_verifications <- droplevels(raw_data$host_verifications)
+```
+
+It is possible to notice that the \texttt{host\_is\_superhost} variable has now only two levels. 
+```{r}
+# Count the number of observations for each level of the "host_is_superhost" variable
+table(raw_data$host_verifications)
+```
+
+
 \subsection{Property\_Type}
-As indicated in the table below, the variable texttt{property\_type} exhibits some levels with a notably low frequency of observations.
+As indicated in the table below, the variable \texttt{property\_type} exhibits some levels with a notably low frequency of observations.
 (We have selected and displayed only 10 random levels as an example, recognizing that the \texttt{property\_type} variable comprises more than 25 levels with fewer than four observations each.)
 ```{r, include=FALSE}
 grouped_data <- raw_data %>%
@@ -761,8 +879,6 @@ raw_data <- anti_join(raw_data, data.frame(property_type = levels_to_remove), by
 levels_to_drop <- levels(raw_data$property_type)[table(raw_data$property_type) == 0]
 
 raw_data$property_type <- droplevels(raw_data$property_type, levels_to_drop)
-
-
 ```
 
 ```{r, include=FALSE}
@@ -807,16 +923,11 @@ raw_data <- anti_join(raw_data, data.frame(neighbourhood_cleansed = levels_to_re
 levels_to_drop <- levels(raw_data$neighbourhood_cleansed)[table(raw_data$neighbourhood_cleansed) == 0]
 
 raw_data$neighbourhood_cleansed <- droplevels(raw_data$neighbourhood_cleansed, levels_to_drop)
-
 ```
 
 ```{r, include=FALSE}
 rm(levels_to_remove, grouped_data, levels_to_drop, t7)
 ```
-
-
-
-
 
 
 
