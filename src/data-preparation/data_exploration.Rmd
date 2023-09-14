@@ -1,0 +1,251 @@
+---
+title: "Data Exploration"
+subtitle: "SKILLS: Data Preparation and Workflow Management - Group 9"
+author:
+  - "Rabino Tommaso"
+  - "Franceschini Emanuele"
+  - "Magalotti Bianca"
+  - "Tan Colin"
+  - "Benmrit Akram"
+date: "\\textit{20 October 2024}"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    fig_caption: true
+header-includes:
+  - "\\usepackage[english]{babel}"  # Language
+  - "\\usepackage[T1]{fontenc}"  # Font encoding
+  - "\\usepackage{mathptmx}"  # Times New Roman font for text
+  - "\\usepackage{helvet}"  # Arial-like font for sans-serif
+  - "\\usepackage{setspace}"  # Line spacing
+  - "\\onehalfspacing"  # 1.5 line spacing
+  - "\\usepackage{fancyhdr}"  # Header and footer customization
+  - "\\usepackage{titlesec}"  # Section titles formatting
+  - "\\usepackage{abstract}"  # Abstract formatting
+  - "\\usepackage{caption}"  # Captions customization
+  - "\\usepackage{graphicx}"  # Graphics
+  - "\\usepackage{amsmath}"  # Math equations
+  - "\\usepackage{amssymb}"  # Math symbols
+  - "\\usepackage{natbib}"  # Citation style (change as needed)
+  - "\\bibliographystyle{apalike}"  # Bibliography style (change as needed)
+  - "\\usepackage{hyperref}"  # Hyperlinks and URLs
+  - "\\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}"
+  - "\\usepackage{appendix}"  # Appendix formatting
+  - "\\usepackage{enumerate}"  # Enumerate environment
+  - "\\pagestyle{fancy}"  # Custom page style
+  - "\\fancyhf{}"
+  - "\\renewcommand{\\headrulewidth}{0pt}"
+  - "\\renewcommand{\\footrulewidth}{0pt}"
+  - "\\fancyhead[R]{\\thepage}"  # Page number in the header
+  - "\\fancypagestyle{plain}{\\fancyhf{}\\renewcommand{\\headrulewidth}{0pt}}"
+  - "\\lhead{\\small{A.A. 2023/2024-Courses: SKILLS: Data Preparation and Workflow Management}}"
+  - "\\usepackage{multicol}"  # For two columns
+geometry: "left=2.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm"  # Adjust margins
+---
+
+
+\section{Correlation Analysis}
+This section is structured as follows:
+
+\begin{enumerate}
+  \item Correlation Analysis of Apartment-related Variables: In this step, a correlogram is generated to examine the correlations between \textit{numeric}, \textit{apartment-related} variables and the price of the listings.
+  \item Correlation Analysis of Host-related Variables: Subsequently, a correlogram is constructed to assess the correlations between \textit{numeric}, \textit{host-related} variables and the price of the listings.
+  \item Correlation Analysis of All Numeric Variables: Lastly, a correlogram is produced, including all numeric variables (\textit{apartment-related} and \textit{host-related}), to identify variables with high mutual correlations. Identifying such variables is essential to mitigate multicollinearity issues in the final regression model.
+\end{enumerate}
+
+
+\subsection{Apartment-related Variables}
+First, the \textit{numeric} variables we considered as \textit{apartment-related} were the following: 
+```{r, include=FALSE}
+corr_data <- raw_data %>% 
+  dplyr::select(price, host_response_rate_percentage, host_acceptance_rate_percentage, host_listings_count, host_total_listings_count, latitude, longitude, accommodates, bedrooms, beds, bathrooms, minimum_nights, maximum_nights, availability_30, availability_60, availability_90, availability_365, number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d, reviews_per_month, review_scores_rating, review_scores_accuracy, review_scores_cleanliness, review_scores_location, review_scores_value)
+
+# Create a gt table for the apartment-related variables
+t8 <- head(corr_data, 10) %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Table of Apartment-related Variables",
+    subtitle = "First 10 Rows of Correlation Data",
+  )
+```
+
+```{r}
+t8
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+From the correlogram below, it is possible to notice that the __variables with the higher correlation with listings' prices__ are, in order: accommodates, bedrooms, availability-related variables, and beds. 
+
+As expected, __the bigger the apartment, the higher the price__ (as can be noticed from the strong positive correlation between price and accommodates, bedrooms, and beds). 
+
+As expected, __the higher the price, the higher the availability__. Apartments with higher prices are less likely to be booked (as can be noticed from the strong positive correlation between price and availability variables). 
+
+Moreover, it is also interesting to notice that __most of the "review_scores" variables__ (except for review_scores_location) __are negatively associated with the listings prices__. 
+
+We will investigate further these associations in the next section. 
+
+```{r}
+corr_matrix <- round(cor(corr_data),2)
+
+ggcorrplot(corr_matrix,
+           hc.order = FALSE,
+           method="square",
+           type = "lower",
+           outline.col = "white",
+           colors = c("#FEFBBD","white", "#AC001E"),
+           lab = TRUE, 
+           lab_size = 2.5,
+           digits = 2,
+           tl.cex = 8,
+           title="Apartment-related Correlogram",
+           ggtheme=theme_solarized(light = TRUE)) +
+  theme(legend.position = "none", 
+        plot.title = element_text(lineheight=2, face="bold", vjust=1, hjust=0.5, colour = "#AC001E"),
+        plot.subtitle = element_text(colour = "#AC001E", vjust=1, hjust=0.5),
+        axis.title = element_text(colour = "#AC001E"), axis.text=element_text(colour = "#666666"))
+
+rm(corr_data, corr_matrix)
+```
+
+
+### CORRELOGRAM HOST-RELATED VARIABLES {.unnumbered .unlisted}
+First of all, we wanted to include in the correlation matrix also some 'date' variables. Therefore, we extracted the day from the 'last_scraped' variable (since month and year were, for all observations, equal to 09 and 2022 and, therefore, the days were the most significant element of this date variable) and the year from the host_since' variable. Then, we converted these two new variables into numeric. 
+
+Then, we have selected some other host-related variables and so the final __variables we considered as host-related__ were the following: 
+```{r}
+corr_data <- raw_data %>% 
+  mutate(last_scraped_day = as.numeric(day(last_scraped)),
+         host_since_year = as.numeric(year(host_since)))
+ 
+corr_data <- corr_data %>% 
+  dplyr::select(price, last_scraped_day, host_since_year, host_response_rate, host_acceptance_rate, host_listings_count, review_scores_checkin, review_scores_communication)
+
+corr_data <- corr_data %>% drop_na()
+  
+head(corr_data, 5)%>%
+  kbl(align = "c") %>%
+  kable_paper("hover", full_width = F)
+```
+
+From the correlogram below, it is possible to notice that the __variables with the higher__ (positive or negative) __correlation with listings' prices__ are, in order: last_scraped_day, host_listings_count and host_acceptance_rate.
+
+As before, it is also interesting to notice that both the __'check-in' score__ (i.e. 'review_scores_checkin') and the the __'communication' score__ (i.e. 'review_scores_communication') __were negatively correlated with the price__.
+
+
+```{r}
+corr_matrix <- round(cor(corr_data),2)
+
+ggcorrplot(corr_matrix,
+           hc.order = FALSE,
+           method="square",
+           type = "lower",
+           outline.col = "white",
+           colors = c("#FEFBBD","white", "#AC001E"),
+           lab = TRUE, 
+           lab_size = 2.5,
+           digits = 2,
+           tl.cex = 8,
+           title="Host-related Correlogram",
+           ggtheme=theme_solarized(light = TRUE)) +
+  theme(legend.position = "none", 
+        plot.title = element_text(lineheight=2, face="bold", vjust=1, hjust=0.5, colour = "#AC001E"),
+        plot.subtitle = element_text(colour = "#AC001E", vjust=1, hjust=0.5),
+        axis.title = element_text(colour = "#AC001E"), axis.text=element_text(colour = "#666666"))
+
+rm(corr_data, corr_matrix)
+```
+
+
+
+## - NUMERIC VARIABLES CORRELATIONS - PART 2
+With the following scripts, we built a correlation matrix using only the 'true' numeric variables in the dataset. As can be noticed from the matrix, __there are some variables that are highly correlated with each other__.
+
+We did this in order to then __remove from our dataset all those variables__ with a high degree of mutual correlation, __to avoid multicollinearity problems__.
+
+In particular, the numeric variables in the dataset were:
+
+```{r}
+numeric_df <- raw_data %>% dplyr::select_if(is.numeric)
+
+corr_matrix <- round(cor(numeric_df),2)
+  
+head(numeric_df, 5)%>%
+  kbl(align = "c") %>%
+  kable_paper("hover", full_width = F)
+```
+
+As can be seen from the correlogram below, the variables with a reciprocal correlation higher than 0.8 were:
+
+* __Availability_30__ and __availability_90__ (0.80).
+* In general, all the __review_scores variables__ were highly correlated with each other.
+
+```{r}
+ggcorrplot(corr_matrix,
+           hc.order = FALSE,
+           method="square",
+           type = "lower",
+           outline.col = "white",
+           colors = c("#FEFBBD","white", "#AC001E"),
+           lab = TRUE, 
+           lab_size = 2.5,
+           digits = 2,
+           tl.cex = 8,
+           title="Numeric Variables Correlogram",
+           ggtheme=theme_solarized(light = TRUE)) +
+  theme(legend.position = "none", 
+        plot.title = element_text(lineheight=2, face="bold", vjust=1, hjust=0.5, colour = "#AC001E"),
+        plot.subtitle = element_text(colour = "#AC001E", vjust=1, hjust=0.5),
+        axis.title = element_text(colour = "#AC001E"), axis.text=element_text(colour = "#666666"))
+
+rm(corr_matrix, numeric_df)
+```
+
+
+
+## - DROPPING MOST CORRELATED NUMERIC VARIABLES
+It is useful to drop highly correlated predictor variables when building a regression model for several reasons:
+
+* <span style="color: #D4AF37;">__Reducing Multicollinearity__</span>: When two or more predictor variables are highly correlated with each other, they provide __redundant information__ to the model. This multicollinearity can cause problems in estimating the regression coefficients, as it becomes __difficult to distinguish the independent effects of each variable__. Dropping one of the highly correlated variables can help to reduce this problem of multicollinearity.
+* <span style="color: #D4AF37;">__Improving Model Interpretability__</span>: A model with fewer predictors is __easier to interpret__ and explain. Dropping highly correlated predictors can help to simplify the model and make it easier to explain to others.
+* <span style="color: #D4AF37;">__Avoiding Overfitting__</span>: A model with too many predictors can lead to overfitting, where the model is too closely fitted to the training data and may __not generalize well to new data__. Dropping highly correlated predictors can help to reduce the number of predictors in the model, which in turn can help to avoid overfitting.
+
+Therefore, we decided to:
+
+* <span style="color: #D4AF37;">__Remove availability_90__</span>: Since, compared to "availability_30", it was less correlated with the price of listings (0.26 vs. 0.30).
+* <span style="color: #D4AF37;">__Remove review_scores_accuracy, review_scores_rating, and review_scores_cleanliness__</span>: Since they were the 'review_scores" variables with the highest reciprocal correlation and with the lowest correlation with the price of listings.
+
+```{r}
+raw_data <- raw_data %>% dplyr::select(-availability_90, -review_scores_accuracy, -review_scores_rating,
+                                       -review_scores_cleanliness)
+```
+
+
+
+
+
+
+
+
