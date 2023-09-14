@@ -124,11 +124,11 @@ In the following code section, we perform data merging and saving tasks to prepa
 dataset_names <- c("data_listings_milan", "data_listings_bergamo", "data_listings_bologna", "data_listings_florence", "data_listings_naples", "data_listings_puglia", "data_listings_rome", "data_listings_sicily", "data_listings_trentino")
 
 # Initialize the merged dataset with the first dataset
-merged_data <- get(dataset_names[1])
+data <- get(dataset_names[1])
 
 # Loop through the remaining datasets and merge them
 for (name in dataset_names[-1]) {
-  merged_data <- rbind(merged_data, get(name))
+  data <- rbind(data, get(name))
 }
 
 # Deleting "source" datasets
@@ -136,17 +136,9 @@ for (name in dataset_names) {
   rm(list = name)
 }
 
-#Save merged dataset
-save_if_not_exists <- function(data, file_path) {
-  if (!file.exists(file_path)) {
-    save(data, file = file_path)
-    cat("File saved successfully:", file_path, "\n")
-  } else {
-    cat("File already exists:", file_path, "\n")
-  }
-}
+# Save the data as a CSV file
+write.csv(data, file = "../../gen/data-preparation/input/data.csv", fileEncoding = "UTF-8",row.names=FALSE )
 
-save_if_not_exists(data, "../../data/dataset1/dataset1.R")
 ```
 
 ```{r, include=FALSE}
