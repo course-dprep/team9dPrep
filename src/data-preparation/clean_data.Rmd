@@ -912,7 +912,7 @@ t7 <- head(grouped_data, 10) %>%
 t7
 ```
 
-Therefore, as done before for the texttt{property\_type} variable, in order to reduce the computational time required by our regression model to predict listings prices, we decided to remove the \texttt{neighbourhood\_cleansed} levels with less than 4 observations. 
+Therefore, as done before for the \texttt{property\_type} variable, in order to reduce the computational time required by our regression model to predict listings prices, it was decided to remove the \texttt{neighbourhood\_cleansed} levels with less than 4 observations. 
 
 ```{r}
 levels_to_remove <- grouped_data %>%
@@ -931,8 +931,11 @@ rm(levels_to_remove, grouped_data, levels_to_drop, t7)
 
 
 
-
-
+Finally, the dataset is saved for future use.
+```{r}
+# Save the data as a CSV file
+write.csv(raw_data, file = "../../gen/data-preparation/input/data.csv", fileEncoding = "UTF-8",row.names=FALSE )
+```
 
 
 
