@@ -108,7 +108,7 @@ In this document, the data manipulation procedures applied to the original datas
 Code for showing the number of columns that contains only missing values:
 
 ```{r}
-cols_to_remove <- sapply(merged_data, function(x) all(is.na(x)))
+cols_to_remove <- sapply(data, function(x) all(is.na(x)))
 indices <- which(unlist(cols_to_remove))
 names_list <- names(cols_to_remove)[indices]
 cat('There are only', length(names_list), 'columns with only missing values')
@@ -121,7 +121,7 @@ cat('Names of columns with only missing values:', names_list)
 
 Code for removing columns with only missing values: 
 ```{r}
-raw_data <- merged_data %>%
+raw_data <- data %>%
   select(-which(cols_to_remove))
 ```
 
