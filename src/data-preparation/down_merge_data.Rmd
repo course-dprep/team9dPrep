@@ -59,7 +59,8 @@ The purpose of this code is to automate the download and extraction of \textit{A
 \begin{itemize}
   \item The url variable is a vector that contains URLs pointing to ZIP files hosted online. Each URL corresponds to Airbnb listing data for a specific city or region in Italy.
   \item The names variable is another vector that provides user-defined names for each URL. These names will be used to label the downloaded data frames, making them easier to work with.
-  \item The data_dir variable specifies the target directory where the ZIP files will be downloaded and extracted.
+  \item The data\_dir variable specifies the target directory where the ZIP files will be downloaded and extracted.
+\end{itemize}
 
 ```{r}
 # URLs for downloading ZIP files
@@ -82,7 +83,7 @@ names <- c("listings_bergamo","listings_bologna", "listings_florence", "listings
 data_dir <- "../../data/"
 ```
 
-\textbf{Download and Extarction: }
+\textbf{Download and Extraction: }
 In the following code block, we have implemented an automated process to download and extract data from various Airbnb listings datasets for Italian cities. The code loops through the previously created vector of URLs, checks if the corresponding CSV file already exists locally, and either downloads the file or skips the download if it already exists. After downloading, it extracts and loads the data into separate datasets, making them ready for further analysis.
 
 ```{r}
