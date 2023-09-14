@@ -126,7 +126,7 @@ raw_data <- data %>%
 ```
 
 ```{r, include=FALSE}
-rm(merged_data)
+rm(data)
 ```
 
 As can be seen from the output below, once `calendar_updated` and `bathroom` have been removed, there are no other columns containing only NAs. 

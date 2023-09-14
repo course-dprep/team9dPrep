@@ -146,7 +146,7 @@ save_if_not_exists <- function(data, file_path) {
   }
 }
 
-save_if_not_exists(merged_data, "../../data/dataset1/dataset1.R")
+save_if_not_exists(data, "../../data/dataset1/dataset1.R")
 ```
 
 ```{r, include=FALSE}
