@@ -846,20 +846,6 @@ rm(levels_to_remove, grouped_data, levels_to_drop, t7)
 
 
 
-```{r, include=FALSE}
-#Save merged dataset
-save_if_not_exists <- function(data, file_path) {
-  if (!file.exists(file_path)) {
-    save(data, file = file_path)
-    cat("File saved successfully:", file_path, "\n")
-  } else {
-    cat("File already exists:", file_path, "\n")
-  }
-}
-
-save_if_not_exists(raw_data, "../../gen/data-preparation/output/cleaned_data.R")
-
-```
 
 
 

@@ -142,7 +142,7 @@ write.csv(data, file = "../../gen/data-preparation/input/data.csv", fileEncoding
 ```
 
 ```{r, include=FALSE}
-rm(dataset_names, name)
+rm(dataset_names, name, data)
 ```
 
 
