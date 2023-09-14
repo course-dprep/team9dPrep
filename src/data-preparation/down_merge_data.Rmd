@@ -1,5 +1,5 @@
 ---
-title: "Download and merging data"
+title: "Download and Merge Data"
 subtitle: "SKILLS: Data Preparation and Workflow Management - Group 9"
 author:
   - "Rabino Tommaso"
@@ -46,8 +46,20 @@ header-includes:
 geometry: "left=2.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm"  # Adjust margins
 ---
 
+```{r, include=FALSE}
+#Load Required Packages
+rm(list=ls())
+library(readr)
+```
 
+\section{Download Dataset}
+The purpose of this code is to automate the download and extraction of \textit{Airbnb} listing data from all available datasets for Italian cities on Airbnb.
 
+\textbf{Preliminary Settings: } Before actually download the datasets, we need to accomplish some preliminary steps:
+\begin{itemize}
+  \item The url variable is a vector that contains URLs pointing to ZIP files hosted online. Each URL corresponds to Airbnb listing data for a specific city or region in Italy.
+  \item The names variable is another vector that provides user-defined names for each URL. These names will be used to label the downloaded data frames, making them easier to work with.
+  \item The data_dir variable specifies the target directory where the ZIP files will be downloaded and extracted.
 
 ```{r}
 # URLs for downloading ZIP files
@@ -68,15 +80,46 @@ names <- c("listings_bergamo","listings_bologna", "listings_florence", "listings
 
 # Define the target directory for extraction
 data_dir <- "../../data/"
+```
 
+\textbf{Download and Extarction: }
+In the following code block, we have implemented an automated process to download and extract data from various Airbnb listings datasets for Italian cities. The code loops through the previously created vector of URLs, checks if the corresponding CSV file already exists locally, and either downloads the file or skips the download if it already exists. After downloading, it extracts and loads the data into separate datasets, making them ready for further analysis.
+
+```{r}
+#Avoid too long downloads to be shut down
+options(timeout = max(1000, getOption("timeout")))
+
+# Loop through the URLs and extract/load the CSV files into separate datasets
+for (i in 1:length(url)) {
+  target_file <- paste0(data_dir, names[i], ".csv.gz")
+
+  # Check if the CSV file already exists
+  if (!file.exists(target_file)) {
+    download.file(url[i], target_file, mode = "wb")
+  } else {
+    print(paste("ZIP file", names[i], "already exists. Skipping download."))
+  }
+
+  # Extract and load the CSV file
+  gz_file <- gzfile(target_file, "rt")
+  dataset_name <- paste("data_", names[i], sep = "")  # Create a unique dataset name
+  assign(dataset_name, read.csv(gz_file))  # Load data into the dataset_name
+  close(gz_file)  # Close the GZ file
+  print(paste("Loaded", names[i]))
+}
+```
+
+```{r, include=FALSE}
+rm(url, target_file, names, i, gz_file, dataset_name)
 ```
 
 
-\section{MERGING DATASETS}
+
+\section{Merge Dataset}
+In the following code section, we perform data merging and saving tasks to prepare the Airbnb listings dataset for our analysis. The code combines multiple datasets corresponding to different Italian cities into a single merged dataset. It also handles the removal of the source datasets to free up memory space. Finally, the merged dataset is saved for future use.
 
 ```{r}
 # List of dataset names
-##
 dataset_names <- c("data_listings_milan", "data_listings_bergamo", "data_listings_bologna", "data_listings_florence", "data_listings_naples", "data_listings_puglia", "data_listings_rome", "data_listings_sicily", "data_listings_trentino")
 
 # Initialize the merged dataset with the first dataset
@@ -92,7 +135,6 @@ for (name in dataset_names) {
   rm(list = name)
 }
 
-
 #Save merged dataset
 save_if_not_exists <- function(data, file_path) {
   if (!file.exists(file_path)) {
@@ -104,7 +146,38 @@ save_if_not_exists <- function(data, file_path) {
 }
 
 save_if_not_exists(merged_data, "../../data/dataset1/dataset1.R")
+```
 
-
+```{r, include=FALSE}
 rm(dataset_names, name)
 ```
+
+
+
+\section{Delete Source ZIP Files}
+In this section, we address the cleanup process by removing the source ZIP files that were downloaded earlier. These ZIP files contained individual Airbnb listings data for various Italian cities. Once the datasets have been merged and the relevant data extracted, these ZIP files are no longer needed and can be safely deleted to free up storage space. The code below iterates through the list of ZIP file names and deletes them if they exist. This step ensures that we maintain an organized and clutter-free working environment.
+
+```{r}
+# List of ZIP file names
+zip_file_names <- c("listings_milan.csv.gz", "listings_bergamo.csv.gz", "listings_bologna.csv.gz", "listings_florence.csv.gz", "listings_naples.csv.gz", "listings_puglia.csv.gz", "listings_rome.csv.gz", "listings_sicily.csv.gz", "listings_trentino.csv.gz")
+
+# Loop through the ZIP file names and delete them
+for (zip_name in zip_file_names) {
+  zip_path <- file.path(data_dir, zip_name)
+  if (file.exists(zip_path)) {
+    file.remove(zip_path)
+    print(paste("Deleted", zip_name))
+  } else {
+    print(paste("ZIP file", zip_name, "does not exist. Skipping deletion."))
+  }
+}
+```
+
+```{r, include=FALSE}
+rm(data_dir, zip_file_names, zip_name, zip_path)
+```
+
+
+
+
+
