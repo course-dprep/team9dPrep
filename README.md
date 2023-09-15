@@ -1,5 +1,6 @@
 # Predict Italian Airbnb Listings Prices
-![image]([https://user-images.githubusercontent.com/109277196/194825057-e42f7bf1-74fb-40be-ab0a-332552b59e9a.png](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.numeroassistenza.it%2Fonline%2Fairbnb-contatti&psig=AOvVaw0j0Kj8-pUI7jk5wVAYUTIl&ust=1694848849617000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqGAoTCPCjz4-KrIEDFQAAAAAdAAAAABCcAQ))
+![GitHub Logo](https://github.com/yourusername/yourrepository/blob/main/images/logo.png)
+
 
 ---
 
