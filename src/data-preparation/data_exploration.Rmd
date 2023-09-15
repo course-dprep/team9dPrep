@@ -46,6 +46,40 @@ header-includes:
 geometry: "left=2.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm"  # Adjust margins
 ---
 
+```{r, include=FALSE}
+knitr::opts_chunk$set(tidy = FALSE,
+                      size = "small",
+                      out.width = "100%",
+                      message = FALSE,
+                      warning = FALSE,
+                      error = FALSE)
+```
+
+
+```{r, include = FALSE}
+###############################################################
+#############             PACKAGES               ##############
+###############################################################
+#GENERAL PACKAGES:
+library(tidyverse) #A "Package of Packages" for Data manipulation and visualization (includes magrittr, lubridate, purrr, tidyr, etc.).
+library(dplyr) #Data frame manipulations (select, slice, etc.
+library(jsonlite) #For Amenities Columns Creation
+
+#PLOT PACKAGES:
+library(ggplot2) #Building fancy plots.
+library(ggthemes) #Themes for ggplots (e.g. "solarized").
+library(ggcorrplot) #For correlograms
+library(scales) #Scaling and formatting ggplots (e.g. scale_fill_gradient()).
+library(gt) #Latex tables
+```
+
+
+```{r, echo=FALSE}
+# Load the R object
+clean_data <- readRDS("../../gen/data-preparation/input/clean_data.rds")
+```
+
+
 
 \section{Correlation Analysis}
 This section is structured as follows:
@@ -58,9 +92,9 @@ This section is structured as follows:
 
 
 \subsection{Apartment-related Variables}
-First, the \textit{numeric} variables we considered as \textit{apartment-related} were the following: 
+First, the \textit{numeric} variables we considered as \textit{apartment-related} and from whihc we will build the correlogram were the following: 
 ```{r, include=FALSE}
-corr_data <- raw_data %>% 
+corr_data <- clean_data %>% 
   dplyr::select(price, host_response_rate_percentage, host_acceptance_rate_percentage, host_listings_count, host_total_listings_count, latitude, longitude, accommodates, bedrooms, beds, bathrooms, minimum_nights, maximum_nights, availability_30, availability_60, availability_90, availability_365, number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d, reviews_per_month, review_scores_rating, review_scores_accuracy, review_scores_cleanliness, review_scores_location, review_scores_value)
 
 # Create a gt table for the apartment-related variables
@@ -81,22 +115,6 @@ t8
 ```
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 From the correlogram below, it is possible to notice that the __variables with the higher correlation with listings' prices__ are, in order: accommodates, bedrooms, availability-related variables, and beds. 
 
 As expected, __the bigger the apartment, the higher the price__ (as can be noticed from the strong positive correlation between price and accommodates, bedrooms, and beds). 
@@ -107,27 +125,34 @@ Moreover, it is also interesting to notice that __most of the "review_scores" va
 
 We will investigate further these associations in the next section. 
 
-```{r}
+```{r, include=FALSE}
 corr_matrix <- round(cor(corr_data),2)
 
-ggcorrplot(corr_matrix,
+my_colors <- c("darkblue", "#FFFFFF", "darkred")
+
+# Restyled correlogram plot
+p6 <- ggcorrplot(corr_matrix,
            hc.order = FALSE,
-           method="square",
+           method = "square",
            type = "lower",
            outline.col = "white",
-           colors = c("#FEFBBD","white", "#AC001E"),
+           colors = my_colors,
            lab = TRUE, 
            lab_size = 2.5,
            digits = 2,
            tl.cex = 8,
-           title="Apartment-related Correlogram",
-           ggtheme=theme_solarized(light = TRUE)) +
+           title = "Apartment-related Correlogram") +
   theme(legend.position = "none", 
-        plot.title = element_text(lineheight=2, face="bold", vjust=1, hjust=0.5, colour = "#AC001E"),
-        plot.subtitle = element_text(colour = "#AC001E", vjust=1, hjust=0.5),
-        axis.title = element_text(colour = "#AC001E"), axis.text=element_text(colour = "#666666"))
+        plot.title = element_text(lineheight = 2, face = "bold", vjust = 1, hjust = 0.5, color = "#333333"),
+        plot.subtitle = element_text(color = "#666666", vjust = 1, hjust = 0.5),
+        axis.title = element_text(color = "#666666"), 
+        axis.text = element_text(color = "#666666"))
 
-rm(corr_data, corr_matrix)
+rm(corr_data, corr_matrix, t8)
+```
+
+```{r}
+p6
 ```
 
 
@@ -136,7 +161,7 @@ First of all, we wanted to include in the correlation matrix also some 'date' va
 
 Then, we have selected some other host-related variables and so the final __variables we considered as host-related__ were the following: 
 ```{r}
-corr_data <- raw_data %>% 
+corr_data <- clean_data %>% 
   mutate(last_scraped_day = as.numeric(day(last_scraped)),
          host_since_year = as.numeric(year(host_since)))
  
@@ -188,7 +213,7 @@ We did this in order to then __remove from our dataset all those variables__ wit
 In particular, the numeric variables in the dataset were:
 
 ```{r}
-numeric_df <- raw_data %>% dplyr::select_if(is.numeric)
+numeric_df <- clean_data %>% dplyr::select_if(is.numeric)
 
 corr_matrix <- round(cor(numeric_df),2)
   
@@ -238,14 +263,9 @@ Therefore, we decided to:
 * <span style="color: #D4AF37;">__Remove review_scores_accuracy, review_scores_rating, and review_scores_cleanliness__</span>: Since they were the 'review_scores" variables with the highest reciprocal correlation and with the lowest correlation with the price of listings.
 
 ```{r}
-raw_data <- raw_data %>% dplyr::select(-availability_90, -review_scores_accuracy, -review_scores_rating,
+clean_data <- clean_data %>% dplyr::select(-availability_90, -review_scores_accuracy, -review_scores_rating,
                                        -review_scores_cleanliness)
 ```
-
-
-
-
-
 
 
 
