@@ -137,7 +137,7 @@ for (name in dataset_names) {
 }
 
 # Save the data as a CSV file
-write.csv(data, file = "../../gen/data-preparation/input/data.csv", fileEncoding = "UTF-8",row.names=FALSE )
+write.csv(data, file = "../../gen/data-preparation/input/merged_data.csv", fileEncoding = "UTF-8",row.names=FALSE )
 
 ```
 
@@ -169,8 +169,3 @@ for (zip_name in zip_file_names) {
 ```{r, include=FALSE}
 rm(data_dir, zip_file_names, zip_name, zip_path)
 ```
-
-
-
-
-
