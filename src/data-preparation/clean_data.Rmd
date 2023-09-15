@@ -76,7 +76,7 @@ library(gt) #Latex tables
 
 
 ```{r, echo=FALSE}
-data <- read.csv("../../gen/data-preparation/input/data.csv", fileEncoding = "UTF-8")
+raw_data <- read.csv("../../gen/data-preparation/input/merged_data.csv", fileEncoding = "UTF-8")
 ```
 
 
@@ -98,7 +98,7 @@ In this document, the data manipulation procedures applied to the original datas
 Code for showing the number of columns that contains only missing values:
 
 ```{r}
-cols_to_remove <- sapply(data, function(x) all(is.na(x)))
+cols_to_remove <- sapply(raw_data, function(x) all(is.na(x)))
 indices <- which(unlist(cols_to_remove))
 names_list <- names(cols_to_remove)[indices]
 cat('There are only', length(names_list), 'columns with only missing values')
@@ -111,12 +111,8 @@ cat('Names of columns with only missing values:', names_list)
 
 Code for removing columns with only missing values: 
 ```{r}
-raw_data <- data %>%
+raw_data <- raw_data %>%
   select(-which(cols_to_remove))
-```
-
-```{r, include=FALSE}
-rm(data)
 ```
 
 As can be seen from the output below, once `calendar_updated` and `bathroom` have been removed, there are no other columns containing only NAs. 
@@ -130,7 +126,7 @@ cat("Now, there are", length(names_list), "columns containing only missing value
 
 
 ```{r, echo=FALSE}
-rm(indices, cols_to_remove, names_list, data_merged)
+rm(indices, cols_to_remove, names_list)
 ```
 
 
@@ -930,41 +926,15 @@ rm(levels_to_remove, grouped_data, levels_to_drop, t7)
 ```
 
 
-
-Finally, the dataset is saved for future use.
+In conclusion, the cleaned dataset is preserved for future purposes. It is stored both as a CSV file for convenient inspection and as an RDS file, retaining all the data manipulation steps, including variable format conversions.
 ```{r}
 # Save the data as a CSV file
-write.csv(raw_data, file = "../../gen/data-preparation/input/data.csv", fileEncoding = "UTF-8",row.names=FALSE )
+write.csv(raw_data, file = "../../gen/data-preparation/input/clean_data.csv", fileEncoding = "UTF-8", row.names = FALSE)
+
+# Save raw_data as an R object
+saveRDS(raw_data, file = "../../gen/data-preparation/input/clean_data.rds")
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```{r, include=FALSE}
+rm(raw_data)
+```
