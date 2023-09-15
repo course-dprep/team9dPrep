@@ -92,13 +92,20 @@ This section is structured as follows:
 
 
 \subsection{Apartment-related Variables}
-First, the \textit{numeric} variables we considered as \textit{apartment-related} and from whihc we will build the correlogram were the following: 
+First, the \textit{numeric} variables we considered as \textit{apartment-related} and from which we will build the correlogram were the following: 
 ```{r, include=FALSE}
+# Select relevant variables for correlation analysis
 corr_data <- clean_data %>% 
-  dplyr::select(price, host_response_rate_percentage, host_acceptance_rate_percentage, host_listings_count, host_total_listings_count, latitude, longitude, accommodates, bedrooms, beds, bathrooms, minimum_nights, maximum_nights, availability_30, availability_60, availability_90, availability_365, number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d, reviews_per_month, review_scores_rating, review_scores_accuracy, review_scores_cleanliness, review_scores_location, review_scores_value)
+  dplyr::select(
+    price, latitude, longitude, accommodates, bedrooms, beds, bathrooms, minimum_nights,
+    maximum_nights, availability_30, availability_60, availability_90, availability_365,
+    number_of_reviews, number_of_reviews_ltm, number_of_reviews_l30d, reviews_per_month,
+    review_scores_rating, review_scores_accuracy, review_scores_cleanliness, review_scores_location,
+    review_scores_value
+  )
 
 # Create a gt table for the apartment-related variables
-t8 <- head(corr_data, 10) %>%
+t8 <- head(corr_data, 5) %>%
   gt() %>%
   tab_style(
     style = cell_text(weight = "bold"),
@@ -106,7 +113,7 @@ t8 <- head(corr_data, 10) %>%
   ) %>%
   tab_header(
     title = "Table of Apartment-related Variables",
-    subtitle = "First 10 Rows of Correlation Data",
+    subtitle = "First 5 Rows of Correlation Data",
   )
 ```
 
@@ -115,20 +122,13 @@ t8
 ```
 
 
-From the correlogram below, it is possible to notice that the __variables with the higher correlation with listings' prices__ are, in order: accommodates, bedrooms, availability-related variables, and beds. 
-
-As expected, __the bigger the apartment, the higher the price__ (as can be noticed from the strong positive correlation between price and accommodates, bedrooms, and beds). 
-
-As expected, __the higher the price, the higher the availability__. Apartments with higher prices are less likely to be booked (as can be noticed from the strong positive correlation between price and availability variables). 
-
-Moreover, it is also interesting to notice that __most of the "review_scores" variables__ (except for review_scores_location) __are negatively associated with the listings prices__. 
-
-We will investigate further these associations in the next section. 
-
+Here is a correlogram displaying correlation values for the variables selected in the previous step:
 ```{r, include=FALSE}
+# Create a correlation matrix
 corr_matrix <- round(cor(corr_data),2)
 
-my_colors <- c("darkblue", "#FFFFFF", "darkred")
+# Define custom color palette
+my_colors <- c("#E6E6E6", "#FFFFFF", "#CCCCCC")
 
 # Restyled correlogram plot
 p6 <- ggcorrplot(corr_matrix,
@@ -148,7 +148,6 @@ p6 <- ggcorrplot(corr_matrix,
         axis.title = element_text(color = "#666666"), 
         axis.text = element_text(color = "#666666"))
 
-rm(corr_data, corr_matrix, t8)
 ```
 
 ```{r}
@@ -156,116 +155,252 @@ p6
 ```
 
 
-### CORRELOGRAM HOST-RELATED VARIABLES {.unnumbered .unlisted}
-First of all, we wanted to include in the correlation matrix also some 'date' variables. Therefore, we extracted the day from the 'last_scraped' variable (since month and year were, for all observations, equal to 09 and 2022 and, therefore, the days were the most significant element of this date variable) and the year from the host_since' variable. Then, we converted these two new variables into numeric. 
+To improve clarity, we created a table displaying the correlation of each variable with \texttt{price}. Additionally, we've organized the variables in descending order based on their correlation with \texttt{price} to enhance interpretation.
 
-Then, we have selected some other host-related variables and so the final __variables we considered as host-related__ were the following: 
-```{r}
-corr_data <- clean_data %>% 
-  mutate(last_scraped_day = as.numeric(day(last_scraped)),
-         host_since_year = as.numeric(year(host_since)))
- 
-corr_data <- corr_data %>% 
-  dplyr::select(price, last_scraped_day, host_since_year, host_response_rate, host_acceptance_rate, host_listings_count, review_scores_checkin, review_scores_communication)
+The table below reveals that certain variables exhibit a stronger correlation with \texttt{price}. Notably, bathrooms (0.50), accommodates (0.41), bedrooms (0.41), and beds (0.30) show the highest positive correlations. This suggests that, as expected, larger properties tend to command higher prices. Conversely, the \texttt{review\_score} variables display relatively weak correlations with \texttt{price}.
 
-corr_data <- corr_data %>% drop_na()
-  
-head(corr_data, 5)%>%
-  kbl(align = "c") %>%
-  kable_paper("hover", full_width = F)
+```{r, include=FALSE}
+# Convert correlation matrix into a dataframe
+corr_matrix_df <- data.frame(corr_matrix)
+
+# Add a new column for variable names
+corr_matrix_df$Variable <- row.names(corr_matrix_df)
+
+# Select the "Variable" and "price" columns
+corr_matrix_df <- corr_matrix_df %>%
+  select(Variable, price) %>%
+  arrange(desc(price))
+
+# Rename the columns
+colnames(corr_matrix_df) <- c("Variable", "Correlation")
+
+
+t9 <- corr_matrix_df %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Correlation with Price",
+    subtitle = "Correlation between Variables and Price"
+  )
 ```
 
-From the correlogram below, it is possible to notice that the __variables with the higher__ (positive or negative) __correlation with listings' prices__ are, in order: last_scraped_day, host_listings_count and host_acceptance_rate.
+```{r}
+t9
+```
 
-As before, it is also interesting to notice that both the __'check-in' score__ (i.e. 'review_scores_checkin') and the the __'communication' score__ (i.e. 'review_scores_communication') __were negatively correlated with the price__.
 
+
+
+```{r, include=FALSE}
+rm(corr_data, corr_matrix, t8, p6, t9, corr_matrix_df, my_colors)
+```
+
+
+\subsection{Host-related Variables}
+First of all, we wanted to include in the correlation matrix also some \texttt{date} variables. Therefore, we extracted the year from \texttt{host\_since} and \texttt{first\_review}, and the month from \texttt{last\_review}. Then, we converted these two new variables into numeric.
+```{r}
+corr_data <- clean_data %>%
+  mutate(host_since_year = as.numeric(year(host_since)),
+         first_review_year = as.numeric(year(first_review)),
+         last_review_day = as.numeric(month(last_review)))
+```
+
+Below is the list of \textit{numeric} variables we considered as \textit{host-related} and from which we will build the following correlogram. 
+```{r, include=FALSE}
+# Select relevant variables
+corr_data <- corr_data %>% 
+  dplyr::select(price, host_since_year, first_review_year, last_review_day, host_response_rate_percentage, host_acceptance_rate_percentage, host_listings_count, host_total_listings_count, review_scores_checkin, review_scores_communication, reviews_per_month)
+
+# Create a gt table for the apartment-related variables
+t10 <- head(corr_data, 5) %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Table of Host-related Variables",
+    subtitle = "First 5 Rows",
+  )
+```
 
 ```{r}
+t10
+```
+
+
+Here is a correlogram displaying correlation values for the variables selected in the previous step:
+```{r, include=FALSE}
 corr_matrix <- round(cor(corr_data),2)
 
-ggcorrplot(corr_matrix,
+# Define custom color palette
+my_colors <- c("#E6E6E6", "#FFFFFF", "#CCCCCC")
+
+# Restyled correlogram plot
+p7 <- ggcorrplot(corr_matrix,
            hc.order = FALSE,
-           method="square",
+           method = "square",
            type = "lower",
            outline.col = "white",
-           colors = c("#FEFBBD","white", "#AC001E"),
+           colors = my_colors,
            lab = TRUE, 
            lab_size = 2.5,
            digits = 2,
            tl.cex = 8,
-           title="Host-related Correlogram",
-           ggtheme=theme_solarized(light = TRUE)) +
+           title = "Apartment-related Correlogram") +
   theme(legend.position = "none", 
-        plot.title = element_text(lineheight=2, face="bold", vjust=1, hjust=0.5, colour = "#AC001E"),
-        plot.subtitle = element_text(colour = "#AC001E", vjust=1, hjust=0.5),
-        axis.title = element_text(colour = "#AC001E"), axis.text=element_text(colour = "#666666"))
+        plot.title = element_text(lineheight = 2, face = "bold", vjust = 1, hjust = 0.5, color = "#333333"),
+        plot.subtitle = element_text(color = "#666666", vjust = 1, hjust = 0.5),
+        axis.title = element_text(color = "#666666"), 
+        axis.text = element_text(color = "#666666"))
 
-rm(corr_data, corr_matrix)
+```
+
+```{r}
+p7
+```
+
+
+To improve clarity, we created a table displaying the correlation of each variable with \texttt{price}. Additionally, we've organized the variables in descending order based on their correlation with \texttt{price} to enhance interpretation.
+
+The table below reveals that certain variables exhibit a stronger correlation with \texttt{price}. Notably, \texttt{host\_acceptance\_rate\_percentage} (0.07), \texttt{host\_listings\_count} (0.07), and \texttt{host\_total\_listings\_count}	(0.07) show the highest positive correlations. Conversely, \texttt{host\_since\_year} displays relatively weak correlations with \texttt{price} (-0.07). In general, \texttt{host-related} variables show weaker correlations with \texttt{price} if compared to \texttt{apartment-related} variables.
+
+```{r, include=FALSE}
+# Convert correlation matrix into a dataframe
+corr_matrix_df <- data.frame(corr_matrix)
+
+# Add a new column for variable names
+corr_matrix_df$Variable <- row.names(corr_matrix_df)
+
+# Select the "Variable" and "price" columns
+corr_matrix_df <- corr_matrix_df %>%
+  select(Variable, price) %>%
+  arrange(desc(price))
+
+# Rename the columns
+colnames(corr_matrix_df) <- c("Variable", "Correlation")
+
+
+t11 <- corr_matrix_df %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Correlation with Price",
+    subtitle = "Correlation between Variables and Price"
+  )
+```
+
+```{r}
+t11
 ```
 
 
 
-## - NUMERIC VARIABLES CORRELATIONS - PART 2
-With the following scripts, we built a correlation matrix using only the 'true' numeric variables in the dataset. As can be noticed from the matrix, __there are some variables that are highly correlated with each other__.
 
-We did this in order to then __remove from our dataset all those variables__ with a high degree of mutual correlation, __to avoid multicollinearity problems__.
-
-In particular, the numeric variables in the dataset were:
-
-```{r}
-numeric_df <- clean_data %>% dplyr::select_if(is.numeric)
-
-corr_matrix <- round(cor(numeric_df),2)
-  
-head(numeric_df, 5)%>%
-  kbl(align = "c") %>%
-  kable_paper("hover", full_width = F)
+```{r, include=FALSE}
+rm(corr_data, corr_matrix, t10, p7, t11, corr_matrix_df, my_colors)
 ```
 
-As can be seen from the correlogram below, the variables with a reciprocal correlation higher than 0.8 were:
 
-* __Availability_30__ and __availability_90__ (0.80).
-* In general, all the __review_scores variables__ were highly correlated with each other.
 
-```{r}
-ggcorrplot(corr_matrix,
+
+
+
+\subsection{All Numeric Variables Correlations}
+Here is a correlogram displaying correlation values for all numeric variables and \texttt{price}.
+```{r, include=FALSE}
+corr_data <- clean_data %>% dplyr::select_if(is.numeric)
+
+corr_matrix <- round(cor(corr_data),2)
+
+# Define custom color palette
+my_colors <- c("#E6E6E6", "#FFFFFF", "#CCCCCC")
+
+# Restyled correlogram plot
+p8 <- ggcorrplot(corr_matrix,
            hc.order = FALSE,
-           method="square",
+           method = "square",
            type = "lower",
            outline.col = "white",
-           colors = c("#FEFBBD","white", "#AC001E"),
+           colors = my_colors,
            lab = TRUE, 
            lab_size = 2.5,
            digits = 2,
            tl.cex = 8,
-           title="Numeric Variables Correlogram",
-           ggtheme=theme_solarized(light = TRUE)) +
+           title = "Apartment-related Correlogram") +
   theme(legend.position = "none", 
-        plot.title = element_text(lineheight=2, face="bold", vjust=1, hjust=0.5, colour = "#AC001E"),
-        plot.subtitle = element_text(colour = "#AC001E", vjust=1, hjust=0.5),
-        axis.title = element_text(colour = "#AC001E"), axis.text=element_text(colour = "#666666"))
+        plot.title = element_text(lineheight = 2, face = "bold", vjust = 1, hjust = 0.5, color = "#333333"),
+        plot.subtitle = element_text(color = "#666666", vjust = 1, hjust = 0.5),
+        axis.title = element_text(color = "#666666"), 
+        axis.text = element_text(color = "#666666"))
 
-rm(corr_matrix, numeric_df)
 ```
-
-
-
-## - DROPPING MOST CORRELATED NUMERIC VARIABLES
-It is useful to drop highly correlated predictor variables when building a regression model for several reasons:
-
-* <span style="color: #D4AF37;">__Reducing Multicollinearity__</span>: When two or more predictor variables are highly correlated with each other, they provide __redundant information__ to the model. This multicollinearity can cause problems in estimating the regression coefficients, as it becomes __difficult to distinguish the independent effects of each variable__. Dropping one of the highly correlated variables can help to reduce this problem of multicollinearity.
-* <span style="color: #D4AF37;">__Improving Model Interpretability__</span>: A model with fewer predictors is __easier to interpret__ and explain. Dropping highly correlated predictors can help to simplify the model and make it easier to explain to others.
-* <span style="color: #D4AF37;">__Avoiding Overfitting__</span>: A model with too many predictors can lead to overfitting, where the model is too closely fitted to the training data and may __not generalize well to new data__. Dropping highly correlated predictors can help to reduce the number of predictors in the model, which in turn can help to avoid overfitting.
-
-Therefore, we decided to:
-
-* <span style="color: #D4AF37;">__Remove availability_90__</span>: Since, compared to "availability_30", it was less correlated with the price of listings (0.26 vs. 0.30).
-* <span style="color: #D4AF37;">__Remove review_scores_accuracy, review_scores_rating, and review_scores_cleanliness__</span>: Since they were the 'review_scores" variables with the highest reciprocal correlation and with the lowest correlation with the price of listings.
 
 ```{r}
-clean_data <- clean_data %>% dplyr::select(-availability_90, -review_scores_accuracy, -review_scores_rating,
-                                       -review_scores_cleanliness)
+p8
 ```
 
 
+To improve clarity, we created a table displaying the pairs of numeric variables with a mutual correlation higher than 0.75. Additionally, we've organized the variables in descending order based on their mutual correlation to enhance interpretation.
+Thi table helps in identifying highly correlated variables for potential removal to avoid multicollinearity in regression analysis.
+```{r, include=FALSE}
+# Convert correlation matrix into a dataframe
+corr_matrix_df <- data.frame(corr_matrix)
 
+# Add a new column for variable names
+corr_matrix_df$Variable <- row.names(corr_matrix_df)
+
+# Define the threshold for correlation
+threshold <- 0.75
+
+# Create a data frame to store pairs of highly correlated variables
+high_corr_pairs <- data.frame(Variable1 = character(0), Variable2 = character(0), Correlation = numeric(0))
+
+# Loop through the rows and columns of the correlation matrix
+for (i in 1:nrow(corr_matrix)) {
+  for (j in 1:ncol(corr_matrix)) {
+    if (i < j && abs(corr_matrix[i, j]) > threshold) {
+      high_corr_pairs <- rbind(high_corr_pairs, 
+                               data.frame(Variable1 = rownames(corr_matrix)[i],
+                                          Variable2 = colnames(corr_matrix)[j],
+                                          Correlation = corr_matrix[i, j]))
+    }
+  }
+}
+
+#Arrange order: 
+high_corr_pairs <- high_corr_pairs %>% arrange(desc(high_corr_pairs$Correlation))
+
+t12 <- high_corr_pairs %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Highly Correlated Variable Pairs",
+    subtitle = paste("Pairs with correlation > ", threshold),
+  )
+
+```
+
+```{r}
+t12
+```
+
+
+The code snippet below is utilized to eliminate one variable from the \texttt{clean\_data} dataframe for each pair of highly correlated variables previously identified. The criterion for removal is to discard the variable with the lowest correlation with \texttt{price}. Between the highly correlated variables, we decided to retain only beds, accommodates, and bedroom, since their very high correlation with \texttt{price}.
+```{r}
+clean_data <- clean_data %>% dplyr::select(-host_total_listings_count, -availability_90, -availability_30, -review_scores_value, -review_scores_accuracy, -reviews_per_month, -review_scores_checkin)
+```
+
+
+```{r, include=FALSE}
+rm(corr_data, corr_matrix, p8, t12, corr_matrix_df, my_colors, i, j, threshold, high_corr_pairs)
+```
