@@ -104,17 +104,17 @@ corr_data <- clean_data %>%
     review_scores_value
   )
 
-# Create a gt table for the apartment-related variables
-t8 <- head(corr_data, 5) %>%
+# Extract the column names as a data frame
+column_names_df <- data.frame(Variable = colnames(corr_data))
+
+# Create a gt table with one column
+t8 <- column_names_df %>%
   gt() %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_column_labels(columns = everything())
-  ) %>%
   tab_header(
-    title = "Table of Apartment-related Variables",
-    subtitle = "First 5 Rows of Correlation Data",
+    title = "Variable Names",
+    subtitle = "List of Numeric Apartment-related Variables"
   )
+
 ```
 
 ```{r}
@@ -195,7 +195,7 @@ t9
 
 
 ```{r, include=FALSE}
-rm(corr_data, corr_matrix, t8, p6, t9, corr_matrix_df, my_colors)
+rm(corr_data, corr_matrix, t8, p6, t9, corr_matrix_df, my_colors, column_names_df)
 ```
 
 
@@ -214,16 +214,15 @@ Below is the list of \textit{numeric} variables we considered as \textit{host-re
 corr_data <- corr_data %>% 
   dplyr::select(price, host_since_year, first_review_year, last_review_day, host_response_rate_percentage, host_acceptance_rate_percentage, host_listings_count, host_total_listings_count, review_scores_checkin, review_scores_communication, reviews_per_month)
 
-# Create a gt table for the apartment-related variables
-t10 <- head(corr_data, 5) %>%
+# Extract the column names as a data frame
+column_names_df <- data.frame(Variable = colnames(corr_data))
+
+# Create a gt table with one column
+t10 <- column_names_df %>%
   gt() %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_column_labels(columns = everything())
-  ) %>%
   tab_header(
-    title = "Table of Host-related Variables",
-    subtitle = "First 5 Rows",
+    title = "Variable Names",
+    subtitle = "List of Numeric Host-related Variables"
   )
 ```
 
@@ -301,15 +300,9 @@ t11
 ```
 
 
-
-
 ```{r, include=FALSE}
-rm(corr_data, corr_matrix, t10, p7, t11, corr_matrix_df, my_colors)
+rm(corr_data, corr_matrix, t10, p7, t11, corr_matrix_df, my_colors, column_names_df)
 ```
-
-
-
-
 
 
 \subsection{All Numeric Variables Correlations}
@@ -404,3 +397,97 @@ clean_data <- clean_data %>% dplyr::select(-host_total_listings_count, -availabi
 ```{r, include=FALSE}
 rm(corr_data, corr_matrix, p8, t12, corr_matrix_df, my_colors, i, j, threshold, high_corr_pairs)
 ```
+
+
+
+\section{Exploratory Data Analysis}
+
+\subsection{Amenities-related Variables}
+This code chunk iterates through all the \texttt{amenities-related} variables within the dataframe, ranging from variable 35 to 127. Then, it computes the median price difference between listings that offer a specific amenity and those that do not.
+```{r}
+# Create an empty dataframe to store the results
+median_diff_df <- data.frame(Variable_Name = character(0), Median_Difference = numeric(0))
+
+# Loop through variables 35 to 127
+for (i in 35:127) {
+  # Select the relevant columns and group by Bidet
+  amenities_df <- clean_data %>%
+    select(price, all_of(i)) %>%
+    group_by(across(all_of(names(.)[2]))) %>%
+    summarize(median_price = median(price))
+  
+  # Calculate the median difference
+  median_diff <- amenities_df$median_price[2] - amenities_df$median_price[1]
+  
+  # Append the result to the dataframe
+  median_diff_df <- rbind(median_diff_df, data.frame(Variable_Name = colnames(clean_data)[i], Median_Difference = median_diff))
+}
+```
+
+The following table, as well as the following plot, displays the top ten median price differences among all amentity. 
+```{r, include=FALSE}
+# Arrange the dataframe by Median_Difference in descending order
+median_diff_df <- head(median_diff_df, 10) %>%
+  arrange(desc(Median_Difference))
+
+t13 <- median_diff_df %>%
+  gt() %>%
+  tab_header(
+    title = "Median Price Differences by Variable",
+    subtitle = "Differences in median price between two groups"
+  ) %>%
+  fmt_number(
+    columns = everything(),
+    decimals = 2
+  )
+```
+
+```{r}
+t13
+```
+
+
+```{r, include=FALSE}
+p9 <- ggplot(median_diff_df, aes(reorder(Variable_Name, Median_Difference), Median_Difference)) +
+  geom_col(aes(fill = Median_Difference)) +
+  scale_fill_gradient(low = "#FFFFFF", high = "#666666") +
+  geom_label(aes(label = paste(Median_Difference, "€")), fill = "#666666", col = "white", size = 2) +
+  labs(x = "Variables",
+       y = "Median Price Difference",
+       title = "Top 10 Variables with Highest Median Price Differences",
+       subtitle = "Data collected from Listings dataset") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", vjust = 1, hjust = 0.5, color = "black"),
+        plot.subtitle = element_text(size = 12, lineheight = 0.8, vjust = 1, hjust = 0.5, color = "black"),
+        axis.title = element_text(size = 14, color = "black"),
+        axis.text = element_text(size = 8, color = "#666666"),
+        panel.grid.major = element_line(color = "gray", size = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white")) +
+  coord_flip()
+
+```
+
+```{r}
+p9
+```
+
+
+```{r}
+rm(i, median_diff, t13, p9, median_diff_df, amenities_df)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
