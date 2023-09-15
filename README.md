@@ -1,6 +1,5 @@
 # Predict Italian Airbnb Listings Prices
-![GitHub Logo](https://github.com/yourusername/yourrepository/blob/main/images/logo.png)
-
+![image](https://www.digital.ink/wp-content/uploads/airbnb_logo_detail.jpg)
 
 ---
 
