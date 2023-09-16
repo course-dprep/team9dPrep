@@ -87,7 +87,6 @@ This section is structured as follows:
 \begin{enumerate}
   \item Correlation Analysis of Apartment-related Variables: In this step, a correlogram is generated to examine the correlations between \textit{numeric}, \textit{apartment-related} variables and the price of the listings.
   \item Correlation Analysis of Host-related Variables: Subsequently, a correlogram is constructed to assess the correlations between \textit{numeric}, \textit{host-related} variables and the price of the listings.
-  \item Correlation Analysis of All Numeric Variables: Lastly, a correlogram is produced, including all numeric variables (\textit{apartment-related} and \textit{host-related}), to identify variables with high mutual correlations. Identifying such variables is essential to mitigate multicollinearity issues in the final regression model.
 \end{enumerate}
 
 
@@ -117,7 +116,7 @@ t8 <- column_names_df %>%
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 t8
 ```
 
@@ -141,7 +140,7 @@ p6 <- ggcorrplot(corr_matrix,
            lab_size = 2.5,
            digits = 2,
            tl.cex = 8,
-           title = "Apartment-related Correlogram") +
+           title = "Apartment-related Variables Correlogram") +
   theme(legend.position = "none", 
         plot.title = element_text(lineheight = 2, face = "bold", vjust = 1, hjust = 0.5, color = "#333333"),
         plot.subtitle = element_text(color = "#666666", vjust = 1, hjust = 0.5),
@@ -150,7 +149,7 @@ p6 <- ggcorrplot(corr_matrix,
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 p6
 ```
 
@@ -187,7 +186,7 @@ t9 <- corr_matrix_df %>%
   )
 ```
 
-```{r}
+```{r, echo=FALSE}
 t9
 ```
 
@@ -226,7 +225,7 @@ t10 <- column_names_df %>%
   )
 ```
 
-```{r}
+```{r, echo=FALSE}
 t10
 ```
 
@@ -249,7 +248,7 @@ p7 <- ggcorrplot(corr_matrix,
            lab_size = 2.5,
            digits = 2,
            tl.cex = 8,
-           title = "Apartment-related Correlogram") +
+           title = "Host-related Variables Correlogram") +
   theme(legend.position = "none", 
         plot.title = element_text(lineheight = 2, face = "bold", vjust = 1, hjust = 0.5, color = "#333333"),
         plot.subtitle = element_text(color = "#666666", vjust = 1, hjust = 0.5),
@@ -258,7 +257,7 @@ p7 <- ggcorrplot(corr_matrix,
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 p7
 ```
 
@@ -295,7 +294,7 @@ t11 <- corr_matrix_df %>%
   )
 ```
 
-```{r}
+```{r, echo=FALSE}
 t11
 ```
 
@@ -305,104 +304,7 @@ rm(corr_data, corr_matrix, t10, p7, t11, corr_matrix_df, my_colors, column_names
 ```
 
 
-\subsection{All Numeric Variables Correlations}
-Here is a correlogram displaying correlation values for all numeric variables and \texttt{price}.
-```{r, include=FALSE}
-corr_data <- clean_data %>% dplyr::select_if(is.numeric)
-
-corr_matrix <- round(cor(corr_data),2)
-
-# Define custom color palette
-my_colors <- c("#E6E6E6", "#FFFFFF", "#CCCCCC")
-
-# Restyled correlogram plot
-p8 <- ggcorrplot(corr_matrix,
-           hc.order = FALSE,
-           method = "square",
-           type = "lower",
-           outline.col = "white",
-           colors = my_colors,
-           lab = TRUE, 
-           lab_size = 2.5,
-           digits = 2,
-           tl.cex = 8,
-           title = "Apartment-related Correlogram") +
-  theme(legend.position = "none", 
-        plot.title = element_text(lineheight = 2, face = "bold", vjust = 1, hjust = 0.5, color = "#333333"),
-        plot.subtitle = element_text(color = "#666666", vjust = 1, hjust = 0.5),
-        axis.title = element_text(color = "#666666"), 
-        axis.text = element_text(color = "#666666"))
-
-```
-
-```{r}
-p8
-```
-
-
-To improve clarity, we created a table displaying the pairs of numeric variables with a mutual correlation higher than 0.75. Additionally, we've organized the variables in descending order based on their mutual correlation to enhance interpretation.
-Thi table helps in identifying highly correlated variables for potential removal to avoid multicollinearity in regression analysis.
-```{r, include=FALSE}
-# Convert correlation matrix into a dataframe
-corr_matrix_df <- data.frame(corr_matrix)
-
-# Add a new column for variable names
-corr_matrix_df$Variable <- row.names(corr_matrix_df)
-
-# Define the threshold for correlation
-threshold <- 0.75
-
-# Create a data frame to store pairs of highly correlated variables
-high_corr_pairs <- data.frame(Variable1 = character(0), Variable2 = character(0), Correlation = numeric(0))
-
-# Loop through the rows and columns of the correlation matrix
-for (i in 1:nrow(corr_matrix)) {
-  for (j in 1:ncol(corr_matrix)) {
-    if (i < j && abs(corr_matrix[i, j]) > threshold) {
-      high_corr_pairs <- rbind(high_corr_pairs, 
-                               data.frame(Variable1 = rownames(corr_matrix)[i],
-                                          Variable2 = colnames(corr_matrix)[j],
-                                          Correlation = corr_matrix[i, j]))
-    }
-  }
-}
-
-#Arrange order: 
-high_corr_pairs <- high_corr_pairs %>% arrange(desc(high_corr_pairs$Correlation))
-
-t12 <- high_corr_pairs %>%
-  gt() %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_column_labels(columns = everything())
-  ) %>%
-  tab_header(
-    title = "Highly Correlated Variable Pairs",
-    subtitle = paste("Pairs with correlation > ", threshold),
-  )
-
-```
-
-```{r}
-t12
-```
-
-
-The code snippet below is utilized to eliminate one variable from the \texttt{clean\_data} dataframe for each pair of highly correlated variables previously identified. The criterion for removal is to discard the variable with the lowest correlation with \texttt{price}. Between the highly correlated variables, we decided to retain only beds, accommodates, and bedroom, since their very high correlation with \texttt{price}.
-```{r}
-clean_data <- clean_data %>% dplyr::select(-host_total_listings_count, -availability_90, -availability_30, -review_scores_value, -review_scores_accuracy, -reviews_per_month, -review_scores_checkin)
-```
-
-
-```{r, include=FALSE}
-rm(corr_data, corr_matrix, p8, t12, corr_matrix_df, my_colors, i, j, threshold, high_corr_pairs)
-```
-
-
-
-\section{Exploratory Data Analysis}
-
-\subsection{Amenities-related Variables}
+\section{Amenities-related Variables}
 This code chunk iterates through all the \texttt{amenities-related} variables within the dataframe, ranging from variable 35 to 127. Then, it computes the median price difference between listings that offer a specific amenity and those that do not.
 ```{r}
 # Create an empty dataframe to store the results
@@ -426,55 +328,209 @@ for (i in 35:127) {
 
 The following table, as well as the following plot, displays the top ten median price differences among all amentity. 
 ```{r, include=FALSE}
-# Arrange the dataframe by Median_Difference in descending order
-median_diff_df <- head(median_diff_df, 10) %>%
-  arrange(desc(Median_Difference))
+# Select the first 10 rows and arrange by Median_Difference
+top_10_median_diff <- median_diff_df %>%
+  arrange(desc(Median_Difference)) %>%
+  head(10)
 
-t13 <- median_diff_df %>%
+# Append "€" symbol to the second column of your dataset
+top_10_median_diff$Median_Difference <- paste(top_10_median_diff$Median_Difference, "€")
+
+# Create a gt table
+t12 <- top_10_median_diff %>%
   gt() %>%
-  tab_header(
-    title = "Median Price Differences by Variable",
-    subtitle = "Differences in median price between two groups"
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
   ) %>%
-  fmt_number(
-    columns = everything(),
-    decimals = 2
+  tab_header(
+    title = "Top 10 Amenities with Highest Median Price Difference",
+    subtitle = "Based on Median Price Difference",
   )
+
 ```
 
-```{r}
-t13
+```{r, echo=FALSE}
+t12
 ```
 
 
 ```{r, include=FALSE}
-p9 <- ggplot(median_diff_df, aes(reorder(Variable_Name, Median_Difference), Median_Difference)) +
-  geom_col(aes(fill = Median_Difference)) +
-  scale_fill_gradient(low = "#FFFFFF", high = "#666666") +
-  geom_label(aes(label = paste(Median_Difference, "€")), fill = "#666666", col = "white", size = 2) +
+# Create a ggplot
+# Select the first 10 rows and arrange by Median_Difference
+top_10_median_diff <- median_diff_df %>%
+  arrange(desc(Median_Difference)) %>%
+  head(10)
+
+
+p8 <- ggplot(top_10_median_diff, aes(x = reorder(Variable_Name, as.numeric(Median_Difference)), y = as.numeric(Median_Difference))) +
+  geom_bar(stat = "identity", fill = "#666666") +
+  geom_text(aes(label = Median_Difference), vjust = -0.5, size = 4, color = "white") +
   labs(x = "Variables",
-       y = "Median Price Difference",
+       y = "Median Price Difference (in €)",
        title = "Top 10 Variables with Highest Median Price Differences",
        subtitle = "Data collected from Listings dataset") +
-  theme(legend.position = "none",
-        plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", vjust = 1, hjust = 0.5, color = "black"),
-        plot.subtitle = element_text(size = 12, lineheight = 0.8, vjust = 1, hjust = 0.5, color = "black"),
-        axis.title = element_text(size = 14, color = "black"),
-        axis.text = element_text(size = 8, color = "#666666"),
-        panel.grid.major = element_line(color = "gray", size = 0.5),
-        panel.grid.minor = element_blank(),
-        panel.background = element_rect(fill = "white")) +
-  coord_flip()
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", vjust = 1, hjust = 0.5, color = "black"),
+    plot.subtitle = element_text(size = 12, lineheight = 0.8, vjust = 1, hjust = 0.5, color = "black"),
+    axis.title = element_text(size = 14, color = "black"),
+    axis.text = element_text(size = 8, color = "#666666"),
+    axis.text.x = element_text(angle = 90, hjust = 1),  
+    panel.grid.major = element_line(color = "gray", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white")
+  )
+
 
 ```
 
-```{r}
+```{r, echo=FALSE}
+p8
+```
+
+```{r, include=FALSE}
+rm(i, median_diff, t12, p8, median_diff_df, amenities_df, top_10_median_diff)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Property\_type variable}
+\subsection{Top 10 most expensive property types}
+The chart displays the top 10 most costly property types among Italian Airbnb listings. Additionally, a horizontal reference line marks the average price for all Airbnb listings in Italy. Notably, all of the top 10 most expensive property types surpass this average price.  
+
+```{r, include=FALSE}
+
+property_type_grouped <- clean_data%>%
+  dplyr::group_by(property_type)%>%
+  dplyr::summarize(avg_price_property_type = round(mean(price), 2))
+
+property_type_grouped <- property_type_grouped%>%
+  dplyr::arrange(desc(avg_price_property_type))%>%
+  dplyr::slice(1:10)
+
+t13 <- property_type_grouped %>%
+  gt() %>%
+  tab_header(
+    title = "Average Price of Listings per Property Type",
+    subtitle = "Top 10 Most Expensive Property Types"
+  )
+
+
+# Define your own scale of grey colors
+grey_colors <- c("#F0F0F0", "#E0E0E0", "#D0D0D0", "#C0C0C0", "#B0B0B0", "#A0A0A0", "#909090", "#808080", "#707070", "#606060")
+
+# Create the ggplot
+p9 <- ggplot(property_type_grouped, aes(reorder(property_type, avg_price_property_type), avg_price_property_type, fill = property_type)) +
+  geom_col() +  # No need to specify col = "white"
+  geom_hline(yintercept = 147.97, linetype = "dashed", color = "red") +
+  scale_fill_manual(values = grey_colors) +  # Use your own grey color scale
+  scale_y_continuous(labels = dollar_format(), n.breaks = 5) +
+  labs(
+    y = "Average Price of Listings",
+    x = "Property Type",
+    title = "Average Price of Listings per Property Type",
+    subtitle = "Top 10 Cheapest Property Type"
+  ) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", vjust = 1, hjust = 0.5, color = "black"),
+    plot.subtitle = element_text(size = 12, lineheight = 0.8, vjust = 1, hjust = 0.5, color = "black"),
+    axis.title = element_text(size = 14, color = "black"),
+    axis.text = element_text(size = 8, color = "#666666"),
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    panel.grid.major = element_line(color = "gray", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white")
+  )
+```
+
+
+```{r, echo=FALSE}
+t13
 p9
 ```
 
 
-```{r}
-rm(i, median_diff, t13, p9, median_diff_df, amenities_df)
+```{r, include=FALSE}
+rm(p9, t13, property_type_grouped, grey_colors)
+```
+
+
+\subsection{Top 10 Cheapest Property Type}
+The chart displays the top 10 most cheapest property types among Italian Airbnb listings. Additionally, a horizontal reference line marks the average price for all Airbnb listings in Italy. Notably, all of the top 10 most cheapest property types are below this average price. 
+
+```{r, include=FALSE}
+property_type_grouped <- clean_data%>%
+  dplyr::group_by(property_type)%>%
+  dplyr::summarize(avg_price_property_type = round(mean(price), 2))
+
+property_type_grouped <- property_type_grouped%>%
+  dplyr::arrange(avg_price_property_type)%>%
+  dplyr::slice(1:10)
+
+
+t14 <- property_type_grouped %>%
+  gt() %>%
+  tab_header(
+    title = "Average Price of Listings per Property Type",
+    subtitle = "Top 10 Most Expensive Property Types"
+  )
+
+
+# Define your own scale of grey colors
+grey_colors <- c("#F0F0F0", "#E0E0E0", "#D0D0D0", "#C0C0C0", "#B0B0B0", "#A0A0A0", "#909090", "#808080", "#707070", "#606060")
+
+# Create the ggplot
+p10 <- ggplot(property_type_grouped, aes(reorder(property_type, avg_price_property_type), avg_price_property_type, fill = property_type)) +
+  geom_col() +  # No need to specify col = "white"
+  geom_hline(yintercept = 147.97, linetype = "dashed", color = "red") +
+  scale_fill_manual(values = grey_colors) +  # Use your own grey color scale
+  scale_y_continuous(labels = dollar_format(), n.breaks = 5) +
+  labs(
+    y = "Average Price of Listings",
+    x = "Property Type",
+    title = "Average Price of Listings per Property Type",
+    subtitle = "Top 10 Cheapest Property Type"
+  ) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", vjust = 1, hjust = 0.5, color = "black"),
+    plot.subtitle = element_text(size = 12, lineheight = 0.8, vjust = 1, hjust = 0.5, color = "black"),
+    axis.title = element_text(size = 14, color = "black"),
+    axis.text = element_text(size = 8, color = "#666666"),
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    panel.grid.major = element_line(color = "gray", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white")
+  )
+```
+
+
+```{r, echo=FALSE}
+t14
+p10
+```
+
+```{r, include=FALSE}
+rm(p10, t14, property_type_grouped, grey_colors)
 ```
 
 
@@ -487,6 +543,164 @@ rm(i, median_diff, t13, p9, median_diff_df, amenities_df)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Neighbourhood\_cleansed variable}
+\subsection{Top 10 most expensive neighbourhoods}
+The chart displays the top 10 most costly neighbourhoods among Italian Airbnb listings. Additionally, a horizontal reference line marks the average price for all Airbnb listings in Italy. Notably, all of the top 10 most expensive neighbourhoods surpass this average price.  
+
+```{r, include=FALSE}
+
+neighbourhood_grouped <- clean_data%>%
+  dplyr::group_by(neighbourhood_cleansed)%>%
+  dplyr::summarize(avg_price_neighbourhood = round(mean(price), 2))
+
+neighbourhood_grouped <- neighbourhood_grouped%>%
+  dplyr::arrange(desc(avg_price_neighbourhood))%>%
+  dplyr::slice(1:10)
+
+t15 <- neighbourhood_grouped %>%
+  gt() %>%
+  tab_header(
+    title = "Average Price of Listings per Neighbourhood",
+    subtitle = "Top 10 Most Expensive Neighbourhoods"
+  )
+
+
+# Define your own scale of grey colors
+grey_colors <- c("#F0F0F0", "#E0E0E0", "#D0D0D0", "#C0C0C0", "#B0B0B0", "#A0A0A0", "#909090", "#808080", "#707070", "#606060")
+
+# Create the ggplot
+p11 <- ggplot(neighbourhood_grouped, aes(reorder(neighbourhood_cleansed, avg_price_neighbourhood), avg_price_neighbourhood, fill = neighbourhood_cleansed)) +
+  geom_col() +  # No need to specify col = "white"
+  geom_hline(yintercept = 147.97, linetype = "dashed", color = "red") +
+  scale_fill_manual(values = grey_colors) +  # Use your own grey color scale
+  scale_y_continuous(labels = dollar_format(), n.breaks = 5) +
+  labs(
+    y = "Average Price of Listings",
+    x = "Neighbourhood",
+    title = "Average Price of Listings per Neighbourhood",
+    subtitle = "Top 10 Cheapest Neighbourhoods"
+  ) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", vjust = 1, hjust = 0.5, color = "black"),
+    plot.subtitle = element_text(size = 12, lineheight = 0.8, vjust = 1, hjust = 0.5, color = "black"),
+    axis.title = element_text(size = 14, color = "black"),
+    axis.text = element_text(size = 8, color = "#666666"),
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    panel.grid.major = element_line(color = "gray", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white")
+  )
+```
+
+
+```{r, echo=FALSE}
+t15
+p11
+```
+
+
+```{r, include=FALSE}
+rm(p11, t15, neighbourhood_grouped, grey_colors)
+```
+
+
+\subsection{Top 10 Cheapest Property Type}
+The chart displays the top 10 most cheapest property types among Italian Airbnb listings. Additionally, a horizontal reference line marks the average price for all Airbnb listings in Italy. Notably, all of the top 10 most cheapest property types are below this average price. 
+
+```{r, include=FALSE}
+neighbourhood_grouped <- clean_data%>%
+  dplyr::group_by(neighbourhood_cleansed)%>%
+  dplyr::summarize(avg_price_neighbourhood = round(mean(price), 2))
+
+neighbourhood_grouped <- neighbourhood_grouped%>%
+  dplyr::arrange(avg_price_neighbourhood)%>%
+  dplyr::slice(1:10)
+
+t16 <- neighbourhood_grouped %>%
+  gt() %>%
+  tab_header(
+    title = "Average Price of Listings per Neighbourhood",
+    subtitle = "Top 10 Cheapest Neighbourhoods"
+  )
+
+
+# Define your own scale of grey colors
+grey_colors <- c("#F0F0F0", "#E0E0E0", "#D0D0D0", "#C0C0C0", "#B0B0B0", "#A0A0A0", "#909090", "#808080", "#707070", "#606060")
+
+# Create the ggplot
+p12 <- ggplot(neighbourhood_grouped, aes(reorder(neighbourhood_cleansed, avg_price_neighbourhood), avg_price_neighbourhood, fill = neighbourhood_cleansed)) +
+  geom_col() +  # No need to specify col = "white"
+  geom_hline(yintercept = 147.97, linetype = "dashed", color = "red") +
+  scale_fill_manual(values = grey_colors) +  # Use your own grey color scale
+  scale_y_continuous(labels = dollar_format(), n.breaks = 5) +
+  labs(
+    y = "Average Price of Listings",
+    x = "Neighbourhood",
+    title = "Average Price of Listings per Neighbourhood",
+    subtitle = "Top 10 Cheapest Neighbourhoods"
+  ) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", vjust = 1, hjust = 0.5, color = "black"),
+    plot.subtitle = element_text(size = 12, lineheight = 0.8, vjust = 1, hjust = 0.5, color = "black"),
+    axis.title = element_text(size = 14, color = "black"),
+    axis.text = element_text(size = 8, color = "#666666"),
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    panel.grid.major = element_line(color = "gray", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white")
+  )
+```
+
+
+```{r, echo=FALSE}
+t16
+p12
+```
+
+```{r, include=FALSE}
+rm(p12, t16, neighbourhood_grouped, grey_colors)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 
 

@@ -76,7 +76,8 @@ library(gt) #Latex tables
 
 
 ```{r, echo=FALSE}
-raw_data <- read.csv("../../gen/data-preparation/input/merged_data.csv", fileEncoding = "UTF-8")
+# Load the R object
+raw_data <- readRDS("../../gen/data-preparation/input/merged_data.rds")
 ```
 
 
