@@ -87,15 +87,15 @@ In this document, the data manipulation procedures applied to the original datas
 
 \begin{enumerate}
     \item[\Roman{enumi}I.] Management of Empty Columns: Removal of the variables \texttt{calendar\_updated} and \texttt{bathrooms} from the dataset due to their sole containment of missing values.
-    \item[\Roman{enumi}II.] Management of Price Outliers: Subsequent removal of observations with outliers in the \texttt{price} variable, as it serves as the dependent variable (DV) in our regression model.
-    \item[\Roman{enumi}III.] Management of Unnecessary Variables: Elimination of variables that lack relevance to our regression model, such as \texttt{listing\_url}.
-    \item[\Roman{enumi}IV.] Management of Character Variables: Conversion of specific variables from a "character" format to "date" and "factor" formats to ensure compatibility with our regression model, which exclusively accommodates "factor" and "numeric" formats.
-    \item[\Roman{enumi}V.] Management of the Amenities Variable: Utilization of the \texttt{amenities} variable to generate a series of Boolean variables, indicating the provision of specific services within a listing, including "pool," "gym," "garden," "elevator," "oven," and more.
-    \item[\Roman{enumi}VI.] Management of the \texttt{property\_type} and \texttt{neighbourhood\_cleansed} Variables: Removal of certain levels within the \texttt{property\_type} and \texttt{neighbourhood\_cleansed} (factor) variables, characterized by minimal observations, to alleviate the computational burden of our regression model.
-    \item[\Roman{enumi}VII.] Management of Observations with Missing Values: Ultimate elimination of all observations containing missing values (NAs) across any variables within the dataset, acknowledging the incompatibility of regression models and correlations with missing data.
+    \item[\Roman{enumi}II.] Management of Observations with Missing Values: Ultimate elimination of all observations containing missing values (NAs) across any variables within the dataset, acknowledging the incompatibility of regression models and correlations with missing data.
+    \item[\Roman{enumi}III.] Management of Price Outliers: Subsequent removal of observations with outliers in the \texttt{price} variable, as it serves as the dependent variable (DV) in our regression model.
+    \item[\Roman{enumi}IV.] Management of Unnecessary Variables: Elimination of variables that lack relevance to our regression model, such as \texttt{listing\_url}.
+    \item[\Roman{enumi}V.] Management of Character Variables: Conversion of specific variables from a "character" format to "date" and "factor" formats to ensure compatibility with our regression model, which exclusively accommodates "factor" and "numeric" formats.
+    \item[\Roman{enumi}VI.] Management of the Amenities Variable: Utilization of the \texttt{amenities} variable to generate a series of Boolean variables, indicating the provision of specific services within a listing, including "pool," "gym," "garden," "elevator," "oven," and more.
+    \item[\Roman{enumi}VII.] Management of Factor Variables: Removal of certain levels within the \texttt{property\_type} and \texttt{neighbourhood\_cleansed} (factor) variables, characterized by minimal observations, to alleviate the computational burden of our regression model.
 \end{enumerate}
 
-\section{Manage empty coloumns}
+\section{Management of empty columns}
 Code for showing the number of columns that contains only missing values:
 
 ```{r}
@@ -139,6 +139,118 @@ rm(indices, cols_to_remove, names_list)
 
 
 
+\section{Management of unnecessary variables}
+During this phase of the project, the 'select' function was utilized to identify and exclude variables that were deemed irrelevant for our price prediction analysis. The selection of variables for removal was made in accordance with the following criteria, with a focus on minimizing the number of exclusions:
+
+\begin{enumerate}
+    \item[\Roman{enumi}I.] Format Criteria: The majority of removed variables were in 'character' format.
+    \item[\Roman{enumi}II.] Usefulness Criteria: Removal of variables that were clearly irrelevant for predicting listings' prices.
+    \item[\Roman{enumi}III.] Redundancy Criteria: Removal of variables that overlapped each other and carried the same information (this was also to avoid multicollinearity, more on this later in this project).
+    \item[\Roman{enumi}IV.] Consistency Criteria: Removal of variables present only in certain data sets.
+\end{enumerate}
+
+Following these guidelines, we chose to remove the following variables:
+```{r, include=FALSE}
+# Create a data frame with your itemized list
+itemized_list <- data.frame(
+  Variable = c(
+    "id", "listing_url", "scrape_id", "last_scraped", "source",
+    "name", "description", "neighborhood_overview", "picture_url",
+    "host_id", "host_url", "host_name", "host_location", "host_about",
+    "host_thumbnail_url", "host_picture_url", "host_neighbourhood",
+    "neighbourhood", "neighbourhood_cleansed_group",
+    "minimum_minimum_nights", "maximum_minimum_nights",
+    "minimum_maximum_nights", "maximum_maximum_nights",
+    "minimum_nights_avg_ntm", "maximum_nights_avg_ntm",
+    "calendar_last_scraped", "license",
+    "calculated_host_listings_count",
+    "calculated_host_listings_count_entire_homes",
+    "calculated_host_listings_count_private_rooms",
+    "calculated_host_listings_count_shared_rooms"
+  ),
+  Description = c(
+    "unique identifier for the listing",
+    "URL of the listing",
+    "ID of the data scrape",
+    "last update of data set",
+    "source from which the listing information were scraped",
+    "title of the ad placed by the host on the AirBnb platform",
+    "brief description of the listing",
+    "brief description of the neighborhood",
+    "URL of listings' pictures",
+    "unique identifier for hosts",
+    "URL of the host",
+    "name of the host",
+    "city of hosts' residence",
+    "brief description of the hosts",
+    "URL of the hosts' thumbnail pictures",
+    "URL of the hosts' pictures",
+    "host's neighborhood",
+    "neighborhood (neighbourhood_cleansed was more informative)",
+    "neighborhood_cleansed_group (only available for regions)",
+    "to avoid redundancy",
+    "to avoid redundancy",
+    "to avoid redundancy",
+    "to avoid redundancy",
+    "to avoid redundancy",
+    "to avoid redundancy",
+    "to avoid redundancy",
+    "to avoid redundancy",
+    "to avoid redundancy",
+    "to avoid redundancy",
+    "to avoid redundancy",
+    "to avoid redundancy"
+  )
+)
+
+t2 <- itemized_list %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Variables to Remove"
+  )
+
+```
+
+```{r, echo=FALSE}
+t2
+rm(t2, itemized_list)
+```
+
+
+The following code, which implies the use of the \texttt{select} function, is used to remove those variables: 
+```{r}
+raw_data <- raw_data %>%
+  dplyr::select (-id, -listing_url, -scrape_id, -last_scraped, -source, -name, -description, -neighborhood_overview, -picture_url, -host_id, -host_url, -host_name, -host_location, -host_about, -host_thumbnail_url, -host_picture_url,-host_neighbourhood, -neighbourhood, -neighbourhood_group_cleansed, -minimum_minimum_nights, -maximum_minimum_nights, -minimum_maximum_nights, -maximum_maximum_nights, -minimum_nights_avg_ntm, -maximum_nights_avg_ntm, -calendar_last_scraped, -license, -calculated_host_listings_count, -calculated_host_listings_count_entire_homes, -calculated_host_listings_count_private_rooms, -calculated_host_listings_count_shared_rooms)
+```
+
+The following character variables remain. Subsequent scripts will address these variables.  
+```{r}
+char_cols <- names(raw_data[,sapply(raw_data, is.character)])
+cat('There are', length(char_cols), 'columns in character format and they are the following:')
+```
+
+
+```{r, echo=FALSE}
+char_cols <- data.frame(Variable = char_cols)
+
+t3 <-char_cols %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Character Variables",
+    subtitle = "List of Remaining Character Variables",
+  )
+
+t3
+rm(t3)
+```
 
 
 
@@ -146,7 +258,128 @@ rm(indices, cols_to_remove, names_list)
 
 
 
-\section{Manage Price Outliers}
+
+
+
+
+
+
+
+\section{Management of Observations with Missing Values}
+After completing the previous data cleaning operation, the removal of observations containing missing values (i.e., NAs) is warranted.
+
+This step holds significance as many regression model functions in R are incompatible with observations featuring missing values. Furthermore, eliminating missing values, if a sufficient number of observations remain, generally enhances model performance.
+
+\textbf{Inspecting the number of missing values:} First, the following code was used to determine the number of rows having at least one missing value: 
+```{r}
+cat('Now, there are', sum(!complete.cases(raw_data)), 'rows with at least 1 NAs regarding the variables we chose to maintain in the dataset')
+```
+
+\textbf{Missing Values per Variable Dataframe:} The subsequent code was employed to generate a two-column dataframe called 'missing_data'. Its first column contains the variable names from the 'raw_data' dataset, while the second column displays the number of missing values for each variable.
+
+```{r}
+missing_data <- raw_data %>%
+  summarize_all(~ sum(is.na(.))) %>%
+  gather() %>%
+  rename(variable = key, missing_values = value)
+
+missing_data <- missing_data %>%
+  filter(missing_values > 0) %>%
+  arrange(desc(missing_values)) 
+
+missing_data$variable <- reorder(missing_data$variable, missing_data$missing_values)
+```
+
+Below is an excerpt from the previously generated dataframe 'missing_data', displaying the first five rows. This dataset will be utilized in the subsequent section for building the plot "Number of Missing Values per Variable".
+```{r, include=FALSE}
+t5 <- head(missing_data, 5) %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Table of Missing Values",
+    subtitle = "Number of Missing Values by Variable",
+  )
+```
+
+```{r, echo=FALSE}
+t5
+```
+
+
+\textbf{Plot of Missing Values per Variable:} The subsequent plot illustrates the number of missing values per variable:
+```{r, include=FALSE}
+p5 <- ggplot(data = missing_data, aes(x = variable, y = missing_values, fill = missing_values)) +
+  geom_bar(stat = "identity") +
+  scale_fill_gradient(low = "#FEFBBD", high = "darkgreen") +
+  geom_label(aes(label = missing_values), fill = "#666666", col = "white", size = 3) +
+  labs(title = "Number of Missing Values per Variable",
+       subtitle = "Data collected from Listings dataset",
+       x = "Variables",
+       y = "Number of Missing Values") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", vjust = 1, hjust = 0.5, colour = "black"),
+        plot.subtitle = element_text(size = 12, lineheight = 0.8, vjust = 1, hjust = 0.5, colour = "black"),
+        axis.title = element_text(size = 14, colour = "black"),
+        axis.text = element_text(size = 8, colour = "black"),
+        panel.grid.major = element_line(color = "gray", size = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white")) +
+  coord_flip()
+```
+
+```{r, echo=FALSE}
+p5
+```
+
+```{r, include=FALSE}
+rm(t5, p5, missing_data)
+```
+
+
+By inspecting the plot, it is possible to notice that the majority of variables with missing values are in 'numeric' format. Most of these belong to the "review-related" variables. Other numeric variables containing missing values include 'bedrooms,' 'beds,' 'review\_per\_month', and more. 
+
+
+\textbf{Managing Missing Values:} Initially, an attempt was made to impute the median and the mean (of the respective variables) for all missing values within the 'numeric' and 'date' variables. However, this imputation approach led to a notable decline in the regression model's performance.
+
+Therefore, as a final decision, the choice was made to eliminate all observations containing missing data from the dataset, since the number of observations remained in the dataset was sufficient. 
+
+The following code shows how to remove those observations from the dataset:
+```{r}
+raw_data <- na.omit(raw_data)
+cat('Now, there are', sum(!complete.cases(raw_data)), 'rows with NAs in the dataset')
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Management of price outliers}
 In the initial phase of our analysis, emphasis was placed on addressing the presence of outliers within our dataset, particularly among numerical predictors. It is noteworthy that while the absence of outliers is often considered a beneficial practice for enhancing regression model performance, it does not represent an absolute requirement for regression analysis. Given this perspective, we directed our attention specifically to outliers within our response variable, which is the listings' \texttt{price}.
 
 To explore potential strategies for handling outliers, we conducted experiments involving the replacement of outliers with both the mean and median values of the \texttt{price} variable. However, these approaches yielded unsatisfactory outcomes, leading to a decline in the overall performance of the final model.
@@ -315,118 +548,6 @@ summary(raw_data$price)
 
 
 
-\section{Manage Unuseful Variables}
-During this phase of the project, the 'select' function was utilized to identify and exclude variables that were deemed irrelevant for our price prediction analysis. The selection of variables for removal was made in accordance with the following criteria, with a focus on minimizing the number of exclusions:
-
-\begin{enumerate}
-    \item[\Roman{enumi}I.] Format Criteria: The majority of removed variables were in 'character' format.
-    \item[\Roman{enumi}II.] Usefulness Criteria: Removal of variables that were clearly irrelevant for predicting listings' prices.
-    \item[\Roman{enumi}III.] Redundancy Criteria: Removal of variables that overlapped each other and carried the same information (this was also to avoid multicollinearity, more on this later in this project).
-    \item[\Roman{enumi}IV.] Consistency Criteria: Removal of variables present only in certain data sets.
-\end{enumerate}
-
-Following these guidelines, we chose to remove the following variables:
-```{r, include=FALSE}
-# Create a data frame with your itemized list
-itemized_list <- data.frame(
-  Variable = c(
-    "id", "listing_url", "scrape_id", "last_scraped", "source",
-    "name", "description", "neighborhood_overview", "picture_url",
-    "host_id", "host_url", "host_name", "host_location", "host_about",
-    "host_thumbnail_url", "host_picture_url", "host_neighbourhood",
-    "neighbourhood", "neighbourhood_cleansed_group",
-    "minimum_minimum_nights", "maximum_minimum_nights",
-    "minimum_maximum_nights", "maximum_maximum_nights",
-    "minimum_nights_avg_ntm", "maximum_nights_avg_ntm",
-    "calendar_last_scraped", "license",
-    "calculated_host_listings_count",
-    "calculated_host_listings_count_entire_homes",
-    "calculated_host_listings_count_private_rooms",
-    "calculated_host_listings_count_shared_rooms"
-  ),
-  Description = c(
-    "unique identifier for the listing",
-    "URL of the listing",
-    "ID of the data scrape",
-    "last update of data set",
-    "source from which the listing information were scraped",
-    "title of the ad placed by the host on the AirBnb platform",
-    "brief description of the listing",
-    "brief description of the neighborhood",
-    "URL of listings' pictures",
-    "unique identifier for hosts",
-    "URL of the host",
-    "name of the host",
-    "city of hosts' residence",
-    "brief description of the hosts",
-    "URL of the hosts' thumbnail pictures",
-    "URL of the hosts' pictures",
-    "host's neighborhood",
-    "neighborhood (neighbourhood_cleansed was more informative)",
-    "neighborhood_cleansed_group (only available for regions)",
-    "to avoid redundancy",
-    "to avoid redundancy",
-    "to avoid redundancy",
-    "to avoid redundancy",
-    "to avoid redundancy",
-    "to avoid redundancy",
-    "to avoid redundancy",
-    "to avoid redundancy",
-    "to avoid redundancy",
-    "to avoid redundancy",
-    "to avoid redundancy",
-    "to avoid redundancy"
-  )
-)
-
-t2 <- itemized_list %>%
-  gt() %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_column_labels(columns = everything())
-  ) %>%
-  tab_header(
-    title = "Variables to Remove"
-  )
-
-```
-
-```{r, echo=FALSE}
-t2
-rm(t2, itemized_list)
-```
-
-
-The following code, which implies the use of the \texttt{select} function, is used to remove those variables: 
-```{r}
-raw_data <- raw_data %>%
-  dplyr::select (-id, -listing_url, -scrape_id, -last_scraped, -source, -name, -description, -neighborhood_overview, -picture_url, -host_id, -host_url, -host_name, -host_location, -host_about, -host_thumbnail_url, -host_picture_url,-host_neighbourhood, -neighbourhood, -neighbourhood_group_cleansed, -minimum_minimum_nights, -maximum_minimum_nights, -minimum_maximum_nights, -maximum_maximum_nights, -minimum_nights_avg_ntm, -maximum_nights_avg_ntm, -calendar_last_scraped, -license, -calculated_host_listings_count, -calculated_host_listings_count_entire_homes, -calculated_host_listings_count_private_rooms, -calculated_host_listings_count_shared_rooms)
-```
-
-The following character variables remain. Subsequent scripts will address these variables.  
-```{r}
-char_cols <- names(raw_data[,sapply(raw_data, is.character)])
-cat('There are', length(char_cols), 'columns in character format and they are the following:')
-```
-
-
-```{r, echo=FALSE}
-char_cols <- data.frame(Variable = char_cols)
-
-t3 <-char_cols %>%
-  gt() %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_column_labels(columns = everything())
-  ) %>%
-  tab_header(
-    title = "Character Variables",
-    subtitle = "List of Remaining Character Variables",
-  )
-
-t3
-rm(t3)
-```
 
 
 
@@ -437,7 +558,14 @@ rm(t3)
 
 
 
-\section{Manage Character Variables}
+
+
+
+
+
+
+
+\section{Management of character variables}
 These scripts was used for the conversion of specific variables from character to date and factor formats, a crucial step to ensure the compatibility of our dataset with regression analysis.
 
 The transformation of these variables holds significance as character variables would have imposed limitations on the scope of our model. These conversions now enable the incorporation of these variables into our regression analysis, expanding the analytical possibilities of our study.
@@ -500,7 +628,19 @@ cat('Now, there is only', length(char_cols), 'column in character format and it 
 ```
 
 
-\section{Manage Amenities Variable}
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Management of the Amenities Variable}
 Within the dataset, the 'amenities' column serves as a character variable, cataloging the services offered by individual listings to their tenants, encompassing amenities such as "Air Conditioning," "Elevator," "Refrigerator," and "Wifi." To systematically determine the presence or absence of these specific services within each apartment, a structured sequence of operations was undertaken:
 
 \begin{enumerate}
@@ -558,7 +698,7 @@ The following is an example of the newly created columns:
 ```{r, echo=FALSE}
 # Select the columns you want to display
 selected_cols <- head(raw_data, 5) %>%
-  dplyr::select("Air_conditioning":"Bathtub")
+  dplyr::select(44:47)
 
 # Create a gt table
 t4 <- gt(selected_cols)
@@ -609,115 +749,9 @@ rm(char_cols)
 
 
 
-\section{Manage Missing Values}
-After completing all the intended data cleaning operations, the removal of observations containing missing values (i.e., NAs) is warranted.
-
-This step holds significance as many regression model functions in R are incompatible with observations featuring missing values. Furthermore, eliminating missing values, if a sufficient number of observations remain, generally enhances model performance.
-
-\textbf{Inspecting the number of missing values:} First, the following code was used to determine the number of rows having at least one missing value: 
-```{r}
-cat('Now, there are', sum(!complete.cases(raw_data)), 'rows with at least 1 NAs regarding the variables we chose to maintain in the dataset')
-```
-
-\textbf{Missing Values per Variable Dataframe:} The subsequent code was employed to generate a two-column dataframe called 'missing_data'. Its first column contains the variable names from the 'raw_data' dataset, while the second column displays the number of missing values for each variable.
-
-```{r}
-missing_data <- raw_data %>%
-  summarize_all(~ sum(is.na(.))) %>%
-  gather() %>%
-  rename(variable = key, missing_values = value)
-
-missing_data <- missing_data %>%
-  filter(missing_values > 0) %>%
-  arrange(desc(missing_values)) 
-
-missing_data$variable <- reorder(missing_data$variable, missing_data$missing_values)
-```
-
-Below is an excerpt from the previously generated dataframe 'missing_data', displaying the first five rows. This dataset will be utilized in the subsequent section for building the plot "Number of Missing Values per Variable".
-```{r, include=FALSE}
-t5 <- head(missing_data, 5) %>%
-  gt() %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_column_labels(columns = everything())
-  ) %>%
-  tab_header(
-    title = "Table of Missing Values",
-    subtitle = "Number of Missing Values by Variable",
-  )
-```
-
-```{r}
-t5
-```
 
 
-\textbf{Plot of Missing Values per Variable:} The subsequent plot illustrates the number of missing values per variable:
-```{r, include=FALSE}
-p5 <- ggplot(data = missing_data, aes(x = variable, y = missing_values, fill = missing_values)) +
-  geom_bar(stat = "identity") +
-  scale_fill_gradient(low = "#FEFBBD", high = "darkgreen") +
-  geom_label(aes(label = missing_values), fill = "#666666", col = "white", size = 3) +
-  labs(title = "Number of Missing Values per Variable",
-       subtitle = "Data collected from Listings dataset",
-       x = "Variables",
-       y = "Number of Missing Values") +
-  theme_minimal() +
-  theme(legend.position = "none",
-        plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", vjust = 1, hjust = 0.5, colour = "black"),
-        plot.subtitle = element_text(size = 12, lineheight = 0.8, vjust = 1, hjust = 0.5, colour = "black"),
-        axis.title = element_text(size = 14, colour = "black"),
-        axis.text = element_text(size = 8, colour = "black"),
-        panel.grid.major = element_line(color = "gray", size = 0.5),
-        panel.grid.minor = element_blank(),
-        panel.background = element_rect(fill = "white")) +
-  coord_flip()
-```
-
-```{r}
-p5
-```
-
-```{r, include=FALSE}
-rm(t5, p5, missing_data)
-```
-
-
-By inspecting the plot, it is possible to notice that: 
-
-\begin{itemize}
-  \item Numeric Variables:
-    \begin{itemize}
-      \item The majority of variables with missing values are in 'numeric' format.
-      \item Most of these belong to the "review-related" variables.
-      \item Other numeric variables containing missing values include 'bathroom,' 'bedrooms,' 'beds,' and more.
-    \end{itemize}
-  \item Date Variables:
-    \begin{itemize}
-      \item Three variables are in 'date' format: 'last\_review,' 'first\_review,' and 'host\_since.'
-    \end{itemize}
-  \item Categorical Variables:
-    \begin{itemize}
-      \item Two variables are in 'factor' format: 'host\_acceptance\_rate\_percentage' and 'host\_response\_time\_percentage.'
-    \end{itemize}
-\end{itemize} 
-
-
-
-
-\textbf{Managing Missing Values:} Initially, an attempt was made to impute the median and the mean (of the respective variables) for all missing values within the 'numeric' and 'date' variables. However, this imputation approach led to a notable decline in the regression model's performance.
-
-Therefore, as a final decision, the choice was made to eliminate all observations containing missing data from the dataset, since the number of observations remained in the dataset was sufficient. 
-
-The following code shows how to remove those observations from the dataset:
-```{r}
-raw_data <- na.omit(raw_data)
-cat('Now, there are', sum(!complete.cases(raw_data)), 'rows with NAs in the dataset')
-```
-
-
-\section{Managing Factor Variables}
+\section{Management of factor variables}
 The purpose of this section is to explore and manage the variables in factor format present in the dataset.
 
 \subsection{Preliminary Step}
@@ -796,10 +830,6 @@ table(raw_data$host_is_superhost)
 
 
 
-
-
-
-
 \subsection{Host\_verifications}
 Initially, the \texttt{host\_verifications}  variable held values containing square brackets and apostrophes, potentially hindering subsequent analysis. Utilizing the \texttt{gsub} function, those special characters were eliminated from the variable's values. Furthermore, it's worth noting that the use of \texttt{gsub} automatically transformed the variable into a \texttt{character} format, necessitating a subsequent conversion back to \texttt{factor}.
 
@@ -860,7 +890,7 @@ t6 <- head(grouped_data, 10) %>%
   )
 ```
 
-```{r}
+```{r, echo=FALSE}
 t6
 ```
 
@@ -905,7 +935,7 @@ t7 <- head(grouped_data, 10) %>%
   )
 ```
 
-```{r}
+```{r, echo=FALSE}
 t7
 ```
 

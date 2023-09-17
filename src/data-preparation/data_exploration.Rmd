@@ -311,7 +311,7 @@ This code chunk iterates through all the \texttt{amenities-related} variables wi
 median_diff_df <- data.frame(Variable_Name = character(0), Median_Difference = numeric(0))
 
 # Loop through variables 35 to 127
-for (i in 35:127) {
+for (i in 42:118) {
   # Select the relevant columns and group by Bidet
   amenities_df <- clean_data %>%
     select(price, all_of(i)) %>%
