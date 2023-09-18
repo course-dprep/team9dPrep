@@ -86,10 +86,10 @@ raw_data <- readRDS("../../gen/data-preparation/input/raw_data.rds")
 In this document, the data manipulation procedures applied to the original dataset are outlined. These procedures encompass the incorporation of new features, the conversion of variables into alternative formats, and the data cleansing process. These manipulations are indispensable for assuring the quality and appropriateness of the dataset for constructing the regression model.
 
 \begin{enumerate}
-    \item[\Roman{enumi}I.] Management of Empty Columns: Removal of the variables \texttt{calendar\_updated} and \texttt{bathrooms} from the dataset due to their sole containment of missing values.
-    \item[\Roman{enumi}II.] Management of Observations with Missing Values: Ultimate elimination of all observations containing missing values (NAs) across any variables within the dataset, acknowledging the incompatibility of regression models and correlations with missing data.
-    \item[\Roman{enumi}III.] Management of Price Outliers: Subsequent removal of observations with outliers in the \texttt{price} variable, as it serves as the dependent variable (DV) in our regression model.
-    \item[\Roman{enumi}IV.] Management of Unnecessary Variables: Elimination of variables that lack relevance to our regression model, such as \texttt{listing\_url}.
+    \item[\Roman{enumi}I.] Management of Empty Columns: Removal of the variables \texttt{calendar\_updated}, \texttt{neighbourhood\_group\_cleansed} and \texttt{bathrooms} from the dataset due to their sole containment of missing values.
+        \item[\Roman{enumi}II.] Management of Unnecessary Variables: Elimination of variables that lack relevance to our regression model, such as \texttt{listing\_url}.
+    \item[\Roman{enumi}III.] Management of Observations with Missing Values: Ultimate elimination of all observations containing missing values (NAs) across any variables within the dataset, acknowledging the incompatibility of regression models and correlations with missing data.
+    \item[\Roman{enumi}IV.] Management of Price Outliers: Subsequent removal of observations with outliers in the \texttt{price} variable, as it serves as the dependent variable (DV) in our regression model.
     \item[\Roman{enumi}V.] Management of Character Variables: Conversion of specific variables from a "character" format to "date" and "factor" formats to ensure compatibility with our regression model, which exclusively accommodates "factor" and "numeric" formats.
     \item[\Roman{enumi}VI.] Management of the Amenities Variable: Utilization of the \texttt{amenities} variable to generate a series of Boolean variables, indicating the provision of specific services within a listing, including "pool," "gym," "garden," "elevator," "oven," and more.
     \item[\Roman{enumi}VII.] Management of Factor Variables: Removal of certain levels within the \texttt{property\_type} and \texttt{neighbourhood\_cleansed} (factor) variables, characterized by minimal observations, to alleviate the computational burden of our regression model.
@@ -656,14 +656,12 @@ rm(constant_factor_vars, constant_factors, factor_vars)
 
 
 The following is an example of the newly created columns:
-```{r}
+
+```{r, include=FALSE}
 # Select the columns you want to display
 selected_cols <- head(raw_data, 5) %>%
   dplyr::select(43:47)
-```
 
-
-```{r, include=FALSE}
 # Create a gt table
 t4 <- gt(selected_cols)
 
@@ -809,8 +807,7 @@ table(raw_data$host_verifications)
 ```
 
 \subsection{Property\_Type}
-As indicated in the table below, the variable \texttt{property\_type} exhibits some levels with a notably low frequency of observations.
-(We have selected and displayed only 10 random levels as an example, recognizing that the \texttt{property\_type} variable comprises more than 25 levels with fewer than four observations each.)
+As can be noticed from the table below, the variable \texttt{property\_type} exhibits some levels with a notably low frequency of observations. Specifically, the table shows the levels of the \texttt{property\_tpe} variable with a frequency lower than 4. 
 ```{r, include=FALSE}
 grouped_data <- raw_data %>%
   dplyr::group_by(property_type) %>%
@@ -855,7 +852,8 @@ rm(grouped_data, levels_to_drop, levels_to_remove, t6)
 
 
 \subsection{Neighbourhood\_cleansed}
-In a manner similar to the previous step, the table below illustrates that the \texttt{neighbourhood\_cleansed} variable exhibits several levels with a notably low frequency of observations. (We have selected and displayed only 10 random levels as an example, recognizing that the \texttt{neighbourhood\_cleansed} variable comprises more than 250 levels with fewer than four observations each.)
+In a manner similar to the previous step, the table below illustrates that the \texttt{neighbourhood\_cleansed} variable exhibits several levels with a notably low frequency of observations. In this case too, the table shows the levels of the \texttt{neighbourhood\_cleansed} variable with a frequency lower than 4.
+
 ```{r}
 grouped_data <- raw_data %>% 
   dplyr::group_by(neighbourhood_cleansed) %>% 
