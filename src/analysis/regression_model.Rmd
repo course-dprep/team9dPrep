@@ -1,0 +1,398 @@
+---
+title: "XGBoost Regression Model"
+subtitle: "SKILLS: Data Preparation and Workflow Management - Group 9"
+author:
+  - "Rabino Tommaso"
+  - "Franceschini Emanuele"
+  - "Magalotti Bianca"
+  - "Tan Colin"
+  - "Benmrit Akram"
+date: "\\textit{20 October 2024}"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    fig_caption: true
+header-includes:
+  - "\\usepackage[english]{babel}"  # Language
+  - "\\usepackage[T1]{fontenc}"  # Font encoding
+  - "\\usepackage{mathptmx}"  # Times New Roman font for text
+  - "\\usepackage{helvet}"  # Arial-like font for sans-serif
+  - "\\usepackage{setspace}"  # Line spacing
+  - "\\onehalfspacing"  # 1.5 line spacing
+  - "\\usepackage{fancyhdr}"  # Header and footer customization
+  - "\\usepackage{titlesec}"  # Section titles formatting
+  - "\\usepackage{abstract}"  # Abstract formatting
+  - "\\usepackage{caption}"  # Captions customization
+  - "\\usepackage{graphicx}"  # Graphics
+  - "\\usepackage{amsmath}"  # Math equations
+  - "\\usepackage{amssymb}"  # Math symbols
+  - "\\usepackage{natbib}"  # Citation style (change as needed)
+  - "\\bibliographystyle{apalike}"  # Bibliography style (change as needed)
+  - "\\usepackage{hyperref}"  # Hyperlinks and URLs
+  - "\\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}"
+  - "\\usepackage{appendix}"  # Appendix formatting
+  - "\\usepackage{enumerate}"  # Enumerate environment
+  - "\\pagestyle{fancy}"  # Custom page style
+  - "\\fancyhf{}"
+  - "\\renewcommand{\\headrulewidth}{0pt}"
+  - "\\renewcommand{\\footrulewidth}{0pt}"
+  - "\\fancyhead[R]{\\thepage}"  # Page number in the header
+  - "\\fancypagestyle{plain}{\\fancyhf{}\\renewcommand{\\headrulewidth}{0pt}}"
+  - "\\lhead{\\small{A.A. 2023/2024-Courses: SKILLS: Data Preparation and Workflow Management}}"
+  - "\\usepackage{multicol}"  # For two columns
+geometry: "left=2.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm"  # Adjust margins
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(tidy = FALSE,
+                      size = "small",
+                      out.width = "100%",
+                      message = FALSE,
+                      warning = FALSE,
+                      error = FALSE)
+```
+
+
+```{r, include = FALSE}
+###############################################################
+#############             PACKAGES               ##############
+###############################################################
+#GENERAL PACKAGES:
+library(tidyverse) #A "Package of Packages" for Data manipulation and visualization (includes magrittr, lubridate, purrr, tidyr, etc.).
+library(dplyr) #Data frame manipulations (select, slice, etc.
+library(jsonlite) #For Amenities Columns Creation
+
+#PLOT PACKAGES:
+library(ggplot2) #Building fancy plots.
+library(ggthemes) #Themes for ggplots (e.g. "solarized").
+library(ggcorrplot) #For correlograms
+library(scales) #Scaling and formatting ggplots (e.g. scale_fill_gradient()).
+library(gt) #Latex tables
+
+#REGRESSION PACKAGES
+library(caret) #Hyperparameters Tuning. 
+library(xgboost) #XGBoost Regression. 
+library(DALEX) #Summary of the XGBoost Regression Model ("explainer).
+library(bayesforecast) #Checking Regression Assumptions.
+```
+
+
+```{r, echo=FALSE}
+# Load the R object
+regression_data <- readRDS("../../gen/analysis/input/clean_data.rds")
+y <- readRDS("../../gen/analysis/input/y.rds")
+```
+
+
+\section{Split the Dataset}
+The following script is used to split the dataset into two different sub-datasets. The first is named \texttt{data\_for\_training}, contains 75% of the observations, and will be used to train the model. The second sub-dataset is named \texttt{data\_for\_testing}, contains the remaining 25% of the observations, and will be used to test the model's performance.
+
+```{r}
+regression_data$log_price <- y
+
+split <- createDataPartition(y,
+                             times = 1,
+                             p =0.75, 
+                             list = FALSE)
+data_for_training <- regression_data[split,]
+data_for_testing <- regression_data[-split,]
+
+cat("Our training dataset has ", nrow(data_for_training), "observations and ", ncol(data_for_training), "variables, while our testing dataset has ", nrow(data_for_testing), "observations and ", ncol(data_for_testing), "variables.")
+
+```
+```{r, include=FALSE}
+rm(y, split, regression_data)
+```
+
+
+\section{Regression model training}
+In the following section we will walk through all the steps needed to train our regression model. After multiple attempts in which we tested different regression models, we opted for an XGBoost regression model:
+
+XGBoost stands for "Extreme Gradient Boosting," which is a popular machine learning algorithm used for both regression and classification tasks. It is based on gradient boosting, which means that it builds an ensemble of decision trees iteratively.
+
+In an XGBoost regression model, the algorithm learns to make predictions by combining the predictions of multiple decision trees. The trees are trained in sequence, where each tree is built to correct the mistakes of the previous tree. The output of the XGBoost model is the weighted average of the predictions of all the trees.
+
+XGBoost algorithms are useful because of several reasons:
+\begin{itemize}
+\item Accuracy: First, it is an extremely powerful and accurate algorithm that has been successful in many competitions and real-world applications.
+\item Hyperparameters: Second,XGBoost provides several hyperparameters that can be tuned to optimize the model's performance.
+\item Efficiency: Finally, XGBoost is a computationally efficient algorithm, and can handle large datasets.
+\end{itemize}
+
+
+\subsection{Storing the target variable}
+
+The first step for building the regression model is quite simple. We started by storing our target variable (\texttt{log\_price}) in a separate vector named \texttt{y\_train}. Then, we removed the target variable from our training dataset using the select() function from the dplyr package.
+
+```{r}
+y_train <- data_for_training$log_price
+
+data_for_training <- data_for_training %>%
+  dplyr::select (-log_price)
+
+```
+
+
+\subsection{Hyperparameters tuning}
+The second step is probably the most complicated one. Basically, the following code snippets are use to perform a Hyperparameters tuning for our XGBoost model using the 'caret' package.
+
+\textbf{Hyperparameters} are the settings that configure a machine learning model and that are not learned by the model during the training phase, but instead are set before the training begins. These settings can have a significant impact on the performance of the model, and so finding the best combination of hyperparameters is an important step in the machine learning process. Basically, if we don't explicitly specify these hyperparameters in R, then the model will be trained with default hyperparameters provided by the function we are using (in our case, the \texttt{xgb.train()} function). However, these default hyperparameters may not be optimal for our specific problem, so it's important to carefully consider and set the hyperparameters that suit our needs.
+
+\textbf{Hyperparameter tuning} is the process of selecting the optimal combination of hyperparameters for a machine learning model. This process may be done manually (by trying different random combinations of hyperparameters and comparing the performances of the different resulting trained models), or it may be automated using techniques like grid search or Bayesian optimization.
+
+Specifically, in this section, we will do the following:
+\begin{itemize}
+\item Hyperparameters to Test>: The first part of the code creates, using the expand.grid() function, a grid of hyperparameters combinations that will be tested.
+\item The grid includes different values for hyperparameters such as the number of boosting rounds (nrounds), learning rate (eta), maximum tree depth (max\_depth), minimum sum of instance weight (min\_child\_weight), and subsampling ratio of the training instance (subsample).
+\item The values for these hyperparameters are predefined, and the grid combines all possible combinations of values for each hyperparameter, resulting in multiple hyperparameter combinations to train our XGBoost model.
+\item Control Object: Then, the trainControl() function is used to create a control object for the training process. Here, the method is set to "cv" for cross-validation, and the number of folds is set to 5.
+\item Find the Best Hyperparameters: Finally, the train() function of the 'xgboost' package is used to apply the hyperparameters combinations to the (training) dataset in order to find the best hyperparameters combinations.
+\end{itemize}
+
+The best hyperparameters which will be used as default parameters of our final xgboost model, are shown below: 
+
+```{r}
+xgb_grid = expand.grid(
+  nrounds = 1000,
+  eta = c(0.1, 0.05, 0.01),
+  max_depth = c(2, 3, 4, 5, 6),
+  gamma = 0,
+  colsample_bytree=1,
+  min_child_weight=c(1, 2, 3, 4 ,5),
+  subsample=1
+)
+
+control <- trainControl(method = "cv", number = 5, verboseIter = TRUE)
+
+xgb_caret <- train(x=data_for_training, y=y_train, method='xgbTree', trControl= control, tuneGrid=xgb_grid)
+
+saveRDS(xgb_caret, file = "../../gen/data-preparation/input/xgb_caret.rds")
+```
+
+```{r}
+best_tune <- xgb_caret$bestTune
+
+t7 <- best_tune %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Best Hyperparameters")
+```
+
+ 
+```{r}
+
+```
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+### Third Step - Create the XGB Matrix for the Model {.unnumbered} 
+
+The third step is quite simple. We __converted our training dataset into a xgb.DMatrix__ (named 'dtrain'), which is the default format used by the xgboost modelling.
+
+```{r}
+dtrain <- xgb.DMatrix(data = as.matrix(data_for_training), label= y_train)
+```
+
+
+### Fourth Step - Finding the Best Number of Iterations to Optimize the (best) Hyperparameters {.unnumbered}
+
+In the fourth step, we performed a cross-validation using the XGBoost package in order to <span style="color: #D4AF37;">__find the best number of iterations to optimize the best hyperparameters__</span> found in the previous section.
+
+Specifically, the following block of code is responsible for __finding the iteration with the lowest RMSE value__ among all the iterations performed during the cross-validation process. This is achieved by using the which.min() function, which returns the index of the minimum value in a given vector. In this case, it is applied to the test_rmse_mean column of the evaluation_log object, which contains the RMSE values for each iteration on the test set. By finding the index of the minimum value, we can determine which iteration produced the lowest RMSE value.
+
+Once the iteration with the lowest RMSE value is identified, the subsequent block of code creates a table that displays the best iteration number to optimize the best-performing hyperparameters.
+  
+As before, since this takes a long time to perform, we decided to 'deactivate' the relative code (by placing it as a #comment inside the chunk). We then saved this object locally and, therefore, we added a piece of code needed to load such an object and use it more quickly for subsequent operations. 
+
+```{r}
+default_param<-list(
+  objective = "reg:squarederror",
+  booster = "gbtree",
+  eta=0.05,
+  gamma=0,
+  max_depth=6, 
+  min_child_weight=4, 
+  subsample=1,
+  colsample_bytree=1
+)
+
+xgbcv <- xgb.cv( params = default_param, data = dtrain, nrounds = 1000, nfold = 5, showsd = T, stratified = T, print_every_n = 50, early_stopping_rounds = 10, maximize = F)
+
+best_iteration <- which.min(xgbcv$evaluation_log$test_rmse_mean)
+best_rmse <- xgbcv$evaluation_log$test_rmse_mean[best_iteration]
+best_iteration_results <- data.frame(iteration = best_iteration, test_rmse_mean = best_rmse)
+
+```
+
+```{r}
+saveRDS(xgbcv, file = "../../gen/data-preparation/input/xgbcv.rds")
+```
+
+
+
+```{r}
+t19 <- best_iteration_results %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Best iteration results"
+  )
+```
+
+```{r, echo=FALSE}
+t19
+```
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Fifth Step - Model Training with Best Hyperparameters and Best Number of Iterations {.unnumbered}
+
+In this section, using the xgb.train() function, __we trained the model using the best number of iterations and the best hyperparameters found in the previous steps__ and stored the model in an object named xgb_mod.
+
+```{r}
+
+xgb_mod <- xgb.train(data = dtrain, params=default_param, nrounds = 594)
+
+rm(default_param)
+```
+
+
+### Sixth Step - Model Performances {.unnumbered}
+
+The DALEX package used in this section provides a set of __tools for explaining the behavior of complex machine learning models__ (including XGBoost models). Using this package, we were able to create an __explainer object__, which takes as input the trained model (xgb_mod), the training data (data = dtrain), and the corresponding response variable (y = y_train).
+
+Then, using this "explainer" object, we extracted the three main regression model's performance metrics from our model:
+
+> __MAD__: the Mean Absolute Deviation is a measure of the average absolute difference between the predicted and actual values of the target variable. Essentially, the lower the MAD value, the better the model performance.
+  
+> __RMSE__: the Root Mean Square Error is calculated by taking the square root of the average of the squared differences between the predicted and actual values. In simple terms, RMSE measures how much the predicted values of a model deviate from the actual values. The lower the RMSE value, the better the model is at making accurate predictions.
+  
+> __R-Squared__: R-squared, also known as the coefficient of determination, is a statistical measure that represents the proportion of variance in a dependent variable that is explained by a set of independent variables. In other words, R-squared measures how well the regression line (or curve) fits the data points. A value closer to 1 indicates a better fit of the model to the data.
+  
+All of these metrics will be subsequently calculated also in relation to the regression model fueled by the testing dataset, in order to have a more complete evaluation of our XGBoost regression model's performance. 
+
+In any case, for now, it is possible to notice that <span style="color: #D4AF37;">__our regression model appears to be a powerful predictor of the response variable__</span>. The small RMSE, the small MAD and high R-squared indicate that the model __can explain a large proportion of the variability in the response variable__, and that the predictions made by the model are very accurate. This suggests that it can provide reliable insights and predictions for your data.
+
+The model's performance metrics are shown below:
+
+```{r, results='hide'}
+
+explainer <- explain(xgb_mod, data = dtrain, y = y_train)
+model_summary <- model_performance(explainer)
+model_summary_measures <- model_summary$measures
+model_summary_measures <- data.frame(model_summary_measures) %>% dplyr::select(-mse)
+
+``` 
+
+```{r}
+
+model_summary_measures%>%
+  kbl(col.names = c("RMSE", "R-Squared", "MAD"),
+      align = c("c", "c", "c")) %>%
+  kable_paper("hover", full_width = F)
+
+rm(model_summary_measures, model_summary, explainer)
+
+```  
+  
+
+```{r, results='hide'}
+explainer <- explain(xgb_mod, data = dtrain, y = y_train)
+model_summary <- model_performance(explainer)
+model_summary_residuals <- model_summary$residuals
+model_summary_residuals <- data.frame(model_summary_residuals)%>%
+  dplyr::select(-label, -diff)
+```
+
+Finally, to gain a comprehensive understanding of our regression model's performance, we employed the DALEX package to generate a table that showcases the <span style="color: #D4AF37;">__actual listings' prices__</span>, the <span style="color: #D4AF37;">__listings' prices predicted__</span> by our regression model, and the <span style="color: #D4AF37;">__corresponding differences__</span> between the two (i.e. residuals) for the initial ten observations in the training dataset.
+
+The table below highlights that __there is generally minimal deviation__ between the observed prices and the model's predictions:
+
+```{r}
+
+comparison_dataset <- model_summary_residuals %>%
+  dplyr::mutate(Predicted_Price = 10^predicted,
+                Actual_Price = 10^observed,
+                Residuals = Predicted_Price - Actual_Price)%>%
+  dplyr::select(Predicted_Price, Actual_Price, Residuals)
+
+head(comparison_dataset, 10)%>%
+  kbl(col.names = c("Predicted Price", "Actual Price", "Residuals"),
+      align = c("c", "c", "c")) %>%
+  kable_paper("hover", full_width = F)
+
+
+rm(comparison_dataset)
+``` 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
