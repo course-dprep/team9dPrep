@@ -156,7 +156,7 @@ p6
 
 To improve clarity, we created a table displaying the correlation of each variable with \texttt{price}. Additionally, we've organized the variables in descending order based on their correlation with \texttt{price} to enhance interpretation.
 
-The table below reveals that certain variables exhibit a stronger correlation with \texttt{price}. Notably, bathrooms (0.50), accommodates (0.41), bedrooms (0.41), and beds (0.30) show the highest positive correlations. This suggests that, as expected, larger properties tend to command higher prices. Conversely, the \texttt{review\_score} variables display relatively weak correlations with \texttt{price}.
+The table below reveals that certain variables exhibit a stronger correlation with \texttt{price}. Notably, bathrooms (0.44), bedrooms (0.42), accommodates (0.39), and beds (0.32) show the highest positive correlations. This suggests that, as expected, larger properties tend to command higher prices. Conversely, the \texttt{review\_score} related variables display relatively weak, or even negative, correlations with \texttt{price}.
 
 ```{r, include=FALSE}
 # Convert correlation matrix into a dataframe
@@ -264,7 +264,10 @@ p7
 
 To improve clarity, we created a table displaying the correlation of each variable with \texttt{price}. Additionally, we've organized the variables in descending order based on their correlation with \texttt{price} to enhance interpretation.
 
-The table below reveals that certain variables exhibit a stronger correlation with \texttt{price}. Notably, \texttt{host\_acceptance\_rate\_percentage} (0.07), \texttt{host\_listings\_count} (0.07), and \texttt{host\_total\_listings\_count}	(0.07) show the highest positive correlations. Conversely, \texttt{host\_since\_year} displays relatively weak correlations with \texttt{price} (-0.07). In general, \texttt{host-related} variables show weaker correlations with \texttt{price} if compared to \texttt{apartment-related} variables.
+The table below reveals that certain variables exhibit a stronger correlation with \texttt{price}. Notably, \texttt{host\_listings\_count} (0.07), and \texttt{host\_total\_listings\_count} (0.06), show the highest positive correlations.
+Conversely, as happened for the apartment-related variables, all \texttt{review\_score} related variables have weak, or even negative, correlations with \texttt{price}.
+
+In general, \texttt{host-related} variables show weaker correlations with \texttt{price} if compared to \texttt{apartment-related} variables.
 
 ```{r, include=FALSE}
 # Convert correlation matrix into a dataframe
@@ -305,13 +308,13 @@ rm(corr_data, corr_matrix, t10, p7, t11, corr_matrix_df, my_colors, column_names
 
 
 \section{Amenities-related Variables}
-This code chunk iterates through all the \texttt{amenities-related} variables within the dataframe, ranging from variable 35 to 127. Then, it computes the median price difference between listings that offer a specific amenity and those that do not.
+This code chunk iterates through all the \texttt{amenities-related} variables within the dataframe, ranging from variable 42 to 123. Then, it computes the median price difference between listings that offer a specific amenity and those that do not.
 ```{r}
 # Create an empty dataframe to store the results
 median_diff_df <- data.frame(Variable_Name = character(0), Median_Difference = numeric(0))
 
 # Loop through variables 35 to 127
-for (i in 42:118) {
+for (i in 42:123) {
   # Select the relevant columns and group by Bidet
   amenities_df <- clean_data %>%
     select(price, all_of(i)) %>%
@@ -393,23 +396,6 @@ p8
 ```{r, include=FALSE}
 rm(i, median_diff, t12, p8, median_diff_df, amenities_df, top_10_median_diff)
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 \section{Property\_type variable}
@@ -535,40 +521,6 @@ rm(p10, t14, property_type_grouped, grey_colors)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 \section{Neighbourhood\_cleansed variable}
 \subsection{Top 10 most expensive neighbourhoods}
 The chart displays the top 10 most costly neighbourhoods among Italian Airbnb listings. Additionally, a horizontal reference line marks the average price for all Airbnb listings in Italy. Notably, all of the top 10 most expensive neighbourhoods surpass this average price.  
@@ -686,22 +638,5 @@ p12
 ```
 
 ```{r, include=FALSE}
-rm(p12, t16, neighbourhood_grouped, grey_colors)
+rm(list=ls())
 ```
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
