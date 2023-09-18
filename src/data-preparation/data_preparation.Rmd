@@ -1,5 +1,5 @@
 ---
-title: "Data Exploration"
+title: "Data Preparation before Modelling the Regression"
 subtitle: "SKILLS: Data Preparation and Workflow Management - Group 9"
 author:
   - "Rabino Tommaso"
@@ -71,6 +71,8 @@ library(ggthemes) #Themes for ggplots (e.g. "solarized").
 library(ggcorrplot) #For correlograms
 library(scales) #Scaling and formatting ggplots (e.g. scale_fill_gradient()).
 library(gt) #Latex tables
+library(moments) #Measuring the skewness of our dependent variable (price).
+library(caret)
 ```
 
 
@@ -135,7 +137,7 @@ high_corr_pairs <- data.frame(Variable1 = character(0), Variable2 = character(0)
 # Loop through the rows and columns of the correlation matrix
 for (i in 1:nrow(corr_matrix)) {
   for (j in 1:ncol(corr_matrix)) {
-    if (i < j && abs(corr_matrix[i, j]) > threshold) {
+    if (!is.na(corr_matrix[i, j]) && i < j && abs(corr_matrix[i, j]) > threshold) {
       high_corr_pairs <- rbind(high_corr_pairs, 
                                data.frame(Variable1 = rownames(corr_matrix)[i],
                                           Variable2 = colnames(corr_matrix)[j],
@@ -144,7 +146,7 @@ for (i in 1:nrow(corr_matrix)) {
   }
 }
 
-#Arrange order: 
+# Arrange the pairs by correlation in descending order
 high_corr_pairs <- high_corr_pairs %>% arrange(desc(high_corr_pairs$Correlation))
 
 t17 <- high_corr_pairs %>%
@@ -157,6 +159,7 @@ t17 <- high_corr_pairs %>%
     title = "Highly Correlated Variable Pairs",
     subtitle = paste("Pairs with correlation > ", threshold),
   )
+
 
 ```
 
@@ -172,259 +175,243 @@ clean_data <- clean_data %>% dplyr::select(-host_total_listings_count, -availabi
 
 
 ```{r, include=FALSE}
-rm(corr_data, corr_matrix, p8, t12, corr_matrix_df, my_colors, i, j, threshold, high_corr_pairs)
+rm(corr_data, corr_matrix, p13, t17, corr_matrix_df, my_colors, i, j, threshold, high_corr_pairs)
 ```
-
-
-
 
 
 
 \section{Dealing with skewness of price}
-First of all, we have to <span style="color: #D4AF37;">__prepare our response variable for the modeling__</span>, because its skewness it's too high. 
-
-> __Skewness__ is a measure of the symmetry in a distribution. A symmetrical variable will have a skewness equal to 0 (i.e. a normal distributed variable will have a skewness of 0). As a rule of thumb, a variable can be regarded as __sufficiently normally distributed if its skewness is near to 0__ or, at least, between -1 and 1.
-
-
-
-
-
-
-
-
-
-
+Now, we have to prepare our response variable for the modeling, because its skewness it's too high. Skewness is a measure of the symmetry in a distribution. A symmetrical variable will have a skewness equal to 0 (i.e. a normal distributed variable will have a skewness of 0). As a rule of thumb, a variable can be regarded as sufficiently normally distributed if its skewness is near to 0 or, at least, between -1 and 1.
 
 ```{r}
-cat("As we can see, the skewness of our target variable (price) is too high: ", skewness(raw_data$price))
+cat("As we can see, the skewness of our target variable (price) is too high: ", skewness(clean_data$price))
 ```
 
-In order to fix this issue, __we computed the logarithm in base 10 of the price__ and use it as __response variable__ of our regression model.
-
+In order to fix this issue, we computed the natural logarithm \texttt{price} and use it as response variable for our regression model.
 ```{r}
-raw_data$log_price = log10(raw_data$price)
-cat("The skewness of our new response variable (log_price) is equal to: ", skewness(raw_data$log_price), "--> a much better result than the previous one.")
+clean_data$log_price = log(clean_data$price)
+cat("The skewness of our new response variable (log_price) is equal to: ", skewness(clean_data$log_price), "--> a much better result than the previous one.")
 ```
 
-It is also possible to <span style="color: #D4AF37;">__measure the improvement in the skewness of our dependent variable__</span> by inspecting the __two Normal Q-Q plots below__. As we know, a Normal Q-Q (Quantile-Quantile) plot is a graphical tool used to assess whether or not a variable is approximately normally distributed. The plot compares the observed data quantiles to the expected quantiles of a normal distribution.
+It is also possible to measure the improvement in the skewness of our dependent variable by inspecting the two Normal Q-Q plots below, one inspecting the distribution of \texttt{price}, and the other inspecting the distribution of the newly created variable \texttt{log\_price}. A Normal Q-Q (Quantile-Quantile) plot is a graphical tool used to assess whether or not a variable is approximately normally distributed. The plot compares the observed data quantiles to the expected quantiles of a normal distribution.
 
-Indeed, it can be seen that __our response variable is now better normally distributed__, since the points better follow the straight line drawn at a 45-degree angle from the origin.
+Indeed, it can be seen that our response variable is now better normally distributed, since the points follow the straight line drawn at a 45-degree angle from the origin.
 
-```{r, fig.show="hold", out.width="50%"}
-par(mfrow=c(2,1))
-
-ggplot(raw_data, aes(sample = price)) +
-  stat_qq(color = "#AC001E") +
-  stat_qq_line(color = "#9A7B4F", size=1) +
+```{r, include=FALSE}
+p14 <- ggplot(clean_data, aes(sample = price)) +
+  stat_qq(color = "red") +
+  stat_qq_line(color = "grey", size=1) +
   labs(title = "Normal Q-Q Plot of Price",
        x = "Theoretical Quantiles",
        y = "Sample Quantiles")+
   theme(legend.position = "none", 
-        plot.title = element_text(size = 18, lineheight=.8, face="bold", vjust=1, hjust=0.5, colour = "#AC001E"),
-        plot.subtitle = element_text(size = 12, lineheight=.8, vjust=1, hjust=0.5, colour = "#AC001E"),
-        axis.title = element_text(size = 14, colour = "#AC001E"), 
+        plot.title = element_text(size = 18, lineheight=.8, face="bold", vjust=1, hjust=0.5, colour = "black"),
+        plot.subtitle = element_text(size = 12, lineheight=.8, vjust=1, hjust=0.5, colour = "black"),
+        axis.title = element_text(size = 14, colour = "black"), 
         axis.text = element_text(size = 8, colour = "#666666"),
         axis.text.x = element_text(hjust = 1),
         panel.grid.major = element_line(color = "gray", size = 0.5),
         panel.grid.minor = element_blank(),
         panel.background = element_rect(fill = "white"))
   
-ggplot(raw_data, aes(sample = log_price)) +
-  stat_qq(color = "#AC001E") +
-  stat_qq_line(color = "#9A7B4F", size=1) +
-  labs(title = "Normal Q-Q Plot of Log_price",
+p15 <- ggplot(clean_data, aes(sample = log_price)) +
+  stat_qq(color = "red") +
+  stat_qq_line(color = "gray", size=1) +
+  labs(title = "Normal Q-Q Plot of log_price",
        x = "Theoretical Quantiles",
        y = "Sample Quantiles")+
   theme(legend.position = "none", 
-        plot.title = element_text(size = 18, lineheight=.8, face="bold", vjust=1, hjust=0.5, colour = "#AC001E"),
-        plot.subtitle = element_text(size = 12, lineheight=.8, vjust=1, hjust=0.5, colour = "#AC001E"),
-        axis.title = element_text(size = 14, colour = "#AC001E"), 
+        plot.title = element_text(size = 18, lineheight=.8, face="bold", vjust=1, hjust=0.5, colour = "black"),
+        plot.subtitle = element_text(size = 12, lineheight=.8, vjust=1, hjust=0.5, colour = "black"),
+        axis.title = element_text(size = 14, colour = "black"), 
         axis.text = element_text(size = 8, colour = "#666666"),
         axis.text.x = element_text(hjust = 1),
         panel.grid.major = element_line(color = "gray", size = 0.5),
         panel.grid.minor = element_blank(),
         panel.background = element_rect(fill = "white"))
-
-
-par(mfrow=c(1,1))
-
-raw_data <- raw_data %>% dplyr::select(-price)
-  
 ```  
 
+```{r, fig.show="hold", out.width="50%"}
+p14
+p15
+``` 
 
-### Second Step - Divide the dataset based on variables 'format' {.unnumbered}
-With the following scripts we __divided the dataset into 3 parts__: one for numeric variables, one for date variables, and one for factor variables. This passage is important because __we will manage each of this part separately__ in the following data preparation sections. Specifically:
-
-* <span style="color: #D4AF37;">__Numeric Variables__</span>: The numeric Variables (except for the response variable _price_) will be __centered__ and __scaled__ to avoid error due to different scales.
-* <span style="color: #D4AF37;">__Date and Factor Variables__</span>: Since XGBoost Regression Models can only handle numerical variables, _factor_ and _date_ predicotrs will be __converted into numeric format__ by using two different methods.
-
+Since we will use the newly created variable \texttt{log\_price} as our response variable, we can remove the \texttt{price} variable from the dataset. 
 ```{r}
-numeric_raw_data <- raw_data %>% dplyr::select_if(is.numeric)
-date_raw_data <- raw_data %>% dplyr::select_if(is.Date)
-factor_raw_data <- raw_data %>% dplyr::select_if(is.factor)
-
-Numeric_Variables <- names(numeric_raw_data)
-Date_Variables <- names(date_raw_data)
-Factor_Variables <- names(factor_raw_data)
-
-cat("There are", length(numeric_raw_data), "numeric variables,", length(date_raw_data), "date variables, and", length(factor_raw_data), "factor variables. And they are the following: ")
-
-Numeric_Variables %>%
-  kbl(col.names = "Numeric Variables",
-      align = "c") %>%
-  kable_paper("hover", full_width = F)%>%
-  scroll_box(height = "200px")
-
-Date_Variables %>%
-  kbl(col.names = "Date Variables",
-      align = "c") %>%
-  kable_paper("hover", full_width = F)
-
-Factor_Variables %>%
-  kbl(col.names = "Factor Variables",
-      align = "c") %>%
-  kable_paper("hover", full_width = F)%>%
-  scroll_box(height = "200px")
-
-
-rm(Numeric_Variables, Date_Variables, Factor_Variables)
+clean_data <- clean_data %>% dplyr::select(-price)
 ```
 
 
-### Third Step - Managing 'Date' Predictors {.unnumbered}
-In order to convert the <span style="color: #D4AF37;">__'date' variables in 'numeric' format__</span> we created 3 different new variables, one for the days, one for the months, and one for the years for each of the 4 date variables. 
+```{r, include=FALSE}
+rm(p14, p15)
+```
+
+
+\section{Divide the dataset based on variables 'format'}
+With the following code block we are going to split the dataset into 3 parts: one for numeric variables, one for date variables, and one for factor variables. This passage is important because we will manage each of this subdataset separately in the following data preparation sections. Specifically:
+\begin{itemize}
+\item Numeric Variables: The numeric Variables (except for the response variable \texttt{log\_price}) will be centered and scaled to avoid error due to different scales of measurement.
+\item Date and Factor Variables: Since XGBoost Regression Models can only handle numerical variables, factor and date predictors will be converted into numeric format by using two different methods.
+\end{itemize}
+
+```{r}
+numeric_clean_data <- clean_data %>% dplyr::select_if(is.numeric)
+date_clean_data <- clean_data %>% dplyr::select_if(is.Date)
+factor_clean_data <- clean_data %>% dplyr::select_if(is.factor)
+
+cat("There are", length(numeric_clean_data), "numeric variables,", length(date_clean_data), "date variables, and", length(factor_clean_data), "factor variables. And they are the following: ")
+
+```
+
+\section{Management of date predictors}
+In order to convert the date variables in numeric format we created 3 different new variables, one for the days, one for the months, and one for the years for each of the 3 date variables. After the creation of these new numeric variables, we can remove the source date variables from our dataset.
+
+```{r}
+date_clean_data$host_since_day <- as.numeric(day(date_clean_data$host_since))
+date_clean_data$host_since_month <- as.numeric(month(date_clean_data$host_since))
+date_clean_data$host_since_year <- as.numeric(year(date_clean_data$host_since))
+
+date_clean_data$first_review_day <- as.numeric(day(date_clean_data$first_review))
+date_clean_data$first_review_month <- as.numeric(month(date_clean_data$first_review))
+date_clean_data$first_review_year <- as.numeric(year(date_clean_data$first_review))
+
+date_clean_data$last_review_day <- as.numeric(day(date_clean_data$last_review))
+date_clean_data$last_review_month <- as.numeric(month(date_clean_data$last_review))
+date_clean_data$last_review_year <- as.numeric(year(date_clean_data$last_review))
+
+date_clean_data <- date_clean_data %>% dplyr::select(-host_since, -first_review, -last_review)
+```
+
 The following, is a glimpse of our newly created variables. 
+```{r, include=FALSE}
+t18 <- head(date_clean_data, 5) %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Date Variables"
+  )
+```
 
-```{r}
-date_raw_data$last_scraped_day <- as.numeric(day(date_raw_data$last_scraped))
-date_raw_data$last_scraped_month <- as.numeric(month(date_raw_data$last_scraped))
-date_raw_data$last_scraped_year <- as.numeric(year(date_raw_data$last_scraped))
+```{r, echo=FALSE}
+t18
+```
 
-date_raw_data$host_since_day <- as.numeric(day(date_raw_data$host_since))
-date_raw_data$host_since_month <- as.numeric(month(date_raw_data$host_since))
-date_raw_data$host_since_year <- as.numeric(year(date_raw_data$host_since))
-
-date_raw_data$first_review_day <- as.numeric(day(date_raw_data$first_review))
-date_raw_data$first_review_month <- as.numeric(month(date_raw_data$first_review))
-date_raw_data$first_review_year <- as.numeric(year(date_raw_data$first_review))
-
-date_raw_data$last_review_day <- as.numeric(day(date_raw_data$last_review))
-date_raw_data$last_review_month <- as.numeric(month(date_raw_data$last_review))
-date_raw_data$last_review_year <- as.numeric(year(date_raw_data$last_review))
-
-date_raw_data <- date_raw_data %>% dplyr::select(-last_scraped, -host_since, -first_review, -last_review)
-
-head(date_raw_data, 5)%>%
-  kbl(align = "c") %>%
-  kable_paper("hover", full_width = F)
+```{r, include=FALSE}
+rm(t18)
 ```
 
 
+\section{Management of numeric predictors}
+In order to avoid errors due to the different scales of measurement used for the different numeric variables in the dataset, we performed two different operations, namely centering and scaling numeric predictors.
 
-### Fourth Step - Centering and Scaling Numeric Predictor {.unnumbered}
-In order to avoid errors due to the different scales used to measure the numeric variables, we performed two different operations, namely <span style="color: #D4AF37;">__centering__</span> and <span style="color: #D4AF37;">__scaling__</span> numeric predictors.
+\textbf{Centering} refers to the process of subtracting the mean value of a numeric variable from each value of that variable. This transformation results in a new variable with a mean of zero. Centering is useful when we want to compare the relative position of different observations, without being affected by the scale of the original variable.
 
-> __Centering__ refers to the process of __subtracting the mean value of a numeric variable from each value of that variable__. This transformation results in a new variable with a mean of zero. Centering is useful when we want to compare the relative position of different observations, without being affected by the scale of the original variable.
+\textbf{Scaling}, on the other hand, refers to the process of transforming a numeric variable so that its values fall within a specific range or interval. Scaling techniques can be used to normalize variables and reduce the impact of extreme values, making them more comparable. For example, a commonly used scaling technique is standardization, where each value is subtracted by the mean and divided by the standard deviation, resulting in a new variable with a mean of zero and standard deviation of one. Another example is min-max scaling, where each value is subtracted by the minimum value and divided by the range, resulting in a new variable with values between 0 and 1.
 
-> __Scaling__, on the other hand, refers to the process of transforming a numeric variable so that its values fall within a specific range or interval. Scaling techniques can be used to normalize variables and reduce the impact of extreme values, making them more comparable. For example, a commonly used scaling technique is __standardization__, where __each value is subtracted by the mean and divided by the standard deviation__, resulting in a new variable with a mean of zero and standard deviation of one. Another example is min-max scaling, where each value is subtracted by the minimum value and divided by the range, resulting in a new variable with values between 0 and 1.
-
-In order to perform these two operations we employed the _preProcess()_ function fo the _caret_ package. Moreover, since we want to scale and center only predictors, we have taken out the target variable from the dataset.
+In order to perform these two operations we employed the preProcess() function from the caret package. Moreover, since we want to scale and center only predictors, we have taken out the response variable (i.e. \texttt{log\_price}) from the dataset.
 
 Before centering and scaling numeric predictors, we stored the mean and the standard deviation of some variables into distinct vectors in order to use them in the conclusion section.
 
 ```{r}
-############### NEEDED FOR THE CONCLUSION #####################################################
+############### NEEDED FOR THE SHINY_APP #####################################################
 
-accommodates_mean <- mean(numeric_raw_data$accommodates)
-accommodates_sd <- sd(numeric_raw_data$accommodates)
-bedrooms_mean <- mean(numeric_raw_data$bedrooms)
-bedrooms_sd <- sd(numeric_raw_data$bedrooms)
-beds_mean <- mean(numeric_raw_data$beds)
-beds_sd <- sd(numeric_raw_data$beds)
-host_listings_count_mean <- mean(numeric_raw_data$host_listings_count)
-host_listings_count_sd <- sd(numeric_raw_data$host_listings_count)
+accommodates_mean <- mean(numeric_clean_data$accommodates)
+accommodates_sd <- sd(numeric_clean_data$accommodates)
+bedrooms_mean <- mean(numeric_clean_data$bedrooms)
+bedrooms_sd <- sd(numeric_clean_data$bedrooms)
+beds_mean <- mean(numeric_clean_data$beds)
+beds_sd <- sd(numeric_clean_data$beds)
+host_listings_count_mean <- mean(numeric_clean_data$host_listings_count)
+host_listings_count_sd <- sd(numeric_clean_data$host_listings_count)
 
 ###############################################################################################
 
 
-y <- numeric_raw_data$log_price
+y <- numeric_clean_data$log_price
 
-numeric_raw_data <- numeric_raw_data %>%
+numeric_clean_data <- numeric_clean_data %>%
   dplyr::select (-log_price)
 
-preprocessed_data <- preProcess(numeric_raw_data, method=c("center", "scale"))
+preprocessed_data <- preProcess(numeric_clean_data, method=c("center", "scale"))
 
 print(preprocessed_data)
 
-numeric_raw_data <- predict(preprocessed_data, newdata = numeric_raw_data)
+numeric_clean_data <- predict(preprocessed_data, newdata = numeric_clean_data)
+```
 
+```{r, include=FALSE}
 rm(preprocessed_data)
 ```
 
+\section{Management of Factor Predictors}
+In order to train a regression model using categorical predictors, we have to convert them in numeric format. For doing so we used a method called One-Hot Encoding.
 
-### Fifth Step - Managing Factor Predictors {.unnumbered}
-In order to train a regression model using categorical predictors, we have to __convert them in 'numeric' format__. For doing so we used a method called <span style="color: #D4AF37;">__'One-Hot Encoding'__</span>. 
+\textbf{One-hot encoding} is a process of converting categorical or factor variables into a set of binary (0/1) variables that can be used in a machine learning model. In this process, each category of the factor variable is represented as a separate binary variable or column. 
 
-> One-hot encoding is a process of __converting categorical or factor__ variables into a __set of binary (0/1) variables__ that can be used in a machine learning model. In this process, each category of the factor variable is represented as a separate binary variable or column. <br>
+For instance, take as an example the variable \texttt{host\_verifications} which has three categories: phone, e-mail, and work e-mail. After one-hot encoding, we will create three new binary variables: \texttt{host\_verifications\_phone}, \texttt{host\_verifications\_email}, and \texttt{host\_verifications\_workemail}. For each observation, the binary variable corresponding to the observed \texttt{host\_verifications} is set to 1, and all others are set to 0.
 
-
-For instance, take as an example the variable _host_verifications_ wich has three categories: _phone_, _e-mail_, and _work e-mail_. After one-hot encoding, we create three new binary variables: _host_verifications_phone_, _host_verifications_email_, and _host_verifications_workemail_. For each observation, the binary variable corresponding to the observed host_verifications is set to 1, and all others are set to 0.
-
-As said, one-hot encoding is necessary because __most machine learning algorithms cannot directly handle categorical variables__. By converting categorical variables into binary variables, we allow machine learning algorithms to treat each category as a separate feature, and to learn unique relationships between each category and the outcome variable.
+As said, one-hot encoding is necessary because most machine learning algorithms cannot directly handle categorical variables. By converting categorical variables into binary variables, we allow machine learning algorithms to treat each category as a separate feature, and to learn unique relationships between each category and the outcome variable.
 
 ```{r}
-factor_raw_data <- as.data.frame(model.matrix(~.-1, factor_raw_data))
-
-head(factor_raw_data, 5)%>%
-  kbl(align = "c") %>%
-  kable_paper("hover", full_width = F)
+factor_clean_data <- as.data.frame(model.matrix(~.-1, factor_clean_data))
 ```
 
 
-### Sixth Step - Combine the sub-datasets {.unnumbered}
-Then, we __combined the 3 sub-datasets__ (factor_raw_data, numeric_raw_data and date_raw_data) that __now contain only numeric variables__ and that now have been centered and scaled.
+\section{Combine the sub-datasets}
+Then, we combined the 3 sub-datasets (i.e. \texttt{factor\_clean\_data}, \texttt{date\_clean\_data}, and \texttt{numeric\_clean\_data} that now contain only numeric variables and that now have been centered and scaled.
 
-```{r}
-rm(raw_data)
-
-raw_data <- cbind(factor_raw_data, numeric_raw_data, date_raw_data)
-
-cat("Now, our dataset has ", nrow(raw_data), "observations and ", ncol(raw_data), "variables")
-
-rm(factor_raw_data, numeric_raw_data, date_raw_data)
-
-head(raw_data, 5)%>%
-  kbl(align = "c") %>%
-  kable_paper("hover", full_width = F)
+```{r, include=FALSE}
+rm(clean_data)
 ```
 
 
+```{r}
+clean_data <- cbind(numeric_clean_data, date_clean_data, factor_clean_data)
+
+cat("Now, our dataset has ", nrow(clean_data), "observations and ", ncol(clean_data), "variables")
+```
+
+```{r, include=FALSE}
+rm(factor_clean_data, numeric_clean_data, date_clean_data)
+```
 
 
+\section{Variables re-naming}
+After the One-Hot Encoding operation, the names of the variables in our dataset have became a little too complicated. Therefore, in order to have a clearer dataset before building the Regression Model, we decided to make some changes in their names. Specifically, we replaced all spaces with underscores.  
 
+```{r}
+# Remove non-alphanumeric symbols (except spaces and underscores) from variable names
+colnames(clean_data) <- gsub("[^[:alnum:] _]", "", colnames(clean_data))
 
+# Replace spaces with underscores in variable names
+colnames(clean_data) <- gsub(" ", "_", colnames(clean_data))
+```
 
+Finally, the dataset, and the other variables previously saved which will be used for the ShinyApp, are saved for future use in .RDS format.
+```{r}
+# Save as an R object
+saveRDS(clean_data, file = "../../gen/analysis/input/clean_data.rds")
 
+saveRDS(accommodates_mean, file = "../../gen/analysis/input/accommodates_mean.rds")
+saveRDS(accommodates_sd, file = "../../gen/analysis/input/accommodates_sd.rds")
 
+saveRDS(bedrooms_mean, file = "../../gen/analysis/input/bedrooms_mean.rds")
+saveRDS(bedrooms_sd, file = "../../gen/analysis/input/bedrooms_sd.rds")
 
+saveRDS(beds_mean, file = "../../gen/analysis/input/beds_mean.rds")
+saveRDS(beds_sd, file = "../../gen/analysis/input/beds_sd.rds")
 
+saveRDS(host_listings_count_mean, file = "../../gen/analysis/input/host_listings_count_mean.rds")
+saveRDS(host_listings_count_sd, file = "../../gen/analysis/input/host_listings_count_sd.rds")
 
+saveRDS(y, file = "../../gen/analysis/input/y.rds")
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```{r, include=FALSE}
+rm(list=ls())
+```
 
 
