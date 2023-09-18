@@ -1,5 +1,5 @@
 ---
-title: "Download and Merge Data"
+title: "Download Data"
 subtitle: "SKILLS: Data Preparation and Workflow Management - Group 9"
 author:
   - "Rabino Tommaso"
@@ -52,130 +52,87 @@ rm(list=ls())
 library(readr)
 ```
 
-\section{Download Dataset}
-The purpose of this code is to automate the download and extraction of \textit{Airbnb} listing data from various datasets representing Italian cities and regions on Airbnb. This automation streamlines the process of acquiring data for research and analysis.
+\section{Introduction}
 
-\textbf{Dataset Selection:} The initial step in our analysis involved the critical task of dataset selection. To ensure a comprehensive study, we opted to acquire and utilize all available Airbnb listings datasets for cities and regions in Italy. These datasets were sourced from \href{http://insideairbnb.com/get-the-data/}{Inside Airbnb}, the official Airbnb data provider. The choice of this dataset is driven by its relevance to our research objectives. We opt for Italian cities because they offer a diverse set of locations, each with its unique property types, features and pricing trends. By analyzing this dataset, we aim to gain valuable insights into the dynamics of Airbnb listings in Italy, helping us draw conclusions for our research.
+\textbf{Airbnb.} Airbnb is a prominent online marketplace founded in 2008, enabling individuals to lease their homes, apartments, or individual rooms to travelers. Over the years, Airbnb has evolved into a global platform operating in more than 220 countries and regions. Its mission revolves around fostering a world where everyone can find their place anywhere, facilitating unique travel experiences, and offering affordable accommodation options. Airbnb's impact on the hospitality industry has been transformative, providing an alternative to conventional hotels. With a vast global presence boasting over 7 million listings, Airbnb is the preferred choice for travelers seeking distinctive and cost-effective lodgings. The platform caters to a diverse array of accommodation choices, ranging from shared rooms to entire residences, accommodating various preferences such as location, pricing, and amenities. Additionally, Airbnb features a secure messaging system for direct communication between hosts and guests, along with a reliable payment system to facilitate transactions. Consequently, Airbnb has garnered favor among both leisure and business travelers, as well as homeowners seeking to monetize their unused space.
 
-\textbf{Preliminary Settings:} Before proceeding with the dataset download and extraction, we need to complete some preliminary steps:
+\textbf{Starting Point - The Dataset.} This project centers around the Milan listings dataset, accessible on the official \href{http://insideairbnb.com/get-the-data/}{Inside Airbnb} website. Inside Airbnb serves as Airbnb's official platform for collecting and storing all listing data. The dataset encompasses information on 19,248 apartments available for rent in Milan through Airbnb. The following code block provides the download link for this dataset.
+
+
+\section{Preliminary settings}
+Before proceeding with the dataset download and extraction, we need to complete some preliminary steps:
+
 \begin{itemize}
-  \item The \texttt{url} object is a vector containing URLs pointing to ZIP files hosted by Inside Airbnb. Each URL corresponds to Airbnb listing data for a specific city or region in Italy.
-  \item The \texttt{names} object is another vector providing user-defined names for each URL. These names will be used to label the downloaded data frames, making them easier to work with.
-  \item The \texttt{data\_dir} object specifies the target directory where the ZIP files will be downloaded and extracted.
+  \item The \texttt{url} object is a vector containing URL pointing to ZIP file hosted by Inside Airbnb. The URL corresponds to Airbnb listing data for Milan.
+  \item The \texttt{name} object is another vector providing user-defined name for the URL. These name will be used to label the downloaded data frame, making it easier to work with.
+  \item The \texttt{data\_dir} object specifies the target directory where the ZIP file will be downloaded and extracted.
 \end{itemize}
 
-These preliminary settings ensure that we have organized access to the datasets we need for our research. With this foundation, we can proceed to acquire, explore and analyze the data.
+These preliminary settings ensure that we have organized access to the dataset we need for our research. With this foundation, we can proceed to acquire, explore and analyze the data.
 
 ```{r}
-# URLs for downloading ZIP files
-url <- c(
-  "http://data.insideairbnb.com/italy/lombardia/bergamo/2023-06-30/data/listings.csv.gz",
-  "http://data.insideairbnb.com/italy/emilia-romagna/bologna/2023-06-21/data/listings.csv.gz",
-  "http://data.insideairbnb.com/italy/toscana/florence/2023-06-21/data/listings.csv.gz",
-  "http://data.insideairbnb.com/italy/lombardy/milan/2023-06-21/data/listings.csv.gz",
-  "http://data.insideairbnb.com/italy/campania/naples/2023-06-21/data/listings.csv.gz",
-  "http://data.insideairbnb.com/italy/puglia/puglia/2023-06-30/data/listings.csv.gz",
-  "http://data.insideairbnb.com/italy/lazio/rome/2023-06-10/data/listings.csv.gz",
-  "http://data.insideairbnb.com/italy/sicilia/sicily/2023-06-29/data/listings.csv.gz",
-  "http://data.insideairbnb.com/italy/trentino-alto-adige-s%C3%BCdtirol/trentino/2023-06-30/data/listings.csv.gz"
-)
+# URL for downloading the Milan dataset ZIP file
+url <- "http://data.insideairbnb.com/italy/lombardy/milan/2023-06-21/data/listings.csv.gz"
 
-# Names for each URL
-names <- c("listings_bergamo","listings_bologna", "listings_florence", "listings_milan", "listings_naples", "listings_puglia", "listings_rome", "listings_sicily", "listings_trentino")
+# Name for the Milan dataset
+name <- "listings_milan"
 
 # Define the target directory for extraction
 data_dir <- "../../data/"
 ```
 
 
-\textbf{Download and Extraction:}
-In the subsequent code section, we've implemented an automated procedure for downloading and extracting data from all Italian Airbnb listings datasets hosted by Inside Airbnb. This code operates by iterating through the previously defined list of URLs, conducting checks to ascertain whether the corresponding ZIP file already resides locally. Based on the outcome of this check, the code either initiates a download or bypasses it. Following successful downloads, the code proceeds to extract the CSV file from the downloaded ZIP file, and organize the data into distinct datasets, rendering them prepared for subsequent analysis.
+\section{Download and Extraction}
+The following code block is responsible for downloading, extracting, and loading the Milan Airbnb listings dataset. It checks if the dataset file already exists locally and, if not, proceeds to download it. After successful download, the code extracts the data from the compressed file and loads it into the 'data_milan' variable. A confirmation message will be printed to indicate that the dataset has been loaded.
 
 ```{r}
 #Avoid too long downloads to be shut down
 options(timeout = max(1000, getOption("timeout")))
 
-# Loop through the URLs and extract/load the CSV files into separate datasets
-for (i in 1:length(url)) {
-  target_file <- paste0(data_dir, names[i], ".csv.gz")
+# Define the target file path
+target_file <- paste0(data_dir, "milan.csv.gz")
 
-  # Check if the CSV file already exists
-  if (!file.exists(target_file)) {
-    download.file(url[i], target_file, mode = "wb")
-  } else {
-    print(paste("ZIP file", names[i], "already exists. Skipping download."))
-  }
-
-  # Extract and load the CSV file
-  gz_file <- gzfile(target_file, "rt")
-  dataset_name <- paste("data_", names[i], sep = "")  # Create a unique dataset name
-  assign(dataset_name, read.csv(gz_file))  # Load data into the dataset_name
-  close(gz_file)  # Close the GZ file
-  print(paste("Loaded", names[i]))
-}
-```
-
-```{r, include=FALSE}
-rm(url, target_file, names, i, gz_file, dataset_name)
-```
-
-
-
-\section{Data Merging and Storage}
-In the subsequent code segment, we execute a data merging task to prepare the Airbnb listings dataset for our analysis. This code combines the numerous datasets previously downloaded and extracted, uniting them into a single, consolidated dataset. Additionally, it manages the removal of the source datasets, a practice designed to liberate valuable memory resources.
-
-Furthermore, the code ensures the lasting accessibility of the merged dataset by saving it in two distinct formats. It is preserved both as a CSV file, facilitating external examination outside the RStudio environment, and as a .RDS (R Data Serialization) object. The latter format is chosen to simplify the reloading process, ensuring seamless integration into subsequent project sections.
-
-```{r}
-# List of dataset names
-dataset_names <- c("data_listings_milan", "data_listings_bergamo", "data_listings_bologna", "data_listings_florence", "data_listings_naples", "data_listings_puglia", "data_listings_rome", "data_listings_sicily", "data_listings_trentino")
-
-# Initialize the merged dataset with the first dataset
-data <- get(dataset_names[1])
-
-# Loop through the remaining datasets and merge them
-for (name in dataset_names[-1]) {
-  data <- rbind(data, get(name))
+# Check if the CSV file already exists
+if (!file.exists(target_file)) {
+  download.file(url, target_file, mode = "wb")
+} else {
+  print("ZIP file milan.csv.gz already exists. Skipping download.")
 }
 
-# Deleting "source" datasets
-for (name in dataset_names) {
-  rm(list = name)
-}
+# Extract and load the CSV file
+gz_file <- gzfile(target_file, "rt")
+data_milan <- read.csv(gz_file)
+close(gz_file)
 
-# Save the data as a CSV file
-write.csv(data, file = "../../data/dataset1/merged_data.csv", fileEncoding = "UTF-8",row.names=FALSE )
-
-#Save the data as .Rds file
-saveRDS(data, file = "../../gen/data-preparation/input/merged_data.rds")
-
+# Print a message to confirm loading
+print("Loaded milan.csv.gz")
 ```
-
-```{r, include=FALSE}
-rm(dataset_names, name, data)
-```
-
-
 
 \section{Delete Source ZIP Files}
-In this section, we address the cleanup process by removing the source ZIP files that were downloaded earlier. These ZIP files contained individual Airbnb listings data for various Italian cities. Once the relevant data have been extracted and the datasets merged, these ZIP files are no longer needed and can be safely deleted to free up storage space. The code below iterates through the list of ZIP file names and deletes them if they exist. This step ensures that we maintain an organized and clutter-free working environment.
-
+In this section, we address the cleanup process by removing the source ZIP file that was downloaded earlier. This ZIP file contained Milan Airbnb listings data. Once the relevant data have been extracted and the dataset saved locally, theis ZIP file is no longer needed and can be safely deleted to free up storage space. This step ensures that we maintain an organized and clutter-free working environment.
 ```{r}
-# List of ZIP file names
-zip_file_names <- c("listings_milan.csv.gz", "listings_bergamo.csv.gz", "listings_bologna.csv.gz", "listings_florence.csv.gz", "listings_naples.csv.gz", "listings_puglia.csv.gz", "listings_rome.csv.gz", "listings_sicily.csv.gz", "listings_trentino.csv.gz")
-
-# Loop through the ZIP file names and delete them
-for (zip_name in zip_file_names) {
-  zip_path <- file.path(data_dir, zip_name)
-  if (file.exists(zip_path)) {
-    file.remove(zip_path)
-    print(paste("Deleted", zip_name))
-  } else {
-    print(paste("ZIP file", zip_name, "does not exist. Skipping deletion."))
-  }
+# Delete the source ZIP file if it exists
+if (file.exists(target_file)) {
+  file.remove(target_file)
+  print("Deleted ZIP file")
+} else {
+  print("ZIP file does not exist. Skipping deletion.")
 }
 ```
 
+
+
+\section{Save the dataset}
+Finally, the code ensures the lasting accessibility of the dataset by saving it in two distinct formats. It is preserved both as a CSV file, facilitating external examination outside the RStudio environment, and as a .RDS (R Data Serialization) object. The latter format is chosen to simplify the reloading process, ensuring seamless integration into subsequent project sections.
+```{r}
+# Save the data as a CSV file
+write.csv(data_milan, file = "../../data/dataset1/dataset.csv", fileEncoding = "UTF-8", row.names = FALSE)
+
+# Save the data as .Rds file
+saveRDS(data_milan, file = "../../gen/data-preparation/input/raw_data.rds")
+```
+
+
 ```{r, include=FALSE}
-rm(data_dir, zip_file_names, zip_name, zip_path)
+rm(list = ls())
 ```
