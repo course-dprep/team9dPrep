@@ -84,6 +84,9 @@ library(bayesforecast) #Checking Regression Assumptions.
 # Load the R object
 regression_data <- readRDS("../../gen/analysis/input/clean_data.rds")
 y <- readRDS("../../gen/analysis/input/y.rds")
+
+#Setting the seed for reproducible results
+set.seed(999)
 ```
 
 \section{Introduction}
@@ -91,7 +94,7 @@ We have now reached the central phase of our work, wherein we will systematicall
 
 This section is organized into the following key segments:
 \begin{enumerate}
-    \item[\Roman{enumi}I.] Dataset Splitting: In the initial stage, we undertake the division of the original dataset, "regression_data," into two distinct sub-datasets. The first sub-dataset encompasses 75% of the observations and serves as the training set for model development. In contrast, the second sub-dataset incorporates the remaining 25% of observations and functions as the validation set, where we assess and scrutinize the model's performance.
+    \item[\Roman{enumi}I.] Dataset Splitting: In the initial stage, we undertake the division of the original dataset, \texttt{regression\_data} into two distinct sub-datasets. The first sub-dataset encompasses 75% of the observations and serves as the training set for model development. In contrast, the second sub-dataset incorporates the remaining 25% of observations and functions as the validation set, where we assess and scrutinize the model's performance.
     \item[\Roman{enumi}II.] Modeling: In the second part, we will focus on the modeling process. This involves hyperparameter tuning, determining the optimal number of iterations for optimizing hyperparameters, training the model, and assessing its performance using the training dataset. Subsequently, a similar evaluation will be conducted using the testing dataset.
     \item[\Roman{enumi}III.] Model Visualization: Following modeling, we will provide two graphical representations of the model's performance when applied to the training dataset. These will include an Actual vs. Fitted Plot, illustrating the relationship between actual and predicted listing prices, and a Features-Importance Plot, offering insights into the relative impact of each predictor on model performance.
     \item[\Roman{enumi}IV.] Model Validation: In this stage, we will apply the model to the testing dataset and rigorously validate its performance by computing relevant metrics.

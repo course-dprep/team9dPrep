@@ -75,6 +75,9 @@ library(gt) #Latex tables
 
 
 ```{r, echo=FALSE}
+#Setting the seed for reproducible results
+set.seed(999)
+
 # Load the R object
 clean_data <- readRDS("../../gen/data-preparation/input/clean_data.rds")
 ```

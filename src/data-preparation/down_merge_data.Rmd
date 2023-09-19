@@ -49,6 +49,8 @@ geometry: "left=2.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm"  # Adjust margins
 ```{r, include=FALSE}
 #Load Required Packages
 rm(list=ls())
+#Setting the seed for reproducible results
+set.seed(999)
 library(readr)
 ```
 

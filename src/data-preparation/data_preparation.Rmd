@@ -77,6 +77,9 @@ library(caret)
 
 
 ```{r, echo=FALSE}
+#Setting the seed for reproducible results
+set.seed(999)
+
 # Load the R object
 clean_data <- readRDS("../../gen/data-preparation/input/clean_data.rds")
 ```
@@ -326,6 +329,8 @@ beds_mean <- mean(numeric_clean_data$beds)
 beds_sd <- sd(numeric_clean_data$beds)
 host_listings_count_mean <- mean(numeric_clean_data$host_listings_count)
 host_listings_count_sd <- sd(numeric_clean_data$host_listings_count)
+bathrooms_mean <- mean(numeric_clean_data$bathrooms)
+bathrooms_sd <- sd(numeric_clean_data$bathrooms)
 
 ###############################################################################################
 
@@ -406,6 +411,9 @@ saveRDS(beds_sd, file = "../../gen/analysis/input/beds_sd.rds")
 
 saveRDS(host_listings_count_mean, file = "../../gen/analysis/input/host_listings_count_mean.rds")
 saveRDS(host_listings_count_sd, file = "../../gen/analysis/input/host_listings_count_sd.rds")
+
+saveRDS(bathrooms_mean, file = "../../gen/analysis/input/bathrooms_mean.rds")
+saveRDS(bathrooms_sd, file = "../../gen/analysis/input/bathrooms_sd.rds")
 
 saveRDS(y, file = "../../gen/analysis/input/y.rds")
 ```
