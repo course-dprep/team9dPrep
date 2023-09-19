@@ -1,21 +1,31 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-718a45dd9cf7e7f842a935f5ebbe5719a5e09af4491e668f4dbf3b35d5cca122.svg)](https://classroom.github.com/online_ide?assignment_repo_id=11726019&assignment_repo_type=AssignmentRepo)
+# Predict Italian Airbnb Listings Prices
+![image](https://www.digital.ink/wp-content/uploads/airbnb_logo_detail.jpg)
 
 ---
-# Contributors:
+
+# Contributors
   - Bianca Magalotti
   - Emanuele Franceschini
   - Akram Benmrit
   - Tommaso Rabino
   - Colin Tan
+
 ---
 
-# Preliminary Research Questions
+# Research Motivation
+In the context of the Italian Airbnb market, optimizing rental prices for listings is a fundamental aspect of property management. As the number of listings continues to grow, hosts face the challenge of determining the most competitive and profitable prices. This research is motivated by the pressing need to empower Airbnb hosts with data-driven tools and insights. By developing a predictive regression model and conducting thorough exploratory data analysis, we aim to provide hosts with a comprehensive understanding of the intricate factors influencing listing prices. Ultimately, this study seeks to enhance hosts' decision-making capabilities, improve the overall Airbnb experience for both hosts and guests, and contribute valuable insights to the evolving landscape of short-term property rentals in Italy.
 
-<span style="font-size: 18px"> __RESEARCH QUESTIONS__ </span>:
+---
 
+# Research Questions
 * __Regression Model__: Can we develop a predictive model that can help Airbnb hosts set the optimal rental prices for their listings?
+* __Exploratory Data Analysis__: How can we use exploratory data analysis to help Airbnb hosts understand the critical factors that influence the price of their listings?
 
 ---
+
+
+
+
 ---
 ---
 
