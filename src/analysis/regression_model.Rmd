@@ -86,21 +86,39 @@ regression_data <- readRDS("../../gen/analysis/input/clean_data.rds")
 y <- readRDS("../../gen/analysis/input/y.rds")
 ```
 
+\section{Introduction}
+We have now reached the central phase of our work, wherein we will systematically guide you through the steps involved in constructing a robust regression model for predicting Airbnb listing prices.
 
+This section is organized into the following key segments:
+\begin{enumerate}
+    \item[\Roman{enumi}I.] Dataset Splitting: In the initial stage, we undertake the division of the original dataset, "regression_data," into two distinct sub-datasets. The first sub-dataset encompasses 75% of the observations and serves as the training set for model development. In contrast, the second sub-dataset incorporates the remaining 25% of observations and functions as the validation set, where we assess and scrutinize the model's performance.
+    \item[\Roman{enumi}II.] Modeling: In the second part, we will focus on the modeling process. This involves hyperparameter tuning, determining the optimal number of iterations for optimizing hyperparameters, training the model, and assessing its performance using the training dataset. Subsequently, a similar evaluation will be conducted using the testing dataset.
+    \item[\Roman{enumi}III.] Model Visualization: Following modeling, we will provide two graphical representations of the model's performance when applied to the training dataset. These will include an Actual vs. Fitted Plot, illustrating the relationship between actual and predicted listing prices, and a Features-Importance Plot, offering insights into the relative impact of each predictor on model performance.
+    \item[\Roman{enumi}IV.] Model Validation: In this stage, we will apply the model to the testing dataset and rigorously validate its performance by computing relevant metrics.
+    \item[\Roman{enumi}V.] Regression Assumptions Check: Finally, we will verify adherence to the core regression assumptions, encompassing linearity, normality, homoscedasticity, independence of residuals, and the absence of multicollinearity among residuals.
+\end{enumerate}
+
+  
 \section{Split the Dataset}
 The following script is used to split the dataset into two different sub-datasets. The first is named \texttt{data\_for\_training}, contains 75% of the observations, and will be used to train the model. The second sub-dataset is named \texttt{data\_for\_testing}, contains the remaining 25% of the observations, and will be used to test the model's performance.
 
 ```{r}
+# Assign the 'log_price' column in 'y' to the 'log_price' column in 'regression_data'
 regression_data$log_price <- y
 
+# Create a data partition for training and testing
 split <- createDataPartition(y,
                              times = 1,
-                             p =0.75, 
+                             p = 0.75,
                              list = FALSE)
+# Subset the 'regression_data' into 'data_for_training' using the partition
 data_for_training <- regression_data[split,]
+
+# Subset the 'regression_data' into 'data_for_testing' using the inverse of the partition
 data_for_testing <- regression_data[-split,]
 
-cat("Our training dataset has ", nrow(data_for_training), "observations and ", ncol(data_for_training), "variables, while our testing dataset has ", nrow(data_for_testing), "observations and ", ncol(data_for_testing), "variables.")
+# Print the dimensions of the training and testing datasets
+cat("Our training dataset has ", nrow(data_for_training), " observations and ", ncol(data_for_training), " variables, while our testing dataset has ", nrow(data_for_testing), " observations and ", ncol(data_for_testing), " variables.")
 
 ```
 ```{r, include=FALSE}
@@ -128,11 +146,12 @@ XGBoost algorithms are useful because of several reasons:
 The first step for building the regression model is quite simple. We started by storing our target variable (\texttt{log\_price}) in a separate vector named \texttt{y\_train}. Then, we removed the target variable from our training dataset using the select() function from the dplyr package.
 
 ```{r}
+# Extract the 'log_price' column from the 'data_for_training' dataset and assign it to 'y_train'
 y_train <- data_for_training$log_price
 
+# Remove the 'log_price' column from the 'data_for_training' dataset
 data_for_training <- data_for_training %>%
-  dplyr::select (-log_price)
-
+  dplyr::select(-log_price)
 ```
 
 
@@ -155,24 +174,38 @@ Specifically, in this section, we will do the following:
 The best hyperparameters which will be used as default parameters of our final xgboost model, are shown below: 
 
 ```{r}
+# Define the hyperparameter grid for XGBoost
 xgb_grid = expand.grid(
   nrounds = 1000,
   eta = c(0.1, 0.05, 0.01),
   max_depth = c(2, 3, 4, 5, 6),
   gamma = 0,
-  colsample_bytree=1,
-  min_child_weight=c(1, 2, 3, 4 ,5),
-  subsample=1
+  colsample_bytree = 1,
+  min_child_weight = c(1, 2, 3, 4, 5),
+  subsample = 1
 )
 
+# Define the control parameters for the training process
 control <- trainControl(method = "cv", number = 5, verboseIter = TRUE)
 
-xgb_caret <- train(x=data_for_training, y=y_train, method='xgbTree', trControl= control, tuneGrid=xgb_grid)
+# Define the path to the .Rds file where the trained model will be saved or loaded from
+rds_file_path <- "../../gen/analysis/input/xgb_caret.rds"
 
-saveRDS(xgb_caret, file = "../../gen/data-preparation/input/xgb_caret.rds")
+# Check if the .Rds file exists
+if (file.exists(rds_file_path)) {
+  # If it exists, load the xgb_caret object from the .Rds file
+  xgb_caret <- readRDS(rds_file_path)
+} else {
+  # If it doesn't exist, run the code to create xgb_caret
+  xgb_caret <- train(x = data_for_training, y = y_train, method = 'xgbTree', trControl = control, tuneGrid = xgb_grid)
+  
+  # Save the xgb_caret object as an .Rds file for future use
+  saveRDS(xgb_caret, file = rds_file_path)
+}
+
 ```
 
-```{r}
+```{r, include=FALSE}
 best_tune <- xgb_caret$bestTune
 
 t7 <- best_tune %>%
@@ -186,93 +219,77 @@ t7 <- best_tune %>%
 ```
 
  
-```{r}
-
+```{r, echo=FALSE}
+t7
 ```
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-### Third Step - Create the XGB Matrix for the Model {.unnumbered} 
 
-The third step is quite simple. We __converted our training dataset into a xgb.DMatrix__ (named 'dtrain'), which is the default format used by the xgboost modelling.
+```{r, include=FALSE}
+rm(xgb_grid, control, t7, xgb_caret, rds_file_path)
+```
+
+
+\subsection{Create the XGB Matrix for the Model}
+ The third step is quite simple. The code block below shows how to convert the training dataset into a xgb.DMatrix (that will be named as \texttt{dtrain}), which is the default format used by the xgboost modelling.
 
 ```{r}
+# Create the XBG.DMatrix
 dtrain <- xgb.DMatrix(data = as.matrix(data_for_training), label= y_train)
 ```
 
 
-### Fourth Step - Finding the Best Number of Iterations to Optimize the (best) Hyperparameters {.unnumbered}
+\subsection{Finding the Best Number of Iterations to Optimize the (best) Hyperparameters}
+In the fourth step, we performed a cross-validation using the XGBoost package in order to find the best number of iterations to optimize the best hyperparameters found in the previous section.
 
-In the fourth step, we performed a cross-validation using the XGBoost package in order to <span style="color: #D4AF37;">__find the best number of iterations to optimize the best hyperparameters__</span> found in the previous section.
-
-Specifically, the following block of code is responsible for __finding the iteration with the lowest RMSE value__ among all the iterations performed during the cross-validation process. This is achieved by using the which.min() function, which returns the index of the minimum value in a given vector. In this case, it is applied to the test_rmse_mean column of the evaluation_log object, which contains the RMSE values for each iteration on the test set. By finding the index of the minimum value, we can determine which iteration produced the lowest RMSE value.
+Specifically, the following block of code is responsible for finding the iteration with the lowest RMSE value among all the iterations performed during the cross-validation process. This is achieved by using the which.min() function, which returns the index of the minimum value in a given vector. In this case, it is applied to the \textit{test\_rmse\_mean} column of the evaluation_log object, which contains the RMSE values for each iteration on the test set. By finding the index of the minimum value, we can determine which iteration produced the lowest RMSE value.
 
 Once the iteration with the lowest RMSE value is identified, the subsequent block of code creates a table that displays the best iteration number to optimize the best-performing hyperparameters.
   
-As before, since this takes a long time to perform, we decided to 'deactivate' the relative code (by placing it as a #comment inside the chunk). We then saved this object locally and, therefore, we added a piece of code needed to load such an object and use it more quickly for subsequent operations. 
 
 ```{r}
-default_param<-list(
+# Define the hyperparameter from the best_tune object
+default_param <- list(
   objective = "reg:squarederror",
   booster = "gbtree",
-  eta=0.05,
-  gamma=0,
-  max_depth=6, 
-  min_child_weight=4, 
-  subsample=1,
-  colsample_bytree=1
+  eta = best_tune$eta,
+  gamma = best_tune$gamma,
+  max_depth = best_tune$max_depth,
+  min_child_weight = best_tune$min_child_weight,
+  subsample = best_tune$subsample,
+  colsample_bytree = best_tune$colsample_bytree
 )
 
-xgbcv <- xgb.cv( params = default_param, data = dtrain, nrounds = 1000, nfold = 5, showsd = T, stratified = T, print_every_n = 50, early_stopping_rounds = 10, maximize = F)
 
+# Define the path to the saved xgbcv.rds file
+xgbcv_path <- "../../gen/analysis/input/xgbcv.rds"
+
+# Check if the xgbcv.rds file exists
+if (file.exists(xgbcv_path)) {
+  # If it exists, load it into the R environment
+  xgbcv <- readRDS(xgbcv_path)
+} else {
+  # If it doesn't exist, run the xgb.cv code and save the result
+  xgbcv <- xgb.cv(
+    params = default_param,
+    data = dtrain,
+    nrounds = 1000,
+    nfold = 5,
+    showsd = TRUE,
+    stratified = TRUE,
+    print_every_n = 50,
+    early_stopping_rounds = 10,
+    maximize = FALSE
+  )
+  
+  # Save the xgbcv object to the specified path
+  saveRDS(xgbcv, xgbcv_path)
+}
+```
+
+```{r, include=FALSE}
 best_iteration <- which.min(xgbcv$evaluation_log$test_rmse_mean)
 best_rmse <- xgbcv$evaluation_log$test_rmse_mean[best_iteration]
 best_iteration_results <- data.frame(iteration = best_iteration, test_rmse_mean = best_rmse)
 
-```
-
-```{r}
-saveRDS(xgbcv, file = "../../gen/data-preparation/input/xgbcv.rds")
-```
-
-
-
-```{r}
 t19 <- best_iteration_results %>%
   gt() %>%
   tab_style(
@@ -287,99 +304,490 @@ t19 <- best_iteration_results %>%
 ```{r, echo=FALSE}
 t19
 ```
+
+```{r, include=FALSE}
+rm(best_tune, t19, best_iteration, best_rmse, xgbcv_path, xgbcv)
 ```
 
 
-
-
-
-
-
-
-
-
-
-
-
-### Fifth Step - Model Training with Best Hyperparameters and Best Number of Iterations {.unnumbered}
-
-In this section, using the xgb.train() function, __we trained the model using the best number of iterations and the best hyperparameters found in the previous steps__ and stored the model in an object named xgb_mod.
+\subsection{Model Training with Best Hyperparameters and Best Number of Iterations}
+In this section, using the xgb.train() function, the XGBoost regression model is trained, using the best number of iterations and the best hyperparameters found in the previous steps. Then, the model is locally saved as an .rds file for future use.
 
 ```{r}
 
-xgb_mod <- xgb.train(data = dtrain, params=default_param, nrounds = 594)
+# Define the path to the .Rds file
+rds_file_path <- "../../gen/analysis/input/xgb_mod.rds"
 
-rm(default_param)
+# Check if the .Rds file exists
+if (file.exists(rds_file_path)) {
+  # If it exists, load the xgb_mod object from the .Rds file
+  xgb_mod <- readRDS(rds_file_path)
+} else {
+  # If it doesn't exist, run the code to create xgb_mod
+  xgb_mod <- xgb.train(data = dtrain, params=default_param, nrounds = best_iteration_results$iteration)
+  
+  # Save the xgb_caret object as an .Rds file for future use
+  saveRDS(xgb_mod, file = rds_file_path)
+}
+
+```
+
+```{r, include=FALSE}
+rm(default_param, best_iteration_results, rds_file_path)
 ```
 
 
-### Sixth Step - Model Performances {.unnumbered}
+\subsection{Model Performances}
+The DALEX package provides a set of tools for explaining the behavior of complex machine learning models, including XGBoost regression models. Using this package, an explainer object is created, which takes as input the trained model (\textit{xgb\_mod), the training data (\textit{dtrain}), and the corresponding response variable (\textit{y\_train}).
 
-The DALEX package used in this section provides a set of __tools for explaining the behavior of complex machine learning models__ (including XGBoost models). Using this package, we were able to create an __explainer object__, which takes as input the trained model (xgb_mod), the training data (data = dtrain), and the corresponding response variable (y = y_train).
+Then, using this "explainer" object, the three main regression model's performance metrics were extracted from our model:
 
-Then, using this "explainer" object, we extracted the three main regression model's performance metrics from our model:
-
-> __MAD__: the Mean Absolute Deviation is a measure of the average absolute difference between the predicted and actual values of the target variable. Essentially, the lower the MAD value, the better the model performance.
+\textbf{MAD}: the Mean Absolute Deviation is a measure of the average absolute difference between the predicted and actual values of the target variable. Essentially, the lower the MAD value, the better the model performance.
   
-> __RMSE__: the Root Mean Square Error is calculated by taking the square root of the average of the squared differences between the predicted and actual values. In simple terms, RMSE measures how much the predicted values of a model deviate from the actual values. The lower the RMSE value, the better the model is at making accurate predictions.
+\textbf{RMSE}: the Root Mean Square Error is calculated by taking the square root of the average of the squared differences between the predicted and actual values. In simple terms, RMSE measures how much the predicted values of a model deviate from the actual values. The lower the RMSE value, the better the model is at making accurate predictions.
   
-> __R-Squared__: R-squared, also known as the coefficient of determination, is a statistical measure that represents the proportion of variance in a dependent variable that is explained by a set of independent variables. In other words, R-squared measures how well the regression line (or curve) fits the data points. A value closer to 1 indicates a better fit of the model to the data.
+\textbf{R-Squared}: R-squared, also known as the coefficient of determination, is a statistical measure that represents the proportion of variance in a dependent variable that is explained by a set of independent variables. In other words, R-squared measures how well the regression line (or curve) fits the data points. A value closer to 1 indicates a better fit of the model to the data.
   
 All of these metrics will be subsequently calculated also in relation to the regression model fueled by the testing dataset, in order to have a more complete evaluation of our XGBoost regression model's performance. 
 
-In any case, for now, it is possible to notice that <span style="color: #D4AF37;">__our regression model appears to be a powerful predictor of the response variable__</span>. The small RMSE, the small MAD and high R-squared indicate that the model __can explain a large proportion of the variability in the response variable__, and that the predictions made by the model are very accurate. This suggests that it can provide reliable insights and predictions for your data.
+In any case, for now, it is possible to notice that our regression model appears to be a powerful predictor of the response variable. The small RMSE, the small MAD and high R-squared indicate that the model can explain a large proportion of the variability in the response variable, and that the predictions made by the model are very accurate. This suggests that it can provide reliable insights and predictions for your data.
+
+```{r, results='hide'}
+# Create an explainer object to analyze the XGBoost model
+explainer <- explain(xgb_mod, data = dtrain, y = y_train)
+
+# Calculate model performance measures using the explainer
+model_summary <- model_performance(explainer)
+
+# Extract the model performance measures
+model_summary_measures <- model_summary$measures
+
+# Convert the model summary measures into a data frame
+model_summary_measures <- data.frame(model_summary_measures)
+
+# Remove the 'mse' (Mean Squared Error) column from the data frame
+model_summary_measures <- dplyr::select(model_summary_measures, -mse)
+
+``` 
 
 The model's performance metrics are shown below:
 
+```{r, include=FALSE}
+# Display the performance metrics:
+t20 <- model_summary_measures %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "XGBoost Regression Performance",
+    subtitle = "Training Dataset"
+  )
+```
+
+```{r, echo=FALSE}
+t20
+```  
+  
+```{r, include=FALSE}
+rm(model_summary_measures, model_summary, explainer, t20)
+```
+
+
+Finally, to gain a comprehensive understanding of the regression model's performance, the DALEX package was employed again, in this case to generate a table that showcases the actual listings' prices, the listings' prices predicted by our regression model, and the corresponding differences between the two (i.e. residuals) for the initial ten observations in the training dataset.
+
+```{r, results='hide'}
+# Create an explainer object to analyze the XGBoost model
+explainer <- explain(xgb_mod, data = dtrain, y = y_train)
+
+# Calculate model performance measures using the explainer
+model_summary <- model_performance(explainer)
+
+# Extract the residuals from the model summary
+model_summary_residuals <- model_summary$residuals
+
+# Convert the residuals into a data frame
+model_summary_residuals <- data.frame(model_summary_residuals)
+
+# Remove 'label' and 'diff' columns from the data frame
+model_summary_residuals <- dplyr::select(model_summary_residuals, -label, -diff)
+
+# Create a comparison dataset by adding Predicted_Price, Actual_Price, and Residuals columns
+comparison_dataset <- model_summary_residuals %>%
+  dplyr::mutate(Predicted_Price = exp(predicted),
+                Actual_Price = exp(observed),
+                Residuals = Predicted_Price - Actual_Price) %>%
+  dplyr::select(Predicted_Price, Actual_Price, Residuals)
+
+```
+
+The table below highlights that there is generally minimal deviation between the observed prices and the model's predictions:
+
+```{r, include=FALSE}
+t21 <- head(comparison_dataset, 10) %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Actual vs. Fitted Prices"
+  )
+```
+
+```{r, echo=FALSE}
+t21
+```  
+
+```{r, include=FALSE}
+rm(t21, model_summary, explainer, comparison_dataset)
+```
+
+
+
+\section{Model Visualization}
+\subsection{Actual vs. Fitted Price Plot}
+Within this section, in order to visually represent our regression model, we have built an Actual vs. Fitted Values Scatterplot using the model fueled with the training dataset.
+Basically, we have plotted the actual prices of listings on the x-axis and the predicted (i.e. fitted) prices of listings on the y-axis as a scatter plot and then add the regression line to show the relationship between the actual and predicted values.
+
+```{r, include=FALSE}
+p15 <- ggplot(model_summary_residuals, aes(x = observed, y = predicted)) +
+  geom_point(color = "darkgrey")+
+  geom_smooth(method = "lm", col = "red", se = FALSE, size = 1) +
+  labs(x = "Actual Price",
+       y = "Predicted Price", 
+       title = "Model Visualization",
+       subtitle = "R-Squared = .833, RMSE = .216, MAD = .103") +
+  theme(legend.position = "none", 
+        plot.title = element_text(size = 18, lineheight=.8, face="bold", vjust=1, hjust=0.5, colour = "black"),
+        plot.subtitle = element_text(size = 12, lineheight=.8, vjust=1, hjust=0.5, colour = "black"),
+        axis.title = element_text(size = 14, colour = "black"), 
+        axis.text = element_text(size = 8, colour = "#666666"),
+        axis.text.x = element_text(hjust = 1),
+        panel.grid.major = element_line(color = "gray", size = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white"))
+
+```
+
+```{r, echo=FALSE}
+p15
+```
+
+```{r, include=FALSE}
+rm(p15, model_summary_residuals)
+```
+
+
+\subsection{Features-Importance Plot}
+In this section a Features-Importance Plot was constructed in order to understand the relative contribution of each feature to the model's performance. In particular, we have retain only the first 20 most important variables. 
+
+```{r}
+# Calculate feature importance using the xgb.importance function
+importance <- xgb.importance(feature_names = colnames(dtrain), model = xgb_mod, data = dtrain, label = y_train)
+
+# Convert the importance results into a data frame
+importance <- as.data.frame(importance)
+
+# Remove 'Cover' and 'Frequency' columns from the data frame
+importance <- importance %>% dplyr::select(-Cover, -Frequency)
+
+# Round the 'Gain' column values to three decimal places
+importance <- dplyr::mutate(importance, Gain = round(Gain, 3))
+
+# Arrange the data frame in descending order based on 'Gain'
+importance <- arrange(importance, desc(Gain))
+
+# Select the top 20 rows from the data frame
+importance <- dplyr::slice(importance, 1:20)
+
+```
+
+```{r, include=FALSE}
+p16 <- ggplot(data = importance, aes(x = reorder(Feature, Gain), y = Gain, fill = Gain)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Permutation Importance Plot",
+       x = "Feature",
+       y = "Importance (Gain)") +
+  coord_flip() +
+  scale_fill_gradient(low = "lightgrey", high = "black")+
+  theme(legend.position = "none", 
+        plot.title = element_text(size = 18, lineheight=.8, face="bold", vjust=1, hjust=0.5, colour = "black"),
+        plot.subtitle = element_text(size = 12, lineheight=.8, vjust=1, hjust=0.5, colour = "black"),
+        axis.title = element_text(size = 14, colour = "black"), 
+        axis.text = element_text(size = 8, colour = "#666666"),
+        axis.text.x = element_text(hjust = 1),
+        panel.grid.major = element_line(color = "gray", size = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white"))
+
+``` 
+
+```{r, echo=FALSE}
+p16
+```
+
+```{r,include=FALSE}
+rm(p16, importance, dtrain)
+```
+
+
+\section{Model Validation}
+In this section, the trained model was applied to the testing dataset created before. Moreover, in order to have a better overall understanding of our regression model performance, the same performance metrics (RMSE, R-Squared, and MAD) analyzed before with regard to the model fueled with the training dataset were computed again for the model fueled with the testing dataset. 
+
 ```{r, results='hide'}
 
-explainer <- explain(xgb_mod, data = dtrain, y = y_train)
+# Extract the 'log_price' column as the target variable for testing
+y_test <- data_for_testing$log_price
+
+# Remove the 'log_price' column from the testing data
+data_for_testing <- data_for_testing %>%
+  dplyr::select (-log_price)
+
+# Create an xgb.DMatrix object from the testing data
+dtest <- xgb.DMatrix(data = as.matrix(data_for_testing))
+
+# Use the trained xgboost model to make predictions on the testing data
+XGBpred <- predict(xgb_mod, dtest)
+
+# Create an explainer object to analyze the xgboost model's predictions
+explainer <- explain(xgb_mod, data = dtest, y = y_test)
+
+# Compute model performance summary measures
 model_summary <- model_performance(explainer)
+
+# Extract model summary measures and remove 'mse' column
 model_summary_measures <- model_summary$measures
 model_summary_measures <- data.frame(model_summary_measures) %>% dplyr::select(-mse)
 
-``` 
-
-```{r}
-
-model_summary_measures%>%
-  kbl(col.names = c("RMSE", "R-Squared", "MAD"),
-      align = c("c", "c", "c")) %>%
-  kable_paper("hover", full_width = F)
-
-rm(model_summary_measures, model_summary, explainer)
-
-```  
-  
-
-```{r, results='hide'}
-explainer <- explain(xgb_mod, data = dtrain, y = y_train)
-model_summary <- model_performance(explainer)
-model_summary_residuals <- model_summary$residuals
-model_summary_residuals <- data.frame(model_summary_residuals)%>%
-  dplyr::select(-label, -diff)
 ```
 
-Finally, to gain a comprehensive understanding of our regression model's performance, we employed the DALEX package to generate a table that showcases the <span style="color: #D4AF37;">__actual listings' prices__</span>, the <span style="color: #D4AF37;">__listings' prices predicted__</span> by our regression model, and the <span style="color: #D4AF37;">__corresponding differences__</span> between the two (i.e. residuals) for the initial ten observations in the training dataset.
+As expected, the model applied on the testing dataset obtained slightly worse results than the one fueled by the training dataset. But it appears to be anyway a powerful predictor of the response variable.
 
-The table below highlights that __there is generally minimal deviation__ between the observed prices and the model's predictions:
+```{r, include=FALSE}
+t22 <- model_summary_measures %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "XGBoost Regression Performance",
+    subtitle = "Testing Dataset"
+  )
+```
+
+```{r, echo=FALSE}
+t22
+```  
+
+```{r, include=FALSE}
+rm(t22, explainer, model_summary)
+```
+
+Below, you can find a table which shows (for the first 10 observations in the testing dataset) the Actual price of Listings, the Predicted Price of Listings, and the difference between the two (i.e. residuals). 
+
+
+```{r, include=FALSE}
+comparison_dataset <- data_for_testing %>%
+  dplyr::mutate(predicted_price = exp(XGBpred),
+                actual_price = exp(y_test),
+                residuals = predicted_price - actual_price)%>%
+  dplyr::select(predicted_price, actual_price, residuals)
+
+t23 <- head(comparison_dataset, 10) %>%
+  gt() %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_header(
+    title = "Actual vs. Fitted Prices"
+  )
+```
+
+```{r, echo=FALSE}
+t23
+``` 
 
 ```{r}
-
-comparison_dataset <- model_summary_residuals %>%
-  dplyr::mutate(Predicted_Price = 10^predicted,
-                Actual_Price = 10^observed,
-                Residuals = Predicted_Price - Actual_Price)%>%
-  dplyr::select(Predicted_Price, Actual_Price, Residuals)
-
-head(comparison_dataset, 10)%>%
-  kbl(col.names = c("Predicted Price", "Actual Price", "Residuals"),
-      align = c("c", "c", "c")) %>%
-  kable_paper("hover", full_width = F)
+rm(model_summary_measures, comparison_dataset, dtest, t23)
+```
 
 
-rm(comparison_dataset)
-``` 
+\section{Regression Assumptions Check}
+Whithin this section, all assumptions of regression models will be assessed. Specifically, the linearity assumption, the normality assumption, the homoscedasticity assumption, the independence of residuals assumption, and the absence of multicollinearity between residuals assumption will be checked.
+
+\subsection{Linearity Assumption}
+The 'linearity assumption' assumes that the relationship between the predictors and the target variable is linear. To check the linearity assumption, a (standardized) Residuals vs. Fitted Plot was employed. This plot shows the residuals (difference between the fitted values and actual values) against the fitted values (values predicted by our model).
+
+The following code block is used to create the dataframe that will be used to construct the Residuals vs. Fitted Plot.
+```{r, results='hide'}
+Actual = y_test
+Predicted = XGBpred
+Residuals = y_test - XGBpred
+Std_Residuals <- scale(y_test - XGBpred)
+Sqrt_Std_Residuals <- sqrt(abs(Std_Residuals))
+
+pred_df <- data.frame(Actual, Predicted, Residuals, Std_Residuals, Sqrt_Std_Residuals)
+```
+
+```{r, include=FALSE}
+rm(Actual, Predicted, Residuals, Std_Residuals, Sqrt_Std_Residuals)
+```
+
+As can be seen from below, since the Residuals vs. Fitted Plot shows a random scatter of points, it is possible to state that the linearity relatioships assumption is met. 
+
+```{r, include=FALSE}
+p16 <- ggplot(pred_df, aes(x = Predicted, y = Std_Residuals)) +
+  geom_point(alpha = 0.3, color = "darkgrey")+
+  geom_hline(yintercept = 0, linetype = "dashed", col = "red", size = 1) +
+  labs(x = "Predicted Price",
+       y = "Standardized Residuals", 
+       title = "Residual vs. Fitted Values Plot") +
+  theme(legend.position = "none", 
+        plot.title = element_text(size = 18, lineheight=.8, face="bold", vjust=1, hjust=0.5, colour = "black"),
+        plot.subtitle = element_text(size = 12, lineheight=.8, vjust=1, hjust=0.5, colour = "black"),
+        axis.title = element_text(size = 14, colour = "black"), 
+        axis.text = element_text(size = 8, colour = "#666666"),
+        axis.text.x = element_text(hjust = 1),
+        panel.grid.major = element_line(color = "gray", size = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white"))
+```
+
+```{r, echo=FALSE}
+p16
+```
+
+```{r, include=FALSE}
+rm(p16)
+```
+
+
+\subsection{Normality Assumption}
+The 'normality of residuals' assumption assumes that the residuals are normally distributed. If the residuals are not normally distributed, their randomness is lost, which implies that the model is not able to explain the relation in the data.
+
+To check the normality assumption, a histogram of the residuals was created to compare the distribution of the residuals to a normal distribution. As can be seen from below, since the histogram of residuals resemble a 'bell-shaped' curve centered around zero, it is possible to state that the assumption of normality of residuals is verified. 
+
+```{r, include=FALSE}
+
+p17 <- ggplot(pred_df, aes(Residuals))+
+  geom_histogram(col = "black", fill = "darkgrey")+
+  scale_x_continuous(n.breaks = 10)+
+  labs(x="Residuals",
+       y= "Occurrences",
+       title = "Histogram of Residuals",
+       subtitle = "Residuals follow approximately a Normal Distribution")+
+  theme(legend.position = "none", 
+        plot.title = element_text(size = 18, lineheight=.8, face="bold", vjust=1, hjust=0.5, colour = "black"),
+        plot.subtitle = element_text(size = 12, lineheight=.8, vjust=1, hjust=0.5, colour = "black"),
+        axis.title = element_text(size = 14, colour = "black"), 
+        axis.text = element_text(size = 8, colour = "#666666"),
+        axis.text.x = element_text(angle = 90, hjust = 1),
+        panel.grid.major = element_line(color = "gray", size = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white"))
+```
+
+```{r, echo=FALSE}
+p17
+```
+
+```{r, include=FALSE}
+rm( p17)
+```
+
+
+
+\subsection{Homoscedasticity Assumption}
+The 'homoscedasticity' assumption assumes that the residuals have equal variances (homoscedasticity) for every fitted values. Basically, homoscedasticity is necessary to calculate accurate standard errors for parameter estimates. 
+
+To assess the Homoscedasticity assumption, a Scale Location plot was constructed. In a Scale-Location plot, the square root of the standardized absolute residuals is plotted against the fitted (predicted) values. Since the plot shows a random scatter of points around a horizontal line (parallel to the x-axis) around zero, we can state that the Homoscedasticity assumption is met. 
+
+
+```{r}
+p18 <- ggplot(pred_df, aes(x = Predicted, y = Sqrt_Std_Residuals)) +
+  geom_point(color = "darkgrey") +
+  geom_smooth(method = "lm", col = "red", se = FALSE, size = 1) +
+  labs(x = "Predicted Prices",
+       y = "Sqrt(std(residuals))", 
+       title = "Scale-Location Plot") +
+  theme(legend.position = "none", 
+        plot.title = element_text(size = 18, lineheight=.8, face="bold", vjust=1, hjust=0.5, colour = "black"),
+        plot.subtitle = element_text(size = 12, lineheight=.8, vjust=1, hjust=0.5, colour = "black"),
+        axis.title = element_text(size = 14, colour = "black"), 
+        axis.text = element_text(size = 8, colour = "#666666"),
+        axis.text.x = element_text(hjust = 1),
+        panel.grid.major = element_line(color = "gray", size = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white"))
+
+```
+
+```{r, echo=FALSE}
+p18
+```
+
+```{r, include=FALSE}
+rm(p18)
+```
+
+
+\subsection{Independence of Residuals Assumption}
+The 'independence of residuals' assumption (absence of autocorrelation between residuals) assumes that residuals are independent to (i.e. uncorrelated with) one anotheer.
+
+To check the independence of residuals assumption, an Autocorrelation Function of Residuals Plot (ACF of Residuals Plot) was built. Since the autocorrelation values (y-axis) are close to zero for almost all lags (x-axis), it is possible to state that this assumption is satisfied.
+
+```{r, include=FALSE}
+resid_ts <- ts(pred_df$Residuals)
+
+p19 <- ggacf(resid_ts) +
+  ggtitle("Autocorrelation Function of Residuals Plot") +
+  xlab("Lags") + ylab("Autocorrelation") +
+  theme(legend.position = "none", 
+        plot.title = element_text(size = 18, lineheight=.8, face="bold", vjust=1, hjust=0.5, colour = "black"),
+        plot.subtitle = element_text(size = 12, lineheight=.8, vjust=1, hjust=0.5, colour = "black"),
+        axis.title = element_text(size = 14, colour = "black"), 
+        axis.text = element_text(size = 8, colour = "#666666"),
+        axis.text.x = element_text(hjust = 1),
+        panel.grid.major = element_line(color = "gray", size = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white"))
+
+```
+
+```{r, echo=FALSE}
+p19
+```
+
+```{r, include=FALSE}
+rm(p19, resid_ts)
+```
+
+
+\subsection{Multicollinearity Assumption}
+The regression assumption of "Absence of Multicollinearity between Predictors" refers to the absence of strong correlations between the predictor variables in a regression model. In other words, multicollinearity occurs when two or more predictor variables in the model are highly correlated with each other, which can cause problems in the estimation of regression coefficients and the interpretation of the results.
+
+Since the final dataset has more than 200 variables, it would have been almost impossible to construct a scatterplot for each pairs of variables. However, since we have previously removed all those predictors with a mutual correlation greater than 0.75 (see data\_preparation), it is possible to safely state that this last assumption is met, too.
+
+
+
+Finally, all relevant R objects are saved locally (as .Rds files) for future use. 
+```{r}
+saveRDS(data_for_testing, file = "../../gen/analysis/input/data_for_testing.rds")
+saveRDS(data_for_training, file = "../../gen/analysis/input/data_for_training.rds")
+saveRDS(xgb_mod, file = "../../gen/analysis/input/xgb_mod.rds")
+saveRDS(y_test, file = "../../gen/analysis/input/y_test.rds")
+saveRDS(y_train, file = "../../gen/analysis/input/y_train.rds")
+```
+
+
+```{r, include=FALSE}
+rm(list=ls())
+```
+
 
 
 
