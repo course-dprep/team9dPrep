@@ -364,6 +364,18 @@ As said, one-hot encoding is necessary because most machine learning algorithms 
 factor_clean_data <- as.data.frame(model.matrix(~.-1, factor_clean_data))
 ```
 
+The purpose of the following code is to enhance the clarity and interpretability of the dataset, particularly for binary features. First, the code is used to rename columns from "NO", to "YES", providing a more intuitive understanding of the data. Additionally, recoding the values ensures that the data aligns with the updated column names, making it easier for analysts and data users to work with the dataset.
+```{r}
+# Rename columns from "NO" to "YES" in columns 105 to 186
+new_col_names <- colnames(factor_clean_data)[105:186]
+new_col_names <- gsub("NO", "YES", new_col_names)
+colnames(factor_clean_data)[105:186] <- new_col_names
+
+# Replace 0 with 1 and 1 with 0 in columns 105 to 186
+factor_clean_data[, 105:186] <- 1 - factor_clean_data[, 105:186]
+
+```
+
 
 \section{Combine the sub-datasets}
 Then, we combined the 3 sub-datasets (i.e. \texttt{factor\_clean\_data}, \texttt{date\_clean\_data}, and \texttt{numeric\_clean\_data} that now contain only numeric variables and that now have been centered and scaled.

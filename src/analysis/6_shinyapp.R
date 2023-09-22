@@ -108,11 +108,11 @@ ui <- fluidPage(theme = shinytheme("simplex"),
   
   #Side_Bar_for_User_Inputs
   sidebarPanel(
-  radioButtons("paid_parking", "Do you have a paid parking on the house premises?", choices = c("YES" = "0", "NO" = "1"), selected = "0"),
-  radioButtons("dedicated_workspace", "Is there a dedicated workspace in your house?", choices = c("YES" = "0", "NO" = "1"), selected = "0"),
-  radioButtons("air_conditioning", "Does your house have an Air Conditioning System?", choices = c("YES" = "0", "NO" = "1"), selected = "0"),
-  radioButtons("elevator", "Does your house have an Elevator?", choices = c("YES" = "0", "NO" = "1"), selected = "0"),
-  radioButtons("free_parking", "Do you have a paid parking on the house premises?", choices = c("YES" = "0", "NO" = "1"), selected = "0"),
+  radioButtons("paid_parking", "Do you have a paid parking on the house premises?", choices = c("YES" = "1", "NO" = "0"), selected = "0"),
+  radioButtons("dedicated_workspace", "Is there a dedicated workspace in your house?", choices = c("YES" = "1", "NO" = "0"), selected = "0"),
+  radioButtons("air_conditioning", "Does your house have an Air Conditioning System?", choices = c("YES" = "1", "NO" = "0"), selected = "0"),
+  radioButtons("elevator", "Does your house have an Elevator?", choices = c("YES" = "0", "NO" = "0"), selected = "0"),
+  radioButtons("free_parking", "Do you have a paid parking on the house premises?", choices = c("YES" = "1", "NO" = "0"), selected = "0"),
   
   radioButtons("superhost", "Are you a SuperHost?", choices = c("YES" = "1", "NO" = "0"), selected = "0"),
   
@@ -124,13 +124,34 @@ ui <- fluidPage(theme = shinytheme("simplex"),
   
   sliderInput("listings_count", "How many houses, rooms, or apartments have you already listed on Airbnb?", min = 1, max = 30, value = 1, step = 1),
   
-  pickerInput("neighbourhood", "In which neighbourhood of Milan is your house located?", choices = c("AFFORI", "BAGGIO", "BANDE_NERE", "BARONA", "BICOCCA", "BOVISA", "BOVISASCA", "BRERA", "BRUZZANO", "BUENOS_AIRES_VENEZIA", "CANTALUPA", "CASCINA_TRIULZA_EXPO", "CENTRALE", "CHIARAVALLE", "CITTA_STUDI", "COMASINA", "CORSICA", "DE_ANGELI_MONTE_ROSA", "DERGANO", "DUOMO", "EX_OM_MORIVIONE", "FARINI", "FIGINO", "FORZE_ARMATE", "GALLARATESE", "GARIBALDI_REPUBBLICA", "GHISOLFA", "GIAMBELLINO", "GIARDINI_PORTA_VENEZIA", "GRATOSOGLIO_TICINELLO", "GRECO", "GUASTALLA", "ISOLA", "LAMBRATE", "LODI_CORVETTO", "LORENTEGGIO", "LORETO", "MACIACHINI_MAGGIOLINA", "MAGENTA_SAN_VITTORE", "MAGGIORE_MUSOCCO", "MECENATE", "MUGGIANO", "NAVIGLI", "NIGUARDA_CA_GRANDA", "ORTOMERCATO", "PADOVA", "PAGANO", "PARCO_AGRICOLO_SUD", "PARCO_BOSCO_IN_CITTA", "PARCO_DEI_NAVIGLI", "PARCO_DELLE_ABBAZIE", "PARCO_FORLANINI_ORTICA", "PARCO_LAMBRO_CIMIANO", "PARCO_MONLUE_PONTE_LAMBRO",  "PARCO_NORD",  "PARCO_SEMPIONE", "PORTA_ROMANA", "PORTELLO", "QT_8", "QUARTO_CAGNINO", "QUARTO_OGGIARO", "QUINTO_ROMANO", "QUINTOSOLE", "RIPAMONTI", "ROGOREDO", "RONCHETTO_SUL_NAVIGLIO", "SAN_CRISTOFORO", "SAN_SIRO", "SACCO", "SARPI", "SCALO_ROMANA", "SELINUNTE", "STADERA", "TIBALDI", "TICINESE", "TORTONA", "TRE_TORRI", "TRENNO", "TRIULZO_SUPERIORE", "UMBRIA_MOLISE", "VIALE_MONZA", "VIGENTINA", "VILLAPIZZONE", "WASHINGTON", "XXII_MARZO"), multiple = FALSE, selected = NULL, options = list(`actions-box` = TRUE)),
-  pickerInput("response_time", "How quickly do you guarantee a response to potential customers? ", choices = c("FEW_DAYS", "A_DAY", "FEW_HOURS", "AN_HOUR"), multiple = FALSE, selected = NULL, options = list(`actions-box` = TRUE)),
-  pickerInput("property_type", "What type of listing do you want to rent on Airbnb?", choices = c("CASA_PARTICULAR", "ENTIRE_CONDO", "ENTIRE_GUEST_SUIT", "ENTIRE_GUEST_HOUSE", "ENTIRE_HOME", "ENTIRE_APARTMENT", "ENTIRE_LOFT", "ENTIRE_PLACE", "ENTIRE_RENTAL_UNIT", "ENTIRE_SERVICED_APARTMENT", "ENTIRE_TOWN_HOUSE", "ENTIRE_VACATION_HOME", "ENTIRE_VILLA", "PRIVATE_ROOM", "PRIVATE_ROOM_IN_B&B", "PRIVATE_ROOM_IN_CASA_PARTICULAR", "PRIVATE_ROOM_IN_CONDO", "PRIVATE_ROOM_IN_FARM_STAY", "PRIVATE_ROOM_IN_GUEST_SUIT", "PRIVATE_ROOM_IN_GUESTHOUSE", "PRIVATE_ROOM_IN_HOME", "PRIVATE_ROOM_IN_HOSTEL", "PRIVATE_ROOM_IN_LOFT", "PRIVATE_ROOM_IN_RENTAL_UNIT", "PRIVATE_ROOM_IN_SERVICED_APARTMENT", "PRIVATE_ROOM_IN_TINY_HOME", "PRIVATE_ROOM_IN_TOWN_HOUSE", "PRIVATE_ROOM_IN_VACATION_HOME", "PRIVATE_ROOM_IN_VILLA", "ROOM_IN_APARTHOTEL", "ROOM_IN_B&B", "ROOM_IN_BOUTIQUE_HOTEL", "ROOM_IN_HOSTEL", "ROOM_IN_HOTEL", "ROOM_IN_SERVICED_APARTMENT", "SHARED_ROOM_IN_B&B", "SHARED_ROOM_IN_CONDO", "SHARED_ROOM_IN_HOME", "SHARED_ROOM_IN_HOSTEL", "SHARED_ROOM__IN_LOFT", "SHARED_ROOM_IN_RENTAL_UNIT", "TINY_HOME"), multiple = FALSE, selected = NULL, options = list(`actions-box` = TRUE)),
-  pickerInput("host_verification", "By what means will you be verifified by Airbnb Platform?", choices = c("EMAIL", "PHONE", "EMAIL_AND_PHONE", "EMAIL_AND_WORK_EMAIL", "PHONE_AND_WORKEMAIL", "NO_VERIFICATION"), multiple = FALSE, selected = NULL, options = list(`actions-box` = TRUE)),
+  pickerInput("neighbourhood", "In which neighbourhood of Milan is your house located?", choices = c("AFFORI", "BAGGIO", "BANDE_NERE", "BARONA", "BICOCCA", "BOVISA", "BRERA", 
+                                                                                                     "BRUZZANO", "BUENOS_AIRES_VENEZIA", "CENTRALE", "CITTA_STUDI", "COMASINA", 
+                                                                                                     "CORSICA", "DE_ANGELI_MONTE_ROSA", "DERGANO", "DUOMO", "EX_OM_MORIVIONE", 
+                                                                                                     "FARINI", "FORZE_ARMATE", "GALLARATESE", "GARIBALDI_REPUBBLICA", "GHISOLFA", 
+                                                                                                     "GIAMBELLINO", "GIARDINI_PORTA_VENEZIA", "GRATOSOGLIO_TICINELLO", "GRECO", 
+                                                                                                     "GUASTALLA", "ISOLA", "LAMBRATE", "LODI_CORVETTO", "LORENTEGGIO", "LORETO", 
+                                                                                                     "MACIACHINI_MAGGIOLINA", "MAGENTA_S_VITTORE", "MAGGIORE_MUSOCCO", "MECENATE", 
+                                                                                                     "NAVIGLI", "NIGUARDA_CA_GRANDA", "ORTOMERCATO", "PADOVA", "PAGANO", 
+                                                                                                     "PARCO_FORLANINI_ORTICA", "PARCO_LAMBRO_CIMIANO", "PARCO_MONLUE_PONTE_LAMBRO", 
+                                                                                                     "PARCO_SEMPIONE", "PORTA_ROMANA", "PORTELLO", "QT_8", "QUARTO_CAGNINO", 
+                                                                                                     "QUARTO_OGGIARO", "RIPAMONTI", "ROGOREDO", "RONCHETTO_SUL_NAVIGLIO", "S_CRISTOFORO", 
+                                                                                                     "S_SIRO", "SARPI", "SCALO_ROMANA", "SELINUNTE", "STADERA", "TIBALDI", "TICINESE", 
+                                                                                                     "TORTONA", "TRE_TORRI", "UMBRIA_MOLISE", "VIALE_MONZA", "VIGENTINA", "VILLAPIZZONE", 
+                                                                                                     "WASHINGTON", "XXII_MARZO"), multiple = FALSE, selected = NULL, options = list(`actions-box` = TRUE)),
   
-  numericInput("rent_nights", "How many nights will the house be rented out per year?", 1, min = 1, max = 365),
-  sliderInput("investment", "How much will it cost to build the house?", min = 0, max = 4000000, value = 1, step = 200000),
+  pickerInput("response_time", "How quickly do you guarantee a response to potential customers? ", choices = c("a_few_days_or_more", "whithin_a_day", "whithin_a_few_hours", "whithin_an_hour"), multiple = FALSE, selected = NULL, options = list(`actions-box` = TRUE)),
+  
+  pickerInput("property_type", "What type of listing do you want to rent on Airbnb?", choices = c("Entire_guest_suit", "Entire_home", "Entire_loft", "Entire_place", "Entire_rental_unit",
+                                                                                                  "Entire_service_apartment", "Entire_townhouse", "Entire_vacation_home", "Entire_villa",
+                                                                                                  "Private_room_in_bed_and_breakfast", "Private_room_in_condo", "Private_room_in_hostel", 
+                                                                                                  "Private_room_in_loft", "Private_room_in_rental_unit", "Private_room_in_serviced_apartment",
+                                                                                                  "Room_in_aparthotel", "Room_in_bed_and_breakfast", "Room_in_boutique_hotel", "Room_in_hotel",
+                                                                                                  "Tiny_home", "Hotel_room", "Private_room"), multiple = FALSE, selected = NULL, options = list(`actions-box` = TRUE)),
+  
+  pickerInput("host_verification", "By what means will you be verifified by Airbnb Platform?", choices = c("email_phone", "email_phone_workemail", "phone", "phone_workemail"), multiple = FALSE, selected = NULL, options = list(`actions-box` = TRUE)),
+  
+  numericInput("rent_nights", "For how many nights do you think your house will be rented over the course of a year?", 1, min = 1, max = 365),
+  sliderInput("investment", "How much did it cost (or will it cost) to build the house you posted (or plan to post) on AirBnb?", min = 0, max = 4000000, value = 1, step = 200000),
   actionButton("build_button", "Build the House")
 ),
 
@@ -149,16 +170,16 @@ mainPanel(
 
 server <- function(input, output) {
   # Define reactive input values
-  pool_reactive <- reactive(ifelse(input$pool == "1", TRUE, FALSE))
-  gym_reactive <- reactive(ifelse(input$gym == "1", TRUE, FALSE))
+  paid_parking_reactive <- reactive(ifelse(input$paid_parking == "1", TRUE, FALSE))
+  dedicated_workspace_reactive <- reactive(ifelse(input$dedicated_workspace == "1", TRUE, FALSE))
   air_conditioning_reactive <- reactive(ifelse(input$air_conditioning == "1", TRUE, FALSE))
-  garden_reactive <- reactive(ifelse(input$garden == "1", TRUE, FALSE))
   elevator_reactive <- reactive(ifelse(input$elevator == "1", TRUE, FALSE))
-  sauna_reactive <- reactive(ifelse(input$sauna == "1", TRUE, FALSE))
+  free_parking_reactive <- reactive(ifelse(input$free_parking == "1", TRUE, FALSE))
   superhost_reactive <- reactive(ifelse(input$superhost == "1", TRUE, FALSE))
   accommodates_reactive <- reactive(input$accommodates)
   bedrooms_reactive <- reactive(input$bedrooms)
   beds_reactive <- reactive(input$beds)
+  bathrooms_reactive <- reactive(input$bathrooms)
   rent_nights_reactive <- reactive(input$rent_nights)
   neighbourhood_reactive <- reactive({ input$neighbourhood })
   response_time_reactive <- reactive({ input$response_time })
@@ -170,29 +191,29 @@ server <- function(input, output) {
   predicted_price_reactive <- reactive({
   data <- dtest_conclusion[1, ]
   
-  data$PoolYES <- ifelse(pool_reactive(), 1, 0)
-  data$GymYES <- ifelse(gym_reactive(), 1, 0)
+  data$Paid_parking_on_premisesYES <- ifelse(paid_parking_reactive(), 1, 0)
+  data$Dedicated_workspaceYES <- ifelse(dedicated_workspace_reactive(), 1, 0)
   data$Air_conditioningYES <- ifelse(air_conditioning_reactive(), 1, 0)
-  data$GardenYES <- ifelse(garden_reactive(), 1, 0)
   data$ElevatorYES <- ifelse(elevator_reactive(), 1, 0)
-  data$SaunaYES <- ifelse(sauna_reactive(), 1, 0)
-  data$HOST_IS_SUPERHOST <- ifelse(superhost_reactive(), 1, 0)
+  data$Free_parking_on_premisesYES <- ifelse(free_parking_reactive(), 1, 0)
+  data$host_is_superhostt <- ifelse(superhost_reactive(), 1, 0)
   data$accommodates <- (accommodates_reactive() - accommodates_mean) / accommodates_sd
   data$bedrooms <- (bedrooms_reactive() - bedrooms_mean) / bedrooms_sd
   data$beds <- (beds_reactive() - beds_mean) / beds_sd
+  data$bathrooms <- (bathrooms_reactive() - bathrooms_mean) / bathrooms_sd
  
-  column_name_1 <- paste0("NEIGHBOURHOOD_", neighbourhood_reactive())
+  column_name_1 <- paste0("neighbourhood_cleansed", neighbourhood_reactive())
   data[, column_name_1] <- 1
-  column_name_2 <- paste0("HOST_RESPONSE_TIME_", response_time_reactive())
+  column_name_2 <- paste0("host_response_time", response_time_reactive())
   data[, column_name_2] <- 1
-  column_name_3 <- paste0("PROPERTY_TYPE_", property_type_reactive())
+  column_name_3 <- paste0("property_type", property_type_reactive())
   data[, column_name_3] <- 1
-  column_name_4 <- paste0("HOST_VERIFICATIONS_", host_verification_reactive())
+  column_name_4 <- paste0("host_verifications", host_verification_reactive())
   data[, column_name_4] <- 1
 
   data_matrix <- xgb.DMatrix(data = as.matrix(data))
   predicted_price <- predict(xgb_mod, data_matrix)
-  predicted_price <- round(10^predicted_price, 3)
+  predicted_price <- round(exp(predicted_price), 3)
   return(predicted_price)
 })
   
@@ -223,6 +244,19 @@ server <- function(input, output) {
 }
 
 shinyApp(ui, server)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
