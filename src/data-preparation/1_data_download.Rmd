@@ -1,0 +1,123 @@
+---
+title: "Download Data"
+subtitle: "SKILLS: Data Preparation and Workflow Management - Group 9"
+author:
+  - "Rabino Tommaso"
+  - "Franceschini Emanuele"
+  - "Magalotti Bianca"
+  - "Tan Colin"
+  - "Benmrit Akram"
+date: "\\textit{20 October 2024}"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    fig_caption: true
+header-includes:
+  - "\\usepackage[english]{babel}"  # Language
+  - "\\usepackage[T1]{fontenc}"  # Font encoding
+  - "\\usepackage{mathptmx}"  # Times New Roman font for text
+  - "\\usepackage{helvet}"  # Arial-like font for sans-serif
+  - "\\usepackage{setspace}"  # Line spacing
+  - "\\onehalfspacing"  # 1.5 line spacing
+  - "\\usepackage{fancyhdr}"  # Header and footer customization
+  - "\\usepackage{titlesec}"  # Section titles formatting
+  - "\\usepackage{abstract}"  # Abstract formatting
+  - "\\usepackage{caption}"  # Captions customization
+  - "\\usepackage{graphicx}"  # Graphics
+  - "\\usepackage{amsmath}"  # Math equations
+  - "\\usepackage{amssymb}"  # Math symbols
+  - "\\usepackage{natbib}"  # Citation style (change as needed)
+  - "\\bibliographystyle{apalike}"  # Bibliography style (change as needed)
+  - "\\usepackage{hyperref}"  # Hyperlinks and URLs
+  - "\\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}"
+  - "\\usepackage{appendix}"  # Appendix formatting
+  - "\\usepackage{enumerate}"  # Enumerate environment
+  - "\\pagestyle{fancy}"  # Custom page style
+  - "\\fancyhf{}"
+  - "\\renewcommand{\\headrulewidth}{0pt}"
+  - "\\renewcommand{\\footrulewidth}{0pt}"
+  - "\\fancyhead[R]{\\thepage}"  # Page number in the header
+  - "\\fancypagestyle{plain}{\\fancyhf{}\\renewcommand{\\headrulewidth}{0pt}}"
+  - "\\lhead{\\small{A.A. 2023/2024-Courses: SKILLS: Data Preparation and Workflow Management}}"
+  - "\\usepackage{multicol}"  # For two columns
+geometry: "left=2.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm"  # Adjust margins
+---
+
+```{r, include=FALSE}
+#Load Required Packages
+rm(list=ls())
+#Setting the seed for reproducible results
+set.seed(999)
+library(readr)
+```
+
+\newpage
+
+\section{Preliminary settings}
+Before proceeding with the dataset download and extraction, some objects were created, to the url from which download the data, a name for the download dataset, and a directory to save it.
+
+```{r}
+# URL for downloading the Milan dataset ZIP file
+url <- "http://data.insideairbnb.com/italy/lombardy/milan/2023-06-21/data/listings.csv.gz"
+
+# Name for the Milan dataset
+name <- "listings_milan"
+
+# Define the target directory for extraction
+data_dir <- "../../data/"
+```
+
+
+\section{Download and Extraction}
+The following code block is responsible for downloading, extracting, and loading the Milan the Airbnb listings dataset, provided by Inside Airbnb.
+
+```{r}
+#Avoid too long downloads to be shut down
+options(timeout = max(1000, getOption("timeout")))
+
+# Define the target file path
+target_file <- paste0(data_dir, "milan.csv.gz")
+
+
+download.file(url, target_file, mode = "wb")
+
+# Extract and load the CSV file
+gz_file <- gzfile(target_file, "rt")
+data_milan <- read.csv(gz_file)
+close(gz_file)
+
+# Print a message to confirm loading
+print("Loaded milan.csv.gz")
+```
+
+\section{Delete Source ZIP Files}
+In this section, we address the cleanup process by removing the source ZIP file that was downloaded earlier. Once the relevant data have been extracted and the dataset saved locally, theis ZIP file is no longer needed and can be safely deleted to free up storage space.
+```{r}
+# Delete the source ZIP file if it exists
+if (file.exists(target_file)) {
+  file.remove(target_file)
+  print("Deleted ZIP file")
+} else {
+  print("ZIP file does not exist. Skipping deletion.")
+}
+```
+
+
+
+\section{Save the dataset}
+Finally, the dataset was saved in two distinct formats, as a csv file and as an Rds object.
+```{r}
+# Save the data as a CSV file
+write.csv(data_milan, file = "../../data/dataset1/dataset.csv", fileEncoding = "UTF-8", row.names = FALSE)
+
+# Save the data as .Rds file
+saveRDS(data_milan, file = "../../gen/data-preparation/input/raw_data.rds")
+```
+
+
+```{r, include=FALSE}
+rm(list = ls())
+```
