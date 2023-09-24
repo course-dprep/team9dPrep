@@ -221,9 +221,10 @@ plot <- ggplot(clean_data, aes(sample = price)) +
   
 ```  
 
-```{r}
+```{r, echo=FALSE}
 plot
 ``` 
+
 ```{r, include=FALSE}
 plot_skew_log_price <- ggplot(clean_data, aes(sample = log_price)) +
   stat_qq(color = "red") +
@@ -242,7 +243,7 @@ plot_skew_log_price <- ggplot(clean_data, aes(sample = log_price)) +
         panel.background = element_rect(fill = "white"))
 ```  
 
-```{r}
+```{r, echo=FALSE}
 plot_skew_log_price
 ``` 
 

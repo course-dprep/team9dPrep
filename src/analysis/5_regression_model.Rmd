@@ -87,20 +87,20 @@ y <- readRDS("../../gen/analysis/input/y.rds")
 ```
 
 \section{Introduction}
-We have now reached the central phase of our work, wherein we will systematically guide you through the steps involved in constructing a robust regression model for predicting Airbnb listing prices.
+We have now reached the central phase of our work, wherein we will guide you through the steps involved in constructing a robust XGBoost regression model for predicting Airbnb listing prices.
 
 This section is organized into the following key segments:
 \begin{enumerate}
-    \item[\Roman{enumi}I.] Dataset Splitting: In the initial stage, we undertake the division of the original dataset, \texttt{regression\_data} into two distinct sub-datasets. The first sub-dataset encompasses 75% of the observations and serves as the training set for model development. In contrast, the second sub-dataset incorporates the remaining 25% of observations and functions as the validation set, where we assess and scrutinize the model's performance.
-    \item[\Roman{enumi}II.] Modeling: In the second part, we will focus on the modeling process. This involves hyperparameter tuning, determining the optimal number of iterations for optimizing hyperparameters, training the model, and assessing its performance using the training dataset. Subsequently, a similar evaluation will be conducted using the testing dataset.
-    \item[\Roman{enumi}III.] Model Visualization: Following modeling, we will provide two graphical representations of the model's performance when applied to the training dataset. These will include an Actual vs. Fitted Plot, illustrating the relationship between actual and predicted listing prices, and a Features-Importance Plot, offering insights into the relative impact of each predictor on model performance.
+    \item[\Roman{enumi}I.] Dataset Splitting: In the initial stage, we undertake the division of the original dataset into a training dataset (containing 75\% of observations) and a testing dataset /containing the remaining 25\% of observations).
+    \item[\Roman{enumi}II.] Modeling: In the second part, we will focus on the modeling process. This involves hyperparameter tuning, determining the optimal number of iterations, training the model, and assessing its performance.
+    \item[\Roman{enumi}III.] Model Visualization: Following modeling, we will provide two graphical representations of the model: an Actual vs. Fitted Plot and a Features-Importance Plot.
     \item[\Roman{enumi}IV.] Model Validation: In this stage, we will apply the model to the testing dataset and rigorously validate its performance by computing relevant metrics.
     \item[\Roman{enumi}V.] Regression Assumptions Check: Finally, we will verify adherence to the core regression assumptions, encompassing linearity, normality, homoscedasticity, independence of residuals, and the absence of multicollinearity among residuals.
 \end{enumerate}
 
   
 \section{Split the Dataset}
-The following script is used to split the dataset into two different sub-datasets. The first is named \texttt{data\_for\_training}, contains 75% of the observations, and will be used to train the model. The second sub-dataset is named \texttt{data\_for\_testing}, contains the remaining 25% of the observations, and will be used to test the model's performance.
+The following script is used to split the dataset into two different sub-datasets. The first is named \texttt{data\_for\_training}, contains 75% of the observations, and will be used to train the model. The second is named \texttt{data\_for\_testing}, contains the remaining 25% of the observations, and will be used to test the model's performance.
 
 ```{r}
 # Assign the 'log_price' column in 'y' to the 'log_price' column in 'regression_data'
@@ -123,18 +123,9 @@ cat("Our training dataset has ", nrow(data_for_training), " observations and ", 
 ```
 
 \section{Regression model training}
-In the following section we will walk through all the steps needed to train our XGBoost regression model. 
-
-XGBoost algorithms are useful because of several reasons:
-\begin{itemize}
-\item Accuracy: First, it is an extremely powerful and accurate algorithm that has been successful in many competitions and real-world applications.
-\item Hyperparameters: Second,XGBoost provides several hyperparameters that can be tuned to optimize the model's performance.
-\item Efficiency: Finally, XGBoost is a computationally efficient algorithm, and can handle large datasets.
-\end{itemize}
-
+In the following section we will walk through all the steps needed to train our XGBoost regression model.
 
 \subsection{Storing the target variable}
-
 The first step for building the regression model is quite simple. We started by storing our target variable (\texttt{log\_price}) in a separate vector named \texttt{y\_train}. Then, we removed the target variable from our training dataset using the select() function from the dplyr package.
 
 ```{r}
@@ -358,6 +349,7 @@ Within this section, in order to visually represent our regression model, we hav
 Basically, we have plotted the actual prices of listings on the x-axis and the predicted (i.e. fitted) prices of listings on the y-axis as a scatter plot and then add the regression line to show the relationship between the actual and predicted values.
 
 ```{r, include=FALSE}
+model_summary_residuals <- model_summary$residuals
 plot_model_visualization <- ggplot(model_summary_residuals, aes(x = observed, y = predicted)) +
   geom_point(color = "darkgrey")+
   geom_smooth(method = "lm", col = "red", se = FALSE, size = 1) +
@@ -483,8 +475,7 @@ Whithin this section, all assumptions of regression models will be assessed. Spe
 \subsection{Linearity Assumption}
 The 'linearity assumption' assumes that the relationship between the predictors and the target variable is linear. To check the linearity assumption, a (standardized) Residuals vs. Fitted Plot was employed. This plot shows the residuals (difference between the fitted values and actual values) against the fitted values (values predicted by our model).
 
-The following code block is used to create the dataframe that will be used to construct the Residuals vs. Fitted Plot.
-```{r, results='hide'}
+```{r, include=FALSE}
 Actual = y_test
 Predicted = XGBpred
 Residuals = y_test - XGBpred
@@ -554,7 +545,7 @@ The 'homoscedasticity' assumption assumes that the residuals have equal variance
 To assess the Homoscedasticity assumption, a Scale Location plot was constructed. In a Scale-Location plot, the square root of the standardized absolute residuals is plotted against the fitted (predicted) values. Since the plot shows a random scatter of points around a horizontal line (parallel to the x-axis) around zero, we can state that the Homoscedasticity assumption is met. 
 
 
-```{r}
+```{r, include=FALSE}
 plot <- ggplot(pred_df, aes(x = Predicted, y = Sqrt_Std_Residuals)) +
   geom_point(color = "darkgrey") +
   geom_smooth(method = "lm", col = "red", se = FALSE, size = 1) +

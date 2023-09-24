@@ -111,16 +111,6 @@ raw_data <- raw_data %>%
   select(-which(cols_to_remove))
 ```
 
-As can be seen from the output below, once \texttt{calendar\_updated}, \texttt{neighbourhood\_group\_cleansed} and \texttt{bathroom} have been removed, there are no other columns containing only NAs. 
-
-```{r}
-cols_to_remove <- sapply(raw_data, function(x) all(is.na(x)))
-indices <- which(unlist(cols_to_remove))
-names_list <- names(cols_to_remove)[indices]
-cat("Now, there are", length(names_list), "columns containing only missing values")
-```
-
-
 \section{Management of unnecessary variables}
 Here, variables that were deemed irrelevant for our price prediction analysis were excluded. The selection of variables for removal was made in accordance with the following criteria:
 

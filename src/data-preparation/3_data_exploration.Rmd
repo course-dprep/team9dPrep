@@ -91,7 +91,6 @@ This section is structured as follows:
 
 
 \subsection{Apartment-related Variables}
-First, the \textit{numeric} variables we considered as \textit{apartment-related} and from which we will build the correlogram were the following: 
 ```{r, include=FALSE}
 # Select relevant variables for correlation analysis
 corr_data <- clean_data %>% 
@@ -182,7 +181,7 @@ table_corr_price_apartment
 Here is a correlogram displaying correlation values for \texttt{numeric} \textit{host-related} variables:
 ```{r, include=FALSE}
 # Select relevant variables
-corr_data <- corr_data %>% 
+corr_data <- clean_data %>% 
   dplyr::select(price, host_response_rate_percentage, host_acceptance_rate_percentage, host_listings_count, host_total_listings_count, review_scores_checkin, review_scores_communication, reviews_per_month)
 
 corr_matrix <- round(cor(corr_data),2)

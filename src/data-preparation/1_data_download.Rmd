@@ -57,7 +57,7 @@ library(readr)
 \newpage
 
 \section{Preliminary settings}
-Before proceeding with the dataset download and extraction, some objects were created, to the url from which download the data, a name for the download dataset, and a directory to save it.
+Before proceeding with the dataset download and extraction, some objects were created. The \texttt{url} object points to the url from which the data will be downloaded, the \texttt{name} object store a user-defined name for the downloaded dataset, and the \texttt{data\_dir} object specify the directory to save it.
 
 ```{r}
 # URL for downloading the Milan dataset ZIP file
@@ -72,7 +72,7 @@ data_dir <- "../../data/"
 
 
 \section{Download and Extraction}
-The following code block is responsible for downloading, extracting, and loading the Milan the Airbnb listings dataset, provided by Inside Airbnb.
+The following code block is responsible for downloading, extracting, and loading the Milan Airbnb listings dataset, provided by Inside Airbnb.
 
 ```{r}
 #Avoid too long downloads to be shut down
@@ -108,7 +108,7 @@ if (file.exists(target_file)) {
 
 
 \section{Save the dataset}
-Finally, the dataset was saved in two distinct formats, as a csv file and as an Rds object.
+Finally, the dataset was saved in two distinct formats, as a csv file (for easier inspection) and as an Rds object (for faster future loadings in the subsequent project files).
 ```{r}
 # Save the data as a CSV file
 write.csv(data_milan, file = "../../data/dataset1/dataset.csv", fileEncoding = "UTF-8", row.names = FALSE)
