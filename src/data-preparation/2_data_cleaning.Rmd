@@ -83,14 +83,14 @@ raw_data <- readRDS("../../gen/data-preparation/input/raw_data.rds")
 
 \newpage
 \section{Introduction}
-In this document, the data manipulation procedures applied to the original dataset are outlined. These procedures encompass the incorporation of new features, the conversion of variables into alternative formats, and the data cleansing process. These manipulations are indispensable for assuring the quality and appropriateness of the dataset for constructing the regression model.
+In this document, the data manipulation procedures applied to the original dataset are outlined. These manipulations are indispensable for assuring the quality and appropriateness of the dataset for constructing the regression model:
 
 \begin{enumerate}
     \item[\Roman{enumi}I.] Management of Empty Columns: Removal of the variables \texttt{calendar\_updated}, \texttt{neighbourhood\_group\_cleansed} and \texttt{bathrooms} from the dataset due to their sole containment of missing values.
         \item[\Roman{enumi}II.] Management of Unnecessary Variables: Elimination of variables that lack relevance to our regression model, such as \texttt{listing\_url}.
     \item[\Roman{enumi}III.] Management of Observations with Missing Values: Ultimate elimination of all observations containing missing values (NAs) across any variables within the dataset, acknowledging the incompatibility of regression models and correlations with missing data.
     \item[\Roman{enumi}IV.] Management of Price Outliers: Subsequent removal of observations with outliers in the \texttt{price} variable, as it serves as the dependent variable (DV) in our regression model.
-    \item[\Roman{enumi}V.] Management of Character Variables: Conversion of specific variables from a "character" format to "date" and "factor" formats to ensure compatibility with our regression model, which exclusively accommodates "factor" and "numeric" formats.
+    \item[\Roman{enumi}V.] Management of Character Variables: Conversion of specific variables from a "character" format to "date" and "factor" formats to ensure compatibility with our regression model.
     \item[\Roman{enumi}VI.] Management of the Amenities Variable: Utilization of the \texttt{amenities} variable to generate a series of Boolean variables, indicating the provision of specific services within a listing, including "dedicated workspace," "parking," "oven," "elevator," "essentials," and more.
     \item[\Roman{enumi}VII.] Management of Factor Variables: Removal of certain levels within the following factor variables: \texttt{host\_response\_time}, \texttt{host\_is\_superhost}, \texttt{host\_verifications}, \texttt{property\_type} and \texttt{neighbourhood\_cleansed}. The objective was to alleviate the computational burden of our regression model.
 \end{enumerate}
@@ -117,7 +117,7 @@ Here, variables that were deemed irrelevant for our price prediction analysis we
 \begin{enumerate}
     \item[\Roman{enumi}I.] \textit{Format Criteria}: The majority of removed variables were in 'character' format.
     \item[\Roman{enumi}II.] \textit{Usefulness Criteria}: Removal of variables that were clearly irrelevant for predicting listings' prices.
-    \item[\Roman{enumi}III.] \textit{Redundancy Criteria}: Removal of variables that overlapped each other and carried the same information (this was also to avoid multicollinearity, more on this later in this project).
+    \item[\Roman{enumi}III.] \textit{Redundancy Criteria}: Removal of variables that overlapped each other and carried the same information (this was also to avoid multicollinearity, more on this later in the project).
 \end{enumerate}
 
 Following these guidelines, we chose to remove the following variables:
@@ -247,14 +247,14 @@ cat('Now, there are', sum(!complete.cases(raw_data)), 'rows with NAs in the data
 \section{Management of price outliers}
 While the absence of outliers is often considered a beneficial practice for enhancing regression model performance, the only absolute requirement for regression analysis is the absence of outliers within the dependent variable. Given this perspective, we directed our attention specifically to outliers within our response variable, which is the listings' \texttt{price}.
 
-The initial step in this process involved converting the \texttt{price} variable into a numeric format, which also entailed the removal of all non-numeric characters, such as dollar signs and commas. The code snippet below illustrates the procedure:
+\textbf{Converting price variable into numeric format}: The initial step in this process involved converting the \texttt{price} variable into a numeric format, which also entailed the removal of all non-numeric characters, such as dollar signs and commas. The code snippet below illustrates the procedure:
 ```{r}
 raw_data <- raw_data %>%
   mutate(price = as.numeric(str_replace_all(price, "[^0-9.]", "")))
 str(raw_data$price)
 ```
 
-Outliers within the \texttt{price} variable are discernible looking at the plot displayed below, illustrating the distribution of the \texttt{price} variable.
+\textbf{Bar Chart of Price with Outliers}: Outliers within the \texttt{price} variable are discernible looking at the plot displayed below, illustrating the distribution of the \texttt{price} variable.
 
 ```{r, include=FALSE}
 plot <- ggplot(raw_data, aes(price)) +
@@ -282,8 +282,7 @@ plot <- ggplot(raw_data, aes(price)) +
 plot
 ```
 
-As illustrated in the table below, a significant proportion of outliers are situated beyond the 99th percentile threshold.
-
+\textbf{Table of Price Outliers by Percentiles Range}: As illustrated in the table below, a significant proportion of outliers are situated beyond the 99th percentile threshold.
 
 ```{r, include = FALSE}
 # Create the table
@@ -302,7 +301,7 @@ table_price_outliers <- df_percentiles %>%
   ) %>%
   tab_header(
     title = "Table of Percentiles",
-    subtitle = "Average Price by Percentile Range",
+    subtitle = "Price by Percentile Range",
   ) 
 ```
 
@@ -311,14 +310,14 @@ table_price_outliers
 ```
 
 
-The following code was used to remove observations exhibiting outliers concerning the \texttt{price} variable. Following an initial exploratory analysis, it was determined that listings with prices exceeding the 99th percentile would be excluded from the dataset.
+\textbf{Removal of Price Outliers}: The following code was used to remove observations exhibiting outliers concerning the \texttt{price} variable. Following an initial exploratory analysis, it was determined that listings with prices exceeding the 99th percentile would be excluded from the dataset.
 
 ```{r}
 raw_data <- raw_data %>%
   dplyr::filter (price <= quantile(raw_data$price, probs = c(0.99)))
 ```
 
-With the removal of outliers surpassing the 99th percentile, there is a notable enhancement in the distribution of prices among apartments, as evident in the plot below:
+\textbf{Bar Chart of Price after the removal of Outliers}: With the removal of outliers surpassing the 99th percentile, there is a notable enhancement in the distribution of prices among apartments, as evident in the plot below:
 ```{r, include = FALSE}
 plot <- ggplot(raw_data, aes(price)) +
   geom_histogram(binwidth = 100, col = "darkgrey", fill = alpha("grey", 0.5)) +
@@ -462,7 +461,7 @@ cat('Now, there are', length(char_cols), 'column in character format.')
 \section{Management of factor variables}
 The purpose of this section is to explore and manage the variables in factor format present in the dataset.
 
-\subsection{Host\_response\_time}
+\textbf{Host\_response\_time}
 In the context of the variable \texttt{host\_response\_time}, despite the previous removal of all observations with missing values within the dataset, it's noteworthy that there are still 2411 observations containing a value equal to \texttt{N\/A}.
 
 ```{r}
@@ -485,7 +484,7 @@ raw_data$host_response_time <- droplevels(raw_data$host_response_time)
 ```
 
 
-\subsection{Host\_is\_superhost}
+\textbf{Host\_is\_superhost}
 Similarly as before, in the context of the variable \texttt{host\_is\_superhost}, despite the previous removal of all observations with missing values within the dataset, it's noteworthy that there are still 266 empty cells. This happens because the consideration of empty cells (empty strings) as missing values varies based on the data setup in R. It is possible to verify this by using the following code, which counts the number of observations for each level of the "host_is_superhost" variable.
 
 ```{r}
@@ -508,7 +507,7 @@ raw_data$host_is_superhost <- droplevels(raw_data$host_is_superhost)
 ```
 
 
-\subsection{Host\_verifications}
+\textbf{Host\_verifications}
 Initially, the \texttt{host\_verifications}  variable held values containing square brackets and apostrophes, potentially hindering subsequent analysis. Utilizing the \texttt{gsub} function, those special characters were eliminated from the variable's values. Furthermore, it's worth noting that the use of \texttt{gsub} automatically transformed the variable into a \texttt{character} format, necessitating a subsequent conversion back to \texttt{factor}.
 
 ```{r}
@@ -540,7 +539,7 @@ raw_data$host_verifications <- droplevels(raw_data$host_verifications)
 ```
 
 
-\subsection{Property\_Type}
+\textbf{Property\_Type}
 As can be noticed from the table below, the variable \texttt{property\_type} exhibits some levels with a notably low frequency of observations. Specifically, the table shows the levels of the \texttt{property\_tpe} variable with a frequency lower than 4. 
 ```{r, include=FALSE}
 grouped_data <- raw_data %>%
@@ -578,7 +577,7 @@ raw_data$property_type <- droplevels(raw_data$property_type, levels_to_drop)
 ```
 
 
-\subsection{Neighbourhood\_cleansed}
+\textbf{Neighbourhood\_cleansed}
 In a manner similar to the previous step, the table below illustrates that the \texttt{neighbourhood\_cleansed} variable exhibits several levels with a notably low frequency of observations. In this case too, the table shows the levels of the \texttt{neighbourhood\_cleansed} variable with a frequency lower than 4.
 
 ```{r, include=FALSE}

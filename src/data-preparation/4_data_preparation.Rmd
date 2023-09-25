@@ -97,8 +97,8 @@ In the present section, the drop of highly correlated predictor variables was un
 
 \end{itemize}
 
-Here is a correlogram displaying correlation values for all numeric variables and \texttt{price}.
 
+\textbf{Numeric Variables Correlation}: Here is a correlogram displaying correlation values for all numeric variables and \texttt{price}.
 ```{r, include=FALSE}
 corr_data <- clean_data %>% dplyr::select_if(is.numeric)
 
@@ -118,7 +118,7 @@ plot <- ggcorrplot(corr_matrix,
            lab_size = 2.5,
            digits = 2,
            tl.cex = 8,
-           title = "Apartment-related Correlogram") +
+           title = "Numeric Variables Correlogram") +
   theme(legend.position = "none", 
         plot.title = element_text(lineheight = 2, face = "bold", vjust = 1, hjust = 0.5, color = "#333333"),
         plot.subtitle = element_text(color = "#666666", vjust = 1, hjust = 0.5),
@@ -131,7 +131,7 @@ plot <- ggcorrplot(corr_matrix,
 plot
 ```
 
-To improve clarity, we created a table displaying, in descending order, the pairs of numeric variables with a mutual correlation higher than 0.75. This table helps in identifying highly correlated variables for potential removal to avoid multicollinearity in regression analysis.
+\textbf{Highly Correlated Variable Pairs}: To improve clarity, we created a table displaying, in descending order, the pairs of numeric variables with a mutual correlation higher than 0.75. This table helps in identifying highly correlated variables for potential removal to avoid multicollinearity in regression analysis.
 ```{r, include=FALSE}
 # Convert correlation matrix into a dataframe
 corr_matrix_df <- data.frame(corr_matrix)
@@ -179,28 +179,28 @@ table_high_correlation_pairs
 ```
 
 
-The code snippet below is utilized to eliminate one variable from the dataset for each pair of highly correlated variables previously identified. The criterion for removal is to discard the variable with the lowest correlation with \texttt{price}. Between the highly correlated variables, we decided to retain only beds, accommodates, and bedroom, since their very high correlation with \texttt{price}.
+\textbf{Variable Remotion}: The code snippet below is utilized to eliminate one variable from the dataset for each pair of highly correlated variables previously identified. The criterion for removal is to discard the variable with the lowest correlation with \texttt{price}. Between the highly correlated variables, we decided to retain only beds, accommodates, and bedroom, since their very high correlation with \texttt{price}.
 ```{r}
 clean_data <- clean_data %>% dplyr::select(-host_total_listings_count, -availability_90, -availability_30, -review_scores_value, -review_scores_accuracy, -reviews_per_month, -review_scores_checkin)
 ```
 
 
 \section{Dealing with skewness of price}
-Now, we have to prepare our response variable for the modeling, because its skewness it's too high. Skewness is a measure of the symmetry in a distribution. A symmetrical variable will have a skewness equal to 0 (i.e. a normal distributed variable will have a skewness of 0). As a rule of thumb, a variable can be regarded as sufficiently normally distributed if its skewness is near to 0 or, at least, between -1 and 1.
+\textbf{Dependent Variable Skewness}: Now, we have to prepare our response variable for the modeling, because its skewness it's too high. Skewness is a measure of the symmetry in a distribution. A symmetrical variable will have a skewness equal to 0 (i.e. a normal distributed variable will have a skewness of 0). As a rule of thumb, a variable can be regarded as sufficiently normally distributed if its skewness is near to 0 or, at least, between -1 and 1.
 
 ```{r}
 price_skew <- skewness(clean_data$price)
 cat("As we can see, the skewness of our target variable (price) is too high: ", price_skew)
 ```
 
-In order to fix this issue, we computed the natural logarithm \texttt{price} and use it as response variable for our regression model.
+\textbf{New Dependent Variable}: In order to fix this issue, we computed the natural logarithm \texttt{price} and use it as response variable for our regression model.
 ```{r}
 clean_data$log_price = log(clean_data$price)
 log_price_skew <- skewness(clean_data$log_price)
 cat("The skewness of our new response variable (log_price) is equal to: ", log_price_skew, "--> a much better result than the previous one.")
 ```
 
-It is also possible to measure the improvement in the skewness of our dependent variable by inspecting the two Normal Q-Q plots below, one inspecting the distribution of \texttt{price}, and the other inspecting the distribution of the newly created variable \texttt{log\_price}. Indeed, it can be seen that \texttt{log\_price} is better distributed, since the points follow the straight line drawn at a 45-degree angle from the origin.
+\textbf{Normal Q-Q Plots}: It is also possible to measure the improvement in the skewness of our dependent variable by inspecting the two Normal Q-Q plots below, one inspecting the distribution of \texttt{price}, and the other inspecting the distribution of the newly created variable \texttt{log\_price}. Indeed, it can be seen that \texttt{log\_price} is better distributed, since the points follow the straight line drawn at a 45-degree angle from the origin.
 
 ```{r, include=FALSE}
 plot <- ggplot(clean_data, aes(sample = price)) +

@@ -94,7 +94,7 @@ print("Loaded milan.csv.gz")
 ```
 
 \section{Delete Source ZIP Files}
-In this section, we address the cleanup process by removing the source ZIP file that was downloaded earlier. Once the relevant data have been extracted and the dataset saved locally, theis ZIP file is no longer needed and can be safely deleted to free up storage space.
+In this section, we address the cleanup process by removing the source ZIP file that was downloaded earlier. Once the relevant data have been extracted and the dataset saved locally, this ZIP file is no longer needed and can be safely deleted to free up storage space.
 ```{r}
 # Delete the source ZIP file if it exists
 if (file.exists(target_file)) {
