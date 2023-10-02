@@ -1,20 +1,9 @@
-################################
-# FIND AND INSTALL R PACKAGES  #
-#                              #
-#                              #
-# Searches source code for     #
-# references to packages,      #
-# and installs all             #
-# uninstalled packages.        #
-#                              #
-# Put this script in the       #
-# root directory of your       #
-# R project, and either        #
-# source it, or run it         #
-# from the command line:       #
-# > Rscript install_packages.R #
-#                              #
-################################
+
+
+###############################################################
+######    AUTOMATICALLY DOWNLOAD UNINSTALLED PACKAGES    ######
+###############################################################
+
 
 # find all source code files in (sub)folders
 files <- list.files(pattern='[.](R|rmd)$', all.files=T, recursive=T, full.names = T, ignore.case=T)
@@ -56,4 +45,147 @@ if (length(to_be_installed)>0) install.packages(to_be_installed, repos = 'https:
 
 cat('\nDone!\n\n')
 
-rm("code", "files", "installed_packages", "to_be_installed", "uniq_packages")
+
+
+
+
+
+
+
+###############################################################
+#############       PRELIMINARY SETTINGS         ##############
+###############################################################
+
+#Restore Environment
+rm(list=ls())
+
+#Setting the seed for reproducible results
+set.seed(999)
+
+
+
+
+
+
+
+###############################################################
+#############             PACKAGES               ##############
+###############################################################
+
+#GENERAL PACKAGES:
+library(readr)
+library(tidyverse) #A "Package of Packages" for Data manipulation and visualization (includes magrittr, lubridate, purrr, tidyr, etc.).
+library(dplyr) #Data frame manipulations (select, slice, etc.
+library(jsonlite) #For Amenities Columns Creation
+library(moments) #Measuring the skewness.
+
+#REGRESSION PACKAGES
+library(caret) #Hyperparameters Tuning. 
+library(xgboost) #XGBoost Regression. 
+library(DALEX) #Summary of the XGBoost Regression Model ("explainer).
+library(bayesforecast) #Checking Regression Assumptions.
+
+#SHINYAPP PACKAGES
+library(shiny) #For the ShinyApp
+library(shinyWidgets) #For the ShinyApp
+
+#PLOT AND FIGURES PACKAGES:
+library(ggplot2) #Building fancy plots.
+library(ggthemes) #Themes for ggplots (e.g. "solarized").
+library(ggcorrplot) #For correlograms
+library(scales) #Scaling and formatting ggplots (e.g. scale_fill_gradient()).
+library(gt) #Latex tables
+
+# WORKING DIRECTORY SETTING PACKAGES
+library(here)
+library(rstudioapi)
+
+
+
+
+
+
+
+
+###############################################################
+######      AUTOMATICALLY SET WORKING DIRECTORY         #######
+###############################################################
+
+current_document_path <- getActiveDocumentContext()$path
+# Check if the document path is set
+if (!is.null(current_document_path)) {
+  # Set the working directory to the source file's location
+  setwd(dirname(current_document_path))
+  setwd("../..")
+  rm(current_document_path)
+} else {
+  cat("No active document or path found. Set working directory manually.\n")
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
