@@ -1,51 +1,45 @@
-# Notes: 
-# - If run on unix system, use rm instead of del command in clean  
-# - Careful with spaces! If use \ to split to multiple lines, cannot have a space after \ 
+# Define variables
+R_SCRIPT := src/data-preparation/0_installing_packages.R
+RMD_FILES := src/data-preparation/1_data_download.Rmd \
+             src/data-preparation/2_data_cleaning.Rmd \
+             src/data-preparation/3_data_exploration.Rmd \
+             src/data-preparation/4_data_preparation.Rmd \
+             src/analysis/5_regression_model.Rmd
 
-# OVERALL BUILD RULES
-all: data_cleaned results paper
-paper: gen/paper/output/paper.pdf
-data_cleaned: gen/data-preparation/output/data_cleaned.RData
-results: gen/analysis/output/model_results.RData
-.PHONY: clean
+R_FILES := src/analysis/6_shinyapp.R \
+           src/analysis/7_clean-up.R
 
-# INDIVIDUAL RECIPES
+ZIP_FOLDER := gen/paper/output/final_paper
+MAIN_TEX_FILE := $(ZIP_FOLDER)/main.tex
+PDF_OUTPUT := $(ZIP_FOLDER)/main.pdf
 
-# Generate paper/text
-gen/paper/output/paper.pdf: gen/paper/output/table1.tex \
-				src/paper/paper.tex
-	pdflatex -interaction=batchmode -output-directory='gen/paper/output/' 'src/paper/paper.tex' 
-	pdflatex -interaction=batchmode -output-directory='gen/paper/output/' 'src/paper/paper.tex' 
-	pdflatex -output-directory='gen/paper/output/' 'src/paper/paper.tex' 
-# Note: runs pdflatex multiple times to have correct cross-references
+# Define targets
+all: install_packages data_analysis run_shinyapp clean_up assemble_pdf
 
-# Generate tables 
-gen/paper/output/table1.tex: gen/analysis/output/model_results.RData \
-				src/paper/tables.R
-	Rscript src/paper/tables.R
+# Target to install R packages
+install_packages:
+    Rscript $(R_SCRIPT)
 
-# Run analysis  
-gen/analysis/output/model_results.RData: gen/data-preparation/output/data_cleaned.RData \
-						src/analysis/analyze.R
-	Rscript src/analysis/update_input.R
-	Rscript src/analysis/analyze.R
+# Rule to generate PDF from Rmd
+%.pdf: %.Rmd
+    Rscript -e "rmarkdown::render('$<', output_format = 'pdf_document')"
 
-# Clean data
-gen/data-preparation/output/data_cleaned.RData: data/dataset1/dataset1.csv \
-						data/dataset2/dataset2.csv \
-						src/data-preparation/merge_data.R \
-						src/data-preparation/clean_data.R 
-	Rscript src/data-preparation/update_input.R
-	Rscript src/data-preparation/merge_data.R
-	Rscript src/data-preparation/clean_data.R 
+# Target for data analysis
+data_analysis: $(RMD_FILES:.Rmd=.pdf)
 
-# Download data
-data/dataset1/dataset1.csv data/dataset2/dataset2.csv: src/data-preparation/download_data.R 
-	Rscript src/data-preparation/download_data.R 
+# Target to run Shiny app
+run_shinyapp: $(R_FILES)
+    Rscript $<
 
-# Clean-up: Deletes temporary files
-# Note: Using R to delete files keeps platform-independence. 
-# 	    --vanilla option prevents from storing .RData output
-clean: 
-	Rscript --vanilla src/clean-up.R
+# Target to clean up
+clean_up: src/analysis/7_clean-up.R
+    Rscript $<
+
+# Target to assemble PDF from LaTeX files
+assemble_pdf: $(PDF_OUTPUT)
+
+# Rule to generate PDF from LaTeX files
+$(PDF_OUTPUT): $(MAIN_TEX_FILE) $(ZIP_FOLDER)/LTJournalArticle.cls $(ZIP_FOLDER)/sample.bib $(ZIP_FOLDER)/Figures/*.png
+    cd $(ZIP_FOLDER) && pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
+
 	
