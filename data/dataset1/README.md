@@ -29,7 +29,7 @@ It's crucial to highlight that not all listed variables will be utilized in subs
 
 Here’s an overview of what each (origianl) variable represents:
 
-| Variable                              | Description                                                                   |
+| Variable                              | Description or Motivation for Removal                                         |
 |---------------------------------------|-------------------------------------------------------------------------------|
 | `id`                                  | A unique identifier for the listing.                                          |
 | `listing_url`                         | The URL of the listing on Airbnb.                                            |
@@ -106,7 +106,7 @@ For the purposes of this project, the dataset used was “listings.csv.gz”, re
 2. **Management of Unnecessary Variables:**
    - Eliminated variables lacking relevance to the regression model, as listed below:
 
-   | Variable                                    | Description                                                |
+| Variable                                    | Description                                                |
 |---------------------------------------------|------------------------------------------------------------|
 | `id`                                        | Unique identifier for the listing.                          |
 | `listing_url`                               | URL of the listing.                                        |
