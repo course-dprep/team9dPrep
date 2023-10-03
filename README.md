@@ -5,7 +5,7 @@
 ---
 
 ## Table of Contents
-- [Introduction](#introduction)
+I. [Introduction](#introduction)
   - [Subsection 1](#contributors)
     - [Sub-subsection 1.1](#research-motivation)
   - [Subsection 2](#subsection-2)
