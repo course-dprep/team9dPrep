@@ -100,6 +100,80 @@ For the purposes of this project, the dataset used was “listings.csv.gz”, re
 
 # Data Processing, Cleaning, and Labelling
 
+1. **Management of Empty Columns:**
+   - Removed variables `calendar_updated`, `neighbourhood_group_cleansed`, and `bathrooms` from the dataset due to their sole containment of missing values.
+
+2. **Management of Unnecessary Variables:**
+   - Eliminated variables lacking relevance to the regression model, as listed below:
+
+   | Variable                                    | Description                                                |
+|---------------------------------------------|------------------------------------------------------------|
+| `id`                                        | Unique identifier for the listing.                          |
+| `listing_url`                               | URL of the listing.                                        |
+| `scrape_id`                                 | ID of the data scrape.                                     |
+| `last_scraped`                              | Last update of the data set.                               |
+| `source`                                    | Source from which the listing information was scraped.     |
+| `name`                                      | Title of the ad placed by the host on the Airbnb platform.  |
+| `description`                               | Brief description of the listing.                           |
+| `neighborhood_overview`                     | Brief description of the neighborhood.                     |
+| `picture_url`                               | URL of the listing's pictures.                             |
+| `host_id`                                   | Unique identifier for hosts.                               |
+| `host_url`                                  | URL of the host.                                           |
+| `host_name`                                 | Name of the host.                                          |
+| `host_location`                             | City of the host's residence.                               |
+| `host_about`                                | Brief description of the hosts.                            |
+| `host_thumbnail_url`                        | URL of the hosts' thumbnail pictures.                      |
+| `host_picture_url`                          | URL of the hosts' pictures.                                |
+| `host_neighbourhood`                        | Host's neighborhood.                                       |
+| `neighbourhood`                             | Neighborhood (neighbourhood_cleansed was more informative).|
+| `minimum_minimum_nights`                    | To avoid redundancy.                                       |
+| `maximum_minimum_nights`                    | To avoid redundancy.                                       |
+| `minimum_maximum_nights`                    | To avoid redundancy.                                       |
+| `maximum_maximum_nights`                    | To avoid redundancy.                                       |
+| `minimum_nights_avg_ntm`                    | To avoid redundancy.                                       |
+| `maximum_nights_avg_ntm`                    | To avoid redundancy.                                       |
+| `calendar_last_scraped`                     | To avoid redundancy.                                       |
+| `license`                                   | To avoid redundancy.                                       |
+| `calculated_host_listings_count`            | To avoid redundancy.                                       |
+| `calculated_host_listings_count_entire_homes`| To avoid redundancy.                                       |
+| `calculated_host_listings_count_private_rooms`| To avoid redundancy.                                      |
+| `calculated_host_listings_count_shared_rooms`| To avoid redundancy.                                      |
+
+
+3. **Management of Observations with Missing Values:**
+   - Eliminated all observations containing missing values (NAs) across any variables within the dataset to ensure compatibility with regression models.
+
+4. **Management of Price Outliers:**
+   - Removed observations with outliers in the `price` variable, the dependent variable in the regression model.
+
+5. **Management of the Amenities Variable:**
+   - Utilized the `amenities` variable to generate Boolean variables indicating the provision of specific services within a listing, such as "dedicated workspace," "parking," "oven," "elevator," and "essentials."
+
+6. **Management of Factor Variables:**
+   - Removed certain levels within factor variables (`host_response_time`, `host_is_superhost`, `host_verifications`, `property_type`, and `neighbourhood_cleansed`) to alleviate computational burden.
+
+7. **Removal of Highly Correlated Predictors:**
+   - Addressed multicollinearity issues by removing predictors that exhibited high correlation.
+
+8. **Logarithm Transformation of Price:**
+   - Computed and used the logarithm of the `price` variable to address its high skewness.
+
+9. **Conversion of Date Predictors:**
+   - Converted date predictors into numerical format by extracting the day, month, and year for each.
+
+10. **One-Hot Encoding:**
+    - Applied one-hot encoding to all categorical, binomial, and factorial variables to transform them into numerical format.
+
+11. **Centering and Scaling:**
+    - Centered and scaled numeric predictors to ensure consistent scales for improved model performance.
+
+These comprehensive data preparation and cleaning steps were undertaken to enhance the quality and relevance of the dataset for building an effective regression model to predict Milan Airbnb listing prices.
+
+
+
+---
+
+# Data Processing, Cleaning, and Labelling
 
 
 
