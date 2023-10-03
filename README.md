@@ -4,11 +4,11 @@
 ---
 
 # Contributors
-  - Bianca Magalotti
-  - Emanuele Franceschini
-  - Akram Benmrit
-  - Tommaso Rabino
-  - Colin Tan
+  - [B. Magalotti](mailto:b.magalotti@tilburguniversity.it)
+  - [E. Franceschini](mailto:e.franceschini@tilburguniversity.it)
+  - [A. Benmrit](mailto:a.benmrit@tilburguniversity.it)
+  - [C. Tan](mailto:c.tan@tilburguniversity.it)
+  - [T. Rabino](mailto:t.rabino@tilburguniversity.it)
 
 ---
 
