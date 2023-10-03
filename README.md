@@ -66,7 +66,7 @@ For the purposes of this project, the dataset used was “listings.csv.gz”, re
         |-- 2_data_cleaning
         |-- 3_data_exploration
         |-- 4_data_preparation
-   |-- paper
+   |-- 7_clean-up
 |-- .gitignore
 |-- README.md
 |-- makefile
@@ -311,7 +311,7 @@ All source code files present in this repository are described in the table belo
 | **4_data_preparation**                      | .Rmd        | Set of operations needed to prepare the dataset for the regression modeling, including computation of logarithm of the DV, one-hot encoding of factor variables, centering and scaling numeric variables, and dividing the dataset into a training and a testing dataset.                 | src/data-preparation | 4_data_preparation.pdf |
 | **5_regression_model**                      | .Rmd        | Hyperparameter tuning, determining the optimal number of iterations, training the model and assessing its performance, checking regression assumptions.                  | src/analysis         | 5_regression_model.pdf |
 | **6_shinyapp**                              | .R          | Develops an interactive and user-friendly ShinyApp capable of predicting the price of an Airbnb listing located in Milan. The ShinyApp uses the previously trained and validated regression model to predict the price of a listing whose characteristics (number of rooms, beds, bathrooms, and accommodated people, location, type of apartment, etc.) can be defined a priori by the user.               | src/analysis         | ShinyApp Interface     |
-| **7_clean_up**                              | .R          | Eliminates all not relevant file, including .RHistory and .RData.                  | src/                 | N/A                    |
+| **7_clean-up**                              | .R          | Eliminates all not relevant file, including .RHistory and .RData.                  | src/                 | N/A                    |
 | **final_paper**                             | .pdf        | Pdf file with all results and insights gained from the anlysis.                  | gen/paper/output     | N/A                    |
 
 ---
