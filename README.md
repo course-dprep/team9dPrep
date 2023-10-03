@@ -260,7 +260,7 @@ The _5_regression_model_ file code is written in such a way as to avoid reproces
 
 
 ### Controlled Randomness
-- [x] Random seed is set at __line 53__ of program _1_download_data_.
+- [x] Random seed is set at **line 53** of program **1_download_data**.
 
 
 
