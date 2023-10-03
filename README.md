@@ -173,16 +173,94 @@ Here’s an overview of what each (origianl) variable represents:
 The present project does not involve exceptionally large datasets, and the R environment is systematically cleaned by a specific code snippet at the end of each code file, making the project accessible for a standard PC commonly available in 2023. The whole set of code files were last run on a Apple MacBook Air (2020), with the following technical specifications: (i) CPU: Apple M1 8-core - 3.2 GHz; (ii) GPU: Apple M1 7-Core GPU; (iii) RAM: 8GB; (iv) SSD: 256GB; (v) Operating System: MacOS 14.
 
 ### Software Requirements
-
 1. **R & RStudio** --> The code was developed and executed in R (R version 4.2.2), utilizing RStudio (RStudio version 2022.12.0+353) as the integrated development environment (IDE). The software and the programming language can be installed from this link: [R and RStudio Installation Guide](https://tilburgsciencehub.com/building-blocks/configure-your-computer/statistics-and-computation/r/).
 
-2. **RMarkdown & LaTex Distribution**: To compile RMarkdown documents into PDF with LaTeX styling, you need to have a LaTeX distribution installed on your computer. To install a LaTeX Distribution:
+2. **LaTex Distribution** --> To compile the final paper into A PDF document with LaTeX styling, you need to have a LaTeX distribution installed on your computer. To install a LaTeX Distribution:
    - On Windows: You can use distributions like MiKTeX or TeX Live. You can download the from the following links: [MikTex Download](https://miktex.org/download); [Tex Live Download](https://tug.org/texlive/windows.html)
    - On macOS: MacTeX is a popular distribution. You can download it from the following link: [MacTex Download](https://tug.org/mactex/mactex-download.html)
 
-2. **LaTex Packages**: To compile RMarkdown documents into PDF with LaTeX styling, you also need to need to to make sure that the necessary LaTeX packages are installed in your LaTeX distribution. You can typically install missing packages using the package manager of your LaTeX distribution. The following LaTex packages are used in this project:
-   - On Windows: You can use distributions like MiKTeX or TeX Live. You can download the from the following links: [MikTex Download](https://miktex.org/download); [Tex Live Download](https://tug.org/texlive/windows.html)
-   - On macOS: MacTeX is a popular distribution. You can download it from the following link: [MacTex Download](https://tug.org/mactex/mactex-download.html)
+3. **LaTex Packages** --> For the same purpose, you also need to need to to make sure that the following necessary LaTeX packages are installed in your LaTeX distribution. You can typically install missing packages using the package manager of your LaTeX distribution.
+
+```
+%----------------------------------------------------------------------------------------
+%	FONTS, MARGINS, AND PDF STYLING
+%----------------------------------------------------------------------------------------
+- babel: Language settings.
+- fontenc: Font encoding.
+- inputenc: Required for inputting international characters.
+- mathpazo: Use the Palatino font.
+- microtype: Slightly tweak font spacing for aesthetics. 
+- mathptmx: Times New Roman font for text.
+- helvet: Arial-like font for sans-serif.
+- setspace: Line spacing.
+- geometry: set the margin.
+- amsmath: Math equations.
+- amssymb: Math symbols.
+- hyperref: Hyperlinks and URLs.
+- enumerate: Enumerate environment.
+- enumitem: Required for list customization.
+- multicol: For two columns.
+
+
+%----------------------------------------------------------------------------------------
+%	HEADERS, FOOTERS, TITLE, ABSTARCT, BIBLIOGRAPHY, CAPTIONS AND GRAPHICS
+%----------------------------------------------------------------------------------------
+- fancyhdr: Header and footer customization.
+
+- titlesec: Section titles formatting.
+- titling: Required for customizing the title section.
+
+- biblatex: to style bibliography.
+- natbib: Citation style.
+- appendix: Appendix formatting.
+
+- abstract: Abstract formatting.
+- caption: Captions customization.
+- graphicx: Graphics.
+
+
+%----------------------------------------------------------------------------------------
+%	TABLES
+%----------------------------------------------------------------------------------------
+\usepackage{color}
+\usepackage{rotating}
+\usepackage{tabularray}
+\usepackage{booktabs}
+
+
+%----------------------------------------------------------------------------------------
+%	TABLES
+%----------------------------------------------------------------------------------------
+- etoolbox
+- footmisc
+- listings
+```
+
+4. **RMarkdown** --> RMarkdown was used to convert the code from RStudio into more comprehensible pdf documents, allowing for a seamless representation of the analysis flow. Refer to the [RMarkdown Installation Guide](https://rmarkdown.rstudio.com/authoring_quick_tour.html#Installation)" for detailed instructions On how to install RMarkdown into your RStudio environment.
+
+5. **make** --> Finally, the build tool make was employed to manage the automation of the compilation of all source code files and the final paper pdf document. The guide to install make can be found at this page: [Make Installation Guide](https://tilburgsciencehub.com/building-blocks/configure-your-computer/automation-and-workflows/make/).
+
+
+### Runtime
+The whole set of code files were last run on a Apple MacBook Air (2020). On this hardware, the code took almost 5 hours to generate the whole output. Most of the time required to run the entire code is spent to process the following R objects:
+
+```
+- xgb_caret.rds (4 hours)
+- xgb_mod.rds (5 minutes)
+- xgbcv.rds (10 minutes)
+```
+
+Therefore, in case you want to save almost the entire time needed to run the whole set of source code files, follow these instructions:
+- Before running the project, go to the project's GitHub repository page.
+- Open the folder _save-time-objects_.
+- Download the 3 files you find inside this folder.
+- Store the 3 files in the following folder _gen/analysis/input_.
+
+The _5_regression_model_ file code is written in such a way as to avoid reprocessing the mentioned R objects if they are already located in the mentioned folder.
+
+
+### Controlled Randomness
+- [x] Random seed is set at __line 53__ of program _1_download_data_.
 
 
 
@@ -191,80 +269,10 @@ The present project does not involve exceptionally large datasets, and the R env
 
 
 
-babel: Language settings.
-fontenc: Font encoding.
-mathptmx: Times New Roman font for text.
-helvet: Arial-like font for sans-serif.
-Line Spacing:
-
-setspace: Line spacing.
-Header and Footer Customization:
-
-fancyhdr: Header and footer customization.
-Section Titles Formatting:
-
-titlesec: Section titles formatting.
-Abstract Formatting:
-
-abstract: Abstract formatting.
-Captions Customization:
-
-caption: Captions customization.
-Graphics:
-
-graphicx: Graphics.
-Math Equations and Symbols:
-
-amsmath: Math equations.
-amssymb: Math symbols.
-Citation Style:
-
-natbib: Citation style (change as needed).
-\bibliographystyle{apalike}: Bibliography style (change as needed).
-Hyperlinks and URLs:
-
-hyperref: Hyperlinks and URLs.
-Appendix Formatting:
-
-appendix: Appendix formatting.
-Enumerate Environment:
-
-enumerate: Enumerate environment.
-Custom Page Style:
-
-Custom page style with headers and footers.
-Page Number in Header:
-
-Page number in the header.
-Multicolumn:
-
-multicol: For two columns.
 
 
 
 
-
-
-
-
-
-
-
-
-
-The compilation of its transformation was managed using RMarkdown, which offers enhanced readability and structured documentation of the analysis flow, while Make was used to automate the execution of the entire code.
-
-
-
-
-The code was developed and executed in R (R version 4.2.2), utilizing RStudio (RStudio version 2022.12.0+353) as the integrated development environment (IDE). The software and the programming language can be installed from this link: "\href{https://tilburgsciencehub.com/building-blocks/configure-your-computer/statistics-and-computation/r/}{R and RStudio Installation Guide}".
-
-
-
-
-RMarkdown was used to convert the code from RStudio into more comprehensible pdf documents, allowing for a seamless representation of the analysis flow. Refer to the "\href{https://rmarkdown.rstudio.com/authoring_quick_tour.html#Installation}{RMarkdown Installation Guide}" for detailed instructions. To knit RMarkdown documents, converting them into a pdf output format, is necessary to have intalled Pandoc from this link: "\href{https://pandoc.org/installing.html}{Pandoc Installation Guide}".
-
-Finally, the build tool Make was employed to manage the sequence of command statements efficiently, assembling pipelines that determine the subsequent execution steps. The guide to install it can be found at this page: "\href{https://tilburgsciencehub.com/building-blocks/configure-your-computer/automation-and-workflows/make/}{Make Installation Guide}". 
 
 
 
@@ -288,73 +296,16 @@ Finally, the build tool Make was employed to manage the sequence of command stat
 
 
 
-## Computational requirements
 
-> INSTRUCTIONS: In general, the specific computer code used to generate the results in the article will be within the repository that also contains this README. However, other computational requirements - shared libraries or code packages, required software, specific computing hardware - may be important, and is always useful, for the goal of replication. Some example text follows. 
 
-> INSTRUCTIONS: We strongly suggest providing setup scripts that install/set up the environment. Sample scripts for [Stata](https://github.com/gslab-econ/template/blob/master/config/config_stata.do),  [R](https://github.com/labordynamicsinstitute/paper-template/blob/master/programs/global-libraries.R), [Julia](https://github.com/labordynamicsinstitute/paper-template/blob/master/programs/packages.jl) are easy to set up and implement. Specific software may have more sophisticated tools: [Python](https://pip.pypa.io/en/stable/user_guide/#ensuring-repeatability), [Julia](https://julia.quantecon.org/more_julia/tools_editors.html#Package-Environments).
 
-### Software Requirements
 
-> INSTRUCTIONS: List all of the software requirements, up to and including any operating system requirements, for the entire set of code. It is suggested to distribute most dependencies together with the replication package if allowed, in particular if sourced from unversioned code repositories, Github repos, and personal webpages. In all cases, list the version *you* used. 
 
-- Stata (code was last run with version 15)
-  - `estout` (as of 2018-05-12)
-  - `rdrobust` (as of 2019-01-05)
-  - the program "`0_setup.do`" will install all dependencies locally, and should be run once.
-- Python 3.6.4
-  - `pandas` 0.24.2
-  - `numpy` 1.16.4
-  - the file "`requirements.txt`" lists these dependencies, please run "`pip install -r requirements.txt`" as the first step. See [https://pip.pypa.io/en/stable/user_guide/#ensuring-repeatability](https://pip.pypa.io/en/stable/user_guide/#ensuring-repeatability) for further instructions on creating and using the "`requirements.txt`" file.
-- Intel Fortran Compiler version 20200104
-- Matlab (code was run with Matlab Release 2018a)
-- R 3.4.3
-  - `tidyr` (0.8.3)
-  - `rdrobust` (0.99.4)
-  - the file "`0_setup.R`" will install all dependencies (latest version), and should be run once prior to running other programs.
 
-Portions of the code use bash scripting, which may require Linux.
 
-Portions of the code use Powershell scripting, which may require Windows 10 or higher.
 
-### Controlled Randomness
 
-> INSTRUCTIONS: Some estimation code uses random numbers, almost always provided by pseudorandom number generators (PRNGs). For reproducibility purposes, these should be provided with a deterministic seed, so that the sequence of numbers provided is the same for the original author and any replicators. While this is not always possible, it is a requirement by many journals' policies. The seed should be set once, and not use a time-stamp. If using parallel processing, special care needs to be taken. If using multiple programs in sequence, care must be taken on how to call these programs, ideally from a main program, so that the sequence is not altered.
 
-- [ ] Random seed is set at line _____ of program ______
-
-### Memory and Runtime Requirements
-
-> INSTRUCTIONS: Memory and compute-time requirements may also be relevant or even critical. Some example text follows. It may be useful to break this out by Table/Figure/section of processing. For instance, some estimation routines might run for weeks, but data prep and creating figures might only take a few minutes.
-
-#### Summary
-
-Approximate time needed to reproduce the analyses on a standard (CURRENT YEAR) desktop machine:
-
-- [ ] <10 minutes
-- [ ] 10-60 minutes
-- [ ] 1-2 hours
-- [ ] 2-8 hours
-- [ ] 8-24 hours
-- [ ] 1-3 days
-- [ ] 3-14 days
-- [ ] > 14 days
-- [ ] Not feasible to run on a desktop machine, as described below.
-
-#### Details
-
-The code was last run on a **4-core Intel-based laptop with MacOS version 10.14.4**. 
-
-Portions of the code were last run on a **32-core Intel server with 1024 GB of RAM, 12 TB of fast local storage**. Computation took 734 hours. 
-
-Portions of the code were last run on a **12-node AWS R3 cluster, consuming 20,000 core-hours**.  
-
-> INSTRUCTIONS: Identifiying hardware and OS can be obtained through a variety of ways:
-> Some of these details can be found as follows:
->
-> - (Windows) by right-clicking on "This PC" in File Explorer and choosing "Properties"
-> - (Mac) Apple-menu > "About this Mac"
-> - (Linux) see code in [tools/linux-system-info.sh](https://github.com/AEADataEditor/replication-template/blob/master/tools/linux-system-info.sh)`
 
 
 ## Description of programs/code
