@@ -621,8 +621,6 @@ raw_data$neighbourhood_cleansed <- droplevels(raw_data$neighbourhood_cleansed, l
 In conclusion, all relevant objects were preserved for future purposes.
 ```{r}
 saveRDS(raw_data, file = "../../gen/data-preparation/input/clean_data.rds")
-saveRDS(table_removed_columns, file = "../../gen/paper/input/table_removed_columns.rds")
-saveRDS(table_price_outliers, file = "../../gen/paper/input/table_price_outliers.rds")
 ```
 
 ```{r, include=FALSE}
