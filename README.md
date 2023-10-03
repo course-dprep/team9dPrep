@@ -6,9 +6,9 @@
 
 
 ## Table of content
-[I. Introduction](https://github.com/course-dprep/team-project-team_9_group_project/edit/main/README.md#introduction)
-- [Contributors](https://github.com/course-dprep/team-project-team_9_group_project/edit/main/README.md#contributors)
-- [Research Motivation](https://github.com/course-dprep/team-project-team_9_group_project/edit/main/README.md#research-motivation)
+[I. Introduction](https://github.com/course-dprep/team-project-team_9_group_project/#introduction)
+- [Contributors](https://github.com/course-dprep/team-project-team_9_group_project/#contributors)
+- [Research Motivation](https://github.com/course-dprep/team-project-team_9_group_project/#research-motivation)
 - [Research Questions](https://github.com/course-dprep/team-assignment-team-6#conceptual-model)
 - [Overview](https://github.com/course-dprep/team-assignment-team-6#conceptual-model)
                                                                                                                   
