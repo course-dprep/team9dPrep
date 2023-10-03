@@ -367,7 +367,7 @@ colnames(clean_data) <- gsub(" ", "_", colnames(clean_data))
 \section{Save relevant objects}
 In conclusion, all relevant objects were preserved for future purposes.
 ```{r}
-saveRDS(clean_data, file = "../../gen/analysis/input/clean_data.rds")
+saveRDS(clean_data, file = "../../gen/analysis/input/regression_data.rds")
 saveRDS(accommodates_mean, file = "../../gen/analysis/input/accommodates_mean.rds")
 saveRDS(accommodates_sd, file = "../../gen/analysis/input/accommodates_sd.rds")
 saveRDS(bedrooms_mean, file = "../../gen/analysis/input/bedrooms_mean.rds")
@@ -379,11 +379,6 @@ saveRDS(host_listings_count_sd, file = "../../gen/analysis/input/host_listings_c
 saveRDS(bathrooms_mean, file = "../../gen/analysis/input/bathrooms_mean.rds")
 saveRDS(bathrooms_sd, file = "../../gen/analysis/input/bathrooms_sd.rds")
 saveRDS(y, file = "../../gen/analysis/input/y.rds")
-
-saveRDS(table_high_correlation_pairs, file = "../../gen/paper/input/table_high_correlation_pairs.rds")
-saveRDS(price_skew, file = "../../gen/paper/input/price_skew.rds")
-saveRDS(log_price_skew, file = "../../gen/paper/input/log_price_skew.rds")
-saveRDS(plot_skew_log_price, file = "../../gen/paper/input/plot_skew_log_price.rds")
 ```
 
 ```{r, include=FALSE}
