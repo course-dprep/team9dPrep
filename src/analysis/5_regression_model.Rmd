@@ -82,7 +82,7 @@ library(bayesforecast) #Checking Regression Assumptions.
 
 ```{r, echo=FALSE}
 # Load the R object
-regression_data <- readRDS("../../gen/analysis/input/clean_data.rds")
+regression_data <- readRDS("../../gen/analysis/input/regression_data.rds")
 y <- readRDS("../../gen/analysis/input/y.rds")
 ```
 
@@ -608,32 +608,8 @@ In conclusion, all relevant objects were preserved for future purposes.
 ```{r}
 saveRDS(data_for_training, file = "../../gen/analysis/input/data_for_training.rds")
 saveRDS(xgb_mod, file = "../../gen/analysis/input/xgb_mod.rds")
-
-saveRDS(table_best_hyperparameters, file = "../../gen/paper/input/table_corr_price_apartment.rds")
-saveRDS(table_best_iteration, file = "../../gen/paper/input/table_corr_price_host.rds")
-saveRDS(table_model_performance_metrics_training, file = "../../gen/paper/input/table_higher_diff_amenities.rds")
-saveRDS(table_model_performance_metrics_testing, file = "../../gen/paper/input/table_expensive_property_type.rds")
-saveRDS(plot_model_visualization, file = "../../gen/paper/input/table_cheap_property_type.rds")
-saveRDS(features_importance_plot, file = "../../gen/paper/input/table_expensive_neighbourhood.rds")
 ```
 
 ```{r, include=FALSE}
 rm(list=ls())
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
