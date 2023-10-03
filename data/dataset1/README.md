@@ -171,7 +171,42 @@ These comprehensive data preparation and cleaning steps were undertaken to enhan
 
 ---
 
-# Data Processing, Cleaning, and Labelling
+# Uses
+
+The dataset was used only for purposes of the present project workflow to model an XGBoost Regression to predict Milan Airbnb Listings Prices.
+
+---
+
+# Distribution
+
+1. **Download the Data**: The raw dataset can be downloaded from the following link: [Inside Airbnb: Milan Listings Downloader]( http://data.insideairbnb.com/italy/lombardy/milan/2023-09-13/data/listings.csv.gz).
+
+Additionally, once all source files of the present project are run, the following dataset will be automatically stored in the described folders and formats: 
+
+2. **Raw Dataset**: The raw dataset (systematically extracted from the zip file that can be downloaded as described above) will be stored in the following two folders and formats:
+
+| Folder                                      | Name                      | Format                    |
+|---------------------------------------------|---------------------------|---------------------------|
+| `data/dataset1`                             | milan_listings            | .csv                      |
+| `gen/data-preparation/input`                | raw_data                  | .rds                      |
+
+3. **Cleaned Dataset**: After all data cleaning and feature enginnering operations performed in the source code file *2_data_cleaning* the cleaned dataset will be stored in the following folder and format:
+
+| Folder                                      | Name                      | Format                    |
+|---------------------------------------------|---------------------------|---------------------------|
+| `gen/data-preparation/input`                | clean_data                | .rds                      |
+
+4. **Regression Data**: After all data preparation operations performed in the source code file *4_data_preparation* the dataset used for modelling the regression will be stored in the following folder and format:
+
+| Folder                                      | Name                      | Format                    |
+|---------------------------------------------|---------------------------|---------------------------|
+| `gen/analysis/input`                        | regression_data           | .rds                      |
+
+These steps ensure that users can always inspect the dataset characteristics at each stage of the project.
+
+
+
+
 
 
 
