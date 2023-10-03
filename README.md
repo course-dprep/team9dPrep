@@ -363,7 +363,7 @@ git clone https://github.com/course-dprep/team-project-team_9_group_project.git
 ```
 3. Set your working directory to the project repository using the following command:
 ```
-cd "your_repository_path/team-project-team_9_group_project
+cd "your_repository_path/team-project-team_9_group_project"
 ```
 4. Run the following command:
 ```
