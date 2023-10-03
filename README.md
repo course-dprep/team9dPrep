@@ -31,8 +31,6 @@ V. [Instructions to Replicators](#instructions-to-replicators)
   - [Alternative Route](#alternative-route)
 
                                                                                                                   
-                                                                                                                  
-                                                                                                                  #description-of-programs
 ---
 
 # Introduction
