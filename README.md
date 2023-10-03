@@ -335,11 +335,11 @@ make
 ```
 
 4. When make has succesfully run all the code, a window of RStudio with the ShinyApp will open.
-   - Note: when the command line/terminal is closed, the website will not be available anymore.
+   - Note: when the command line/terminal is closed, the ShinyApp will not be available anymore.
 
 
 ### Alternative route
-An alternative route to run the code would be to run (or knitr) all .R (and .Rmd) files in order (follow the numbers in the files names).
+An alternative route to run the code would be to run (or knitr) all .R (and .Rmd) files in order (follow the numbers in the files names). Note: through this alternative route, the final_paper.pdf document will not be generated automatically.
 
 
 ---
