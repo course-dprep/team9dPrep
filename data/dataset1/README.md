@@ -125,20 +125,19 @@ For the purposes of this project, the dataset used was “listings.csv.gz”, re
 | `host_thumbnail_url`                        | URL of the hosts' thumbnail pictures.                      |
 | `host_picture_url`                          | URL of the hosts' pictures.                                |
 | `host_neighbourhood`                        | Host's neighborhood.                                       |
-| `neighbourhood`                             | Neighborhood (neighbourhood_cleansed was more informative).|
-| `minimum_minimum_nights`                    | To avoid redundancy.                                       |
-| `maximum_minimum_nights`                    | To avoid redundancy.                                       |
-| `minimum_maximum_nights`                    | To avoid redundancy.                                       |
-| `maximum_maximum_nights`                    | To avoid redundancy.                                       |
-| `minimum_nights_avg_ntm`                    | To avoid redundancy.                                       |
-| `maximum_nights_avg_ntm`                    | To avoid redundancy.                                       |
-| `calendar_last_scraped`                     | To avoid redundancy.                                       |
-| `license`                                   | To avoid redundancy.                                       |
-| `calculated_host_listings_count`            | To avoid redundancy.                                       |
-| `calculated_host_listings_count_entire_homes`| To avoid redundancy.                                       |
-| `calculated_host_listings_count_private_rooms`| To avoid redundancy.                                      |
-| `calculated_host_listings_count_shared_rooms`| To avoid redundancy.                                      |
-
+| `neighbourhood`                             | Neighbourhood_cleansed was more informative.               |
+| `minimum_minimum_nights`                    | Similar to minimum nights.                                 |
+| `maximum_minimum_nights`                    | Similar to minimum nights.                                 |
+| `minimum_maximum_nights`                    | Similar to maximum nights.                                 |
+| `maximum_maximum_nights`                    | Similar to maximum nights.                                 |
+| `minimum_nights_avg_ntm`                    | Similar to minimum nights.                                 |
+| `maximum_nights_avg_ntm`                    | Similar to maximum nights.                                 |
+| `calendar_last_scraped`                     | Useless, calender_update was removed.                      |
+| `license`                                   | License number associated with an Airbnb listing.          |
+| `calculated_host_listings_count`            | Similar to host_listings_count.                            |
+| `calculated_host_listings_count_entire_homes`| Similar to host_listings_count.                           |
+| `calculated_host_listings_count_private_rooms`| Similar to host_listings_count.                          |
+| `calculated_host_listings_count_shared_rooms`| Similar to host_listings_count.                           |
 
 3. **Management of Observations with Missing Values:**
    - Eliminated all observations containing missing values (NAs) across any variables within the dataset to ensure compatibility with regression models.
@@ -156,7 +155,7 @@ For the purposes of this project, the dataset used was “listings.csv.gz”, re
    - Addressed multicollinearity issues by removing predictors that exhibited high correlation.
 
 8. **Logarithm Transformation of Price:**
-   - Computed and used the logarithm of the `price` variable to address its high skewness.
+   - Computed and used as dependent variable the logarithm of the `price` variable to address its high skewness.
 
 9. **Conversion of Date Predictors:**
    - Converted date predictors into numerical format by extracting the day, month, and year for each.
@@ -168,7 +167,6 @@ For the purposes of this project, the dataset used was “listings.csv.gz”, re
     - Centered and scaled numeric predictors to ensure consistent scales for improved model performance.
 
 These comprehensive data preparation and cleaning steps were undertaken to enhance the quality and relevance of the dataset for building an effective regression model to predict Milan Airbnb listing prices.
-
 
 
 ---
