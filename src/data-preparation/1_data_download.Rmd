@@ -137,7 +137,7 @@ if (file.exists(target_file)) {
 Finally, the dataset was saved in two distinct formats, as a csv file (for easier inspection) and as an Rds object (for faster future loadings in the subsequent project files).
 ```{r}
 # Save the data as a CSV file
-write.csv(data_milan, file = "../../data/dataset1/dataset.csv", fileEncoding = "UTF-8", row.names = FALSE)
+write.csv(data_milan, file = "../../data/dataset1/milan_listings.csv", fileEncoding = "UTF-8", row.names = FALSE)
 
 # Save the data as .Rds file
 saveRDS(data_milan, file = "../../gen/data-preparation/input/raw_data.rds")
