@@ -361,7 +361,7 @@ To run the code, follow these instructions:
 ```
 git clone https://github.com/course-dprep/team-project-team_9_group_project.git
 ```
-3. Set your working directory to `airbnb-price-calculator` using the following command:
+3. Set your working directory to the project repository using the following command:
 ```
 cd "your_repository_path/team-project-team_9_group_project
 ```
