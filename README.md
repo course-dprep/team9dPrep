@@ -175,11 +175,44 @@ The present project does not involve exceptionally large datasets, and the R env
 ### Software Requirements
 1. **R & RStudio** --> The code was developed and executed in R (R version 4.2.2), utilizing RStudio (RStudio version 2022.12.0+353) as the integrated development environment (IDE). The software and the programming language can be installed from this link: [R and RStudio Installation Guide](https://tilburgsciencehub.com/building-blocks/configure-your-computer/statistics-and-computation/r/).
 
-2. **LaTex Distribution** --> To compile the final paper into A PDF document with LaTeX styling, you need to have a LaTeX distribution installed on your computer. To install a LaTeX Distribution:
+2. **R Libraries and Packages** --> The source code files utilize the following R packages and libraries. You do nnot need to download or load them in advance, the source code file *0_installing_packages* will handle this issue for you.
+
+```
+- GENERAL PACKAGES:
+library(readr)
+library(tidyverse) #A "Package of Packages" for Data manipulation and visualization (includes magrittr, lubridate, purrr, tidyr, etc.).
+library(dplyr) #Data frame manipulations (select, slice, etc.
+library(jsonlite) #For Amenities Columns Creation
+library(moments) #Measuring the skewness.
+
+- REGRESSION PACKAGES
+library(caret) #Hyperparameters Tuning. 
+library(xgboost) #XGBoost Regression. 
+library(DALEX) #Summary of the XGBoost Regression Model ("explainer).
+library(bayesforecast) #Checking Regression Assumptions.
+
+- SHINYAPP PACKAGES
+library(shiny) #For the ShinyApp
+library(shinyWidgets) #For the ShinyApp
+
+- PLOT AND FIGURES PACKAGES:
+library(ggplot2) #Building fancy plots.
+library(ggthemes) #Themes for ggplots (e.g. "solarized").
+library(ggcorrplot) #For correlograms
+library(scales) #Scaling and formatting ggplots (e.g. scale_fill_gradient()).
+library(gt) #Latex tables
+
+- WORKING DIRECTORY SETTING PACKAGES
+library(here)
+library(rstudioapi)
+
+```
+
+4. **LaTex Distribution** --> To compile the final paper into A PDF document with LaTeX styling, you need to have a LaTeX distribution installed on your computer. To install a LaTeX Distribution:
    - On Windows: You can use distributions like MiKTeX or TeX Live. You can download the from the following links: [MikTex Download](https://miktex.org/download); [Tex Live Download](https://tug.org/texlive/windows.html)
    - On macOS: MacTeX is a popular distribution. You can download it from the following link: [MacTex Download](https://tug.org/mactex/mactex-download.html)
 
-3. **LaTex Packages** --> For the same purpose, you also need to need to to make sure that the following necessary LaTeX packages are installed in your LaTeX distribution. You can typically install missing packages using the package manager of your LaTeX distribution.
+5. **LaTex Packages** --> For the same purpose, you also need to need to to make sure that the following necessary LaTeX packages are installed in your LaTeX distribution. You can typically install missing packages using the package manager of your LaTeX distribution.
 
 ```
 %----------------------------------------------------------------------------------------
@@ -236,9 +269,9 @@ The present project does not involve exceptionally large datasets, and the R env
 - listings
 ```
 
-4. **RMarkdown** --> RMarkdown was used to convert the code from RStudio into more comprehensible pdf documents, allowing for a seamless representation of the analysis flow. Refer to the [RMarkdown Installation Guide](https://rmarkdown.rstudio.com/authoring_quick_tour.html#Installation)" for detailed instructions On how to install RMarkdown into your RStudio environment.
+5. **RMarkdown** --> RMarkdown was used to convert the code from RStudio into more comprehensible pdf documents, allowing for a seamless representation of the analysis flow. Refer to the [RMarkdown Installation Guide](https://rmarkdown.rstudio.com/authoring_quick_tour.html#Installation)" for detailed instructions On how to install RMarkdown into your RStudio environment.
 
-5. **make** --> Finally, the build tool make was employed to manage the automation of the compilation of all source code files and the final paper pdf document. The guide to install make can be found at this page: [Make Installation Guide](https://tilburgsciencehub.com/building-blocks/configure-your-computer/automation-and-workflows/make/).
+6. **make** --> Finally, the build tool make was employed to manage the automation of the compilation of all source code files and the final paper pdf document. The guide to install make can be found at this page: [Make Installation Guide](https://tilburgsciencehub.com/building-blocks/configure-your-computer/automation-and-workflows/make/).
 
 
 ### Runtime
@@ -263,132 +296,51 @@ The _5_regression_model_ file code is written in such a way as to avoid reproces
 - [x] Random seed is set at **line 53** of program **1_download_data**.
 
 
+--- 
 
 
+# Description of programs/code
+All source code files present in this repository are described in the table below:
+
+| File Name                                   | File Format | File Description                            | File Location        | File Output            | 
+|---------------------------------------------|-------------|---------------------------------------------|----------------------| -----------------------|
+| **0_installing_packages**                   | .R          | Installs all the necessary R packages and set the working directory to the source file location.                                            | src/data-preparation | N/A                    |
+| **1_data_download**                         | .Rmd        | Downloads the data source zip file, extract the database, and load it into R.         | src/data-preparation | 1_data_download.pdf    |
+| **2_data_cleaning**                         | .Rmd        | Cleans the dataset from NAs, outliers, and useless or empty columns.              | src/data-preparation | 2_data_cleaning.pdf    |
+| **3_data_exploration**                      | .Rmd        | Set of EDA operations, including correlograms and categorical variable visualizations.              | src/data-preparation | 3_data_exploration.pdf |
+| **4_data_preparation**                      | .Rmd        | Set of operations needed to prepare the dataset for the regression modeling, including computation of logarithm of the DV, one-hot encoding of factor variables, centering and scaling numeric variables, and dividing the dataset into a training and a testing dataset.                 | src/data-preparation | 4_data_preparation.pdf |
+| **5_regression_model**                      | .Rmd        | Hyperparameter tuning, determining the optimal number of iterations, training the model and assessing its performance, checking regression assumptions.                  | src/analysis         | 5_regression_model.pdf |
+| **6_shinyapp**                              | .R          | Develops an interactive and user-friendly ShinyApp capable of predicting the price of an Airbnb listing located in Milan. The ShinyApp uses the previously trained and validated regression model to predict the price of a listing whose characteristics (number of rooms, beds, bathrooms, and accommodated people, location, type of apartment, etc.) can be defined a priori by the user.               | src/analysis         | ShinyApp Interface     |
+| **7_clean_up**                              | .R          | Eliminates all not relevant file, including .RHistory and .RData.                  | src/                 | N/A                    |
+| **final_paper**                             | .pdf        | Pdf file with all results and insights gained from the anlysis.                  | gen/paper/output     | N/A                    |
+
+---
+
+# Instructions to Replicators
+
+### Step-by-step
+To run the code, follow these instructions:
+1. Fork this repository
+2. Open your command line / terminal and run the following code:
+```
+git clone https://github.com/course-dprep/team-project-team_9_group_project.git
+```
+3. Set your working directory to `airbnb-price-calculator` using the following command:
+```
+cd "your_repository_path/team-project-team_9_group_project
+```
+4. Run the following command:
+```
+make
+```
+
+4. When make has succesfully run all the code, a window of RStudio with the ShinyApp will open.
+   - Note: when the command line/terminal is closed, the website will not be available anymore.
 
 
-
-
-
-
-
-
-
+### Alternative route
+An alternative route to run the code would be to run (or knitr) all .R (and .Rmd) files in order (follow the numbers in the files names).
 
 
 ---
 ---
-
-
-# README TAMPLATE FROM TILBURG SCIENCE HUB (to be adapted)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Description of programs/code
-
-> INSTRUCTIONS: Give a high-level overview of the program files and their purpose. Remove redundant/ obsolete files from the Replication archive.
-
-- Programs in `programs/01_dataprep` will extract and reformat all datasets referenced above. The file `programs/01_dataprep/main.do` will run them all.
-- Programs in `programs/02_analysis` generate all tables and figures in the main body of the article. The program `programs/02_analysis/main.do` will run them all. Each program called from `main.do` identifies the table or figure it creates (e.g., `05_table5.do`).  Output files are called appropriate names (`table5.tex`, `figure12.png`) and should be easy to correlate with the manuscript.
-- Programs in `programs/03_appendix` will generate all tables and figures  in the online appendix. The program `programs/03_appendix/main-appendix.do` will run them all. 
-- Ado files have been stored in `programs/ado` and the `main.do` files set the ADO directories appropriately. 
-- The program `programs/00_setup.do` will populate the `programs/ado` directory with updated ado packages, but for purposes of exact reproduction, this is not needed. The file `programs/00_setup.log` identifies the versions as they were last updated.
-- The program `programs/config.do` contains parameters used by all programs, including a random seed. Note that the random seed is set once for each of the two sequences (in `02_analysis` and `03_appendix`). If running in any order other than the one outlined below, your results may differ.
-
-### (Optional, but recommended) License for Code
-
-> INSTRUCTIONS: Most journal repositories provide for a default license, but do not impose a specific license. Authors should actively select a license. This should be provided in a LICENSE.txt file, separately from the README, possibly combined with the license for any data provided. Some code may be subject to inherited license requirements, i.e., the original code author may allow for redistribution only if the code is licensed under specific rules - authors should check with their sources. For instance, some code authors require that their article describing the econometrics of the package be cited. Licensing can be complex. Some non-legal guidance may be found [here](https://social-science-data-editors.github.io/guidance/Licensing_guidance.html).
-
-The code is licensed under a MIT/BSD/GPL [choose one!] license. See [LICENSE.txt](LICENSE.txt) for details.
-
-## Instructions to Replicators
-
-> INSTRUCTIONS: The first two sections ensure that the data and software necessary to conduct the replication have been collected. This section then describes a human-readable instruction to conduct the replication. This may be simple, or may involve many complicated steps. It should be a simple list, no excess prose. Strict linear sequence. If more than 4-5 manual steps, please wrap a main program/Makefile around them, in logical sequences. Examples follow.
-
-- Edit `programs/config.do` to adjust the default path
-- Run `programs/00_setup.do` once on a new system to set up the working environment. 
-- Download the data files referenced above. Each should be stored in the prepared subdirectories of `data/`, in the format that you download them in. Do not unzip. Scripts are provided in each directory to download the public-use files. Confidential data files requested as part of your FSRDC project will appear in the `/data` folder. No further action is needed on the replicator's part.
-- Run `programs/01_main.do` to run all steps in sequence.
-
-### Details
-
-- `programs/00_setup.do`: will create all output directories, install needed ado packages. 
-   - If wishing to update the ado packages used by this archive, change the parameter `update_ado` to `yes`. However, this is not needed to successfully reproduce the manuscript tables. 
-- `programs/01_dataprep`:  
-   - These programs were last run at various times in 2018. 
-   - Order does not matter, all programs can be run in parallel, if needed. 
-   - A `programs/01_dataprep/main.do` will run them all in sequence, which should take about 2 hours.
-- `programs/02_analysis/main.do`.
-   - If running programs individually, note that ORDER IS IMPORTANT. 
-   - The programs were last run top to bottom on July 4, 2019.
-- `programs/03_appendix/main-appendix.do`. The programs were last run top to bottom on July 4, 2019.
-- Figure 1: The figure can be reproduced using the data provided in the folder “2_data/data_map”, and ArcGIS Desktop (Version 10.7.1) by following these (manual) instructions:
-  - Create a new map document in ArcGIS ArcMap, browse to the folder
-“2_data/data_map” in the “Catalog”, with files  "provinceborders.shp", "lakes.shp", and "cities.shp". 
-  - Drop the files listed above onto the new map, creating three separate layers. Order them with "lakes" in the top layer and "cities" in the bottom layer.
-  - Right-click on the cities file, in properties choose the variable "health"... (more details)
-
-## List of tables and programs
-
-
-> INSTRUCTIONS: Your programs should clearly identify the tables and figures as they appear in the manuscript, by number. Sometimes, this may be obvious, e.g. a program called "`table1.do`" generates a file called `table1.png`. Sometimes, mnemonics are used, and a mapping is necessary. In all circumstances, provide a list of tables and figures, identifying the program (and possibly the line number) where a figure is created.
->
-> NOTE: If the public repository is incomplete, because not all data can be provided, as described in the data section, then the list of tables should clearly indicate which tables, figures, and in-text numbers can be reproduced with the public material provided.
-
-The provided code reproduces:
-
-- [ ] All numbers provided in text in the paper
-- [ ] All tables and figures in the paper
-- [ ] Selected tables and figures in the paper, as explained and justified below.
-
-
-| Figure/Table #    | Program                  | Line Number | Output file                      | Note                            |
-|-------------------|--------------------------|-------------|----------------------------------|---------------------------------|
-| Table 1           | 02_analysis/table1.do    |             | summarystats.csv                 ||
-| Table 2           | 02_analysis/table2and3.do| 15          | table2.csv                       ||
-| Table 3           | 02_analysis/table2and3.do| 145         | table3.csv                       ||
-| Figure 1          | n.a. (no data)           |             |                                  | Source: Herodus (2011)          |
-| Figure 2          | 02_analysis/fig2.do      |             | figure2.png                      ||
-| Figure 3          | 02_analysis/fig3.do      |             | figure-robustness.png            | Requires confidential data      |
-
-## References
-
-> INSTRUCTIONS: As in any scientific manuscript, you should have proper references. For instance, in this sample README, we cited "Ruggles et al, 2019" and "DESE, 2019" in a Data Availability Statement. The reference should thus be listed here, in the style of your journal:
-
-Steven Ruggles, Steven M. Manson, Tracy A. Kugler, David A. Haynes II, David C. Van Riper, and Maryia Bakhtsiyarava. 2018. "IPUMS Terra: Integrated Data on Population and Environment: Version 2 [dataset]." Minneapolis, MN: *Minnesota Population Center, IPUMS*. https://doi.org/10.18128/D090.V2
-
-Department of Elementary and Secondary Education (DESE), 2019. "Student outcomes database [dataset]" *Massachusetts Department of Elementary and Secondary Education (DESE)*. Accessed January 15, 2019.
-
-U.S. Bureau of Economic Analysis (BEA). 2016. “Table 30: "Economic Profile by County, 1969-2016.” (accessed Sept 1, 2017).
-
-Inglehart, R., C. Haerpfer, A. Moreno, C. Welzel, K. Kizilova, J. Diez-Medrano, M. Lagos, P. Norris, E. Ponarin & B. Puranen et al. (eds.). 2014. World Values Survey: Round Six - Country-Pooled Datafile Version: http://www.worldvaluessurvey.org/WVSDocumentationWV6.jsp. Madrid: JD Systems Institute.
-
----
-
-## Acknowledgements
-
-Some content on this page was copied from [Hindawi](https://www.hindawi.com/research.data/#statement.templates). Other content was adapted  from [Fort (2016)](https://doi.org/10.1093/restud/rdw057), Supplementary data, with the author's permission.
