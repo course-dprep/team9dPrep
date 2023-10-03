@@ -1,41 +1,38 @@
 # Predict Italian Airbnb Listings Prices
-![image](https://www.digital.ink/wp-content/uploads/airbnb_logo_detail.jpg)
-
+![image](https://wallpapercave.com/wp/wp10784413.jpg)
 
 ---
 
 ## Table of Contents
 I. [Introduction](#introduction)
-  - [Subsection 1](#contributors)
-    - [Sub-subsection 1.1](#research-motivation)
-  - [Subsection 2](#subsection-2)
- 
-  - 
-## Table of content
-[I. Introduction](https://github.com/course-dprep/team-project-team_9_group_project/#introduction)
-- [Contributors](https://github.com/course-dprep/team-project-team_9_group_project/#contributors)
-- [Research Motivation](https://github.com/course-dprep/team-project-team_9_group_project/#research-motivation)
-- [Research Questions](https://github.com/course-dprep/team-assignment-team-6#conceptual-model)
-- [Overview](https://github.com/course-dprep/team-assignment-team-6#conceptual-model)
+  - [Contributors](#contributors)
+  - [Research Motivation](#research-motivation)
+  - [Research Questions](#research-questions)
+  - [Overview](#overview)
+
+II. [Data Availability and Provenance Statements](#data-availability-and-provenance-statements)
+  - [Data Availability](#data-availability)
+  - [Statement about Rights](#statement-about-rights)
+  - [Summary of Availability](#summary-of-availability)
+  - [Repository Structure](#repository-structure)
+  - [Details on the Data Source](#details-on-the-data-source-formats-and-directories)
+  - [Details on the Raw Data Source](#details-on-the-raw-data-source)
+
+III. [Requirements](#requirements)
+  - [Computational Requirements](#computational-requirements)
+  - [Software Requirements](#software-requirements)
+  - [Runtime](#runtime)
+  - [Controlled Randomness](#controlled-randomness)
+
+IV. [Programs Descriptions](#programs-description)
+
+V. [Instructions to Replicators](#instructions-to-replicators)
+  - [Step by Step Guide](#step-by-step)
+  - [Alternative Route](#alternative-route)
+
                                                                                                                   
-[II. Method](https://github.com/course-dprep/team-assignment-team-6#2-method)
-- [Datasets](https://github.com/course-dprep/team-assignment-team-6#datasets)
-- [Variables](https://github.com/course-dprep/team-assignment-team-6#variables)
-- [Research method](https://github.com/course-dprep/team-assignment-team-6#research-method)
-
-[III. Results and interpretation](https://github.com/course-dprep/team-assignment-team-6#3-results-and-interpretation)
-
-[IV. Repository](https://github.com/course-dprep/team-assignment-team-6/master/README.md#4-repository)
-- [Structure](https://github.com/course-dprep/team-assignment-team-6#structure)
-
-[V. Running instructions](https://github.com/course-dprep/team-assignment-team-6#5-running-instructions)
-- [Software](https://github.com/course-dprep/team-assignment-team-6#software)
-- [Running the code](https://github.com/course-dprep/team-assignment-team-6#running-the-code)
-
-[VI. More resources](https://github.com/course-dprep/team-assignment-team-6#6-more-rescources)
-
-[VII. About](https://github.com/course-dprep/team-assignment-team-6#7-about)
-
+                                                                                                                  
+                                                                                                                  #description-of-programs
 ---
 
 # Introduction
@@ -111,7 +108,7 @@ For the purposes of this project, the dataset used was “listings.csv.gz”, re
 |-- makefile
 ```
 
-### Details on Data Source formats and locations
+### Details on the Data Source: formats and directories
 
 1. **Download the Data**: The raw dataset can be downloaded from the following link: [Inside Airbnb: Milan Listings Downloader]( http://data.insideairbnb.com/italy/lombardy/milan/2023-09-13/data/listings.csv.gz).
 
@@ -338,7 +335,7 @@ The _5_regression_model_ file code is written in such a way as to avoid reproces
 --- 
 
 
-# Description of programs/code
+# Programs Description
 All source code files present in this repository are described in the table below:
 
 | File Name                                   | File Format | File Description                            | File Location        | File Output            | 
