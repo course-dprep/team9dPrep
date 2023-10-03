@@ -421,18 +421,6 @@ table_cheap_neighbourhood
 
 
 
-\section{Save relevant objects}
-In conclusion, all relevant objects were preserved for future purposes.
-```{r}
-saveRDS(table_corr_price_apartment, file = "../../gen/paper/input/table_corr_price_apartment.rds")
-saveRDS(table_corr_price_host, file = "../../gen/paper/input/table_corr_price_host.rds")
-saveRDS(table_higher_diff_amenities, file = "../../gen/paper/input/table_higher_diff_amenities.rds")
-saveRDS(table_expensive_property_type, file = "../../gen/paper/input/table_expensive_property_type.rds")
-saveRDS(table_cheap_property_type, file = "../../gen/paper/input/table_cheap_property_type.rds")
-saveRDS(table_expensive_neighbourhood, file = "../../gen/paper/input/table_expensive_neighbourhood.rds")
-saveRDS(table_cheap_neighbourhood, file = "../../gen/paper/input/table_cheap_neighbourhood.rds")
-```
-
 ```{r, include=FALSE}
 rm(list=ls())
 ```
