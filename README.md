@@ -1,6 +1,39 @@
 # Predict Italian Airbnb Listings Prices
 ![image](https://www.digital.ink/wp-content/uploads/airbnb_logo_detail.jpg)
 
+
+---
+
+
+## Table of content
+[I. Introduction](https://github.com/course-dprep/team-project-team_9_group_project/edit/main/README.md#introduction)
+- [Contributors](https://github.com/course-dprep/team-project-team_9_group_project/edit/main/README.md#contributors)
+- [Research Motivation](https://github.com/course-dprep/team-project-team_9_group_project/edit/main/README.md#research-motivation)
+- [Research Questions](https://github.com/course-dprep/team-assignment-team-6#conceptual-model)
+- [Overview](https://github.com/course-dprep/team-assignment-team-6#conceptual-model)
+                                                                                                                  
+[II. Method](https://github.com/course-dprep/team-assignment-team-6#2-method)
+- [Datasets](https://github.com/course-dprep/team-assignment-team-6#datasets)
+- [Variables](https://github.com/course-dprep/team-assignment-team-6#variables)
+- [Research method](https://github.com/course-dprep/team-assignment-team-6#research-method)
+
+[III. Results and interpretation](https://github.com/course-dprep/team-assignment-team-6#3-results-and-interpretation)
+
+[IV. Repository](https://github.com/course-dprep/team-assignment-team-6/master/README.md#4-repository)
+- [Structure](https://github.com/course-dprep/team-assignment-team-6#structure)
+
+[V. Running instructions](https://github.com/course-dprep/team-assignment-team-6#5-running-instructions)
+- [Software](https://github.com/course-dprep/team-assignment-team-6#software)
+- [Running the code](https://github.com/course-dprep/team-assignment-team-6#running-the-code)
+
+[VI. More resources](https://github.com/course-dprep/team-assignment-team-6#6-more-rescources)
+
+[VII. About](https://github.com/course-dprep/team-assignment-team-6#7-about)
+
+---
+
+# Introduction
+
 ### Contributors
 
 | Author                                      | Contact                                     | 
