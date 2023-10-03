@@ -2,7 +2,9 @@
 *.aux
 *.Rhistory
 .RData
-**gen/
+**gen/analysis
+**gen/data-preparation"
+**gen/paper/input"
 **.Rout
 *.csv
 .Rproj.user
