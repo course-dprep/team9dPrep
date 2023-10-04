@@ -57,24 +57,49 @@ knitr::opts_chunk$set(tidy = FALSE,
 
 
 ```{r, include = FALSE}
-###############################################################
-#############             PACKAGES               ##############
-###############################################################
 #GENERAL PACKAGES:
+library(readr)
 library(tidyverse) #A "Package of Packages" for Data manipulation and visualization (includes magrittr, lubridate, purrr, tidyr, etc.).
 library(dplyr) #Data frame manipulations (select, slice, etc.
 library(jsonlite) #For Amenities Columns Creation
+library(moments) #Measuring the skewness.
 
-#PLOT PACKAGES:
+#REGRESSION PACKAGES
+library(caret) #Hyperparameters Tuning. 
+library(xgboost) #XGBoost Regression. 
+library(DALEX) #Summary of the XGBoost Regression Model ("explainer).
+library(bayesforecast) #Checking Regression Assumptions.
+
+#SHINYAPP PACKAGES
+library(shiny) #For the ShinyApp
+library(shinyWidgets) #For the ShinyApp
+
+#PLOT AND FIGURES PACKAGES:
 library(ggplot2) #Building fancy plots.
 library(ggthemes) #Themes for ggplots (e.g. "solarized").
 library(ggcorrplot) #For correlograms
 library(scales) #Scaling and formatting ggplots (e.g. scale_fill_gradient()).
 library(gt) #Latex tables
-library(moments) #Measuring the skewness of our dependent variable (price).
-library(caret)
+
+# WORKING DIRECTORY SETTING PACKAGES
+library(here)
+library(rstudioapi)
 ```
 
+```{r, include=FALSE}
+# Set the working directory to the source file location
+
+current_document_path <- getActiveDocumentContext()$path
+# Check if the document path is set
+if (!is.null(current_document_path)) {
+  # Set the working directory to the source file's location
+  setwd(dirname(current_document_path))
+  setwd("../..")
+  rm(current_document_path)
+} else {
+  cat("No active document or path found. Set working directory manually.\n")
+}
+```
 
 ```{r, echo=FALSE}
 # Load the R object
