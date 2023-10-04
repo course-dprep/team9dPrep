@@ -5,4 +5,3 @@ data-preparation:
 
 analysis:
     make -C src/analysis
-
