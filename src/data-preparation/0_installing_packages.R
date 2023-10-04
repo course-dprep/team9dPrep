@@ -110,17 +110,19 @@ library(rstudioapi)
 ######      AUTOMATICALLY SET WORKING DIRECTORY         #######
 ###############################################################
 
+# Get the path of the active document
 current_document_path <- getActiveDocumentContext()$path
+
 # Check if the document path is set
 if (!is.null(current_document_path)) {
   # Set the working directory to the source file's location
   setwd(dirname(current_document_path))
-  setwd("../..")
+  
+  # Optionally, you can remove the document path variable
   rm(current_document_path)
 } else {
   cat("No active document or path found. Set working directory manually.\n")
 }
-
 
 
 

@@ -3,8 +3,7 @@
 *.Rhistory
 .RData
 **gen/analysis
-**gen/data-preparation"
-**gen/paper/input"
+**gen/data-preparation
 **.Rout
 *.csv
 .Rproj.user
