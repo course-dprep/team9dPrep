@@ -8,3 +8,4 @@ all: 5_regression_model 6_shinyapp clean-up
 
 clean-up:
     Rscript -e "source('src/analysis/clean-up.R')"
+
