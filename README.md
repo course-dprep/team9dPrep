@@ -327,7 +327,7 @@ The _5_regression_model_ file code is written in such a way as to avoid reproces
 
 
 ### Controlled Randomness
-- [x] Random seed is set at **line 53** of program **1_download_data**.
+- [x] Random seed is set at the beginning of each source code file. The seed is set to ``` set.seed(999) ```
 
 
 --- 
