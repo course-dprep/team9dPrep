@@ -30,6 +30,9 @@ library(here)
 library(rstudioapi)
 
 
+#Setting the seed for reproducible results
+set.seed(999)
+
 
 # Get the path of the active document
 current_document_path <- getActiveDocumentContext()$path

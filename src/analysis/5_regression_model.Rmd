@@ -55,6 +55,10 @@ knitr::opts_chunk$set(tidy = FALSE,
                       error = FALSE)
 ```
 
+```{r, include=FALSE}
+#Setting the seed for reproducible results
+set.seed(999)
+```
 
 ```{r, include = FALSE}
 #GENERAL PACKAGES:
