@@ -1,16 +1,10 @@
-# Makefile in src/analysis
-ANALYSIS = ../../gen/analysis
+all: 5_regression_model 6_shinyapp clean-up
 
-all: $(ANALYSIS)/5_regression_model.pdf $(ANALYSIS)/6_shinyapp.R $(ANALYSIS)/clean-up.R
+5_regression_model:
+    Rscript -e "rmarkdown::render('src/analysis/5_regression_model.Rmd')"
 
-## Regression model
-$(ANALYSIS)/5_regression_model.pdf: 5_regression_model.Rmd
-	Rscript -e 'rmarkdown::render("$<")'
+6_shinyapp:
+    Rscript -e "source('src/analysis/6_shinyapp.R')"
 
-## Shiny App
-$(ANALYSIS)/6_shinyapp.R: 6_shinyapp.R
-	R --vanilla < $<
-
-## Clean up
-$(ANALYSIS)/clean-up.R: clean-up.R
-	R --vanilla < $<
+clean-up:
+    Rscript -e "source('src/analysis/clean-up.R')"

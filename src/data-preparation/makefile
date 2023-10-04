@@ -1,28 +1,19 @@
-# Makefile in src/data-preparation
-DPOUTPUT = ../../gen/data-preparation/output
+all: 0_installing_packages 1_data_download 2_data_cleaning 3_data_exploration 4_data_preparation clean-up
 
-all: $(DPOUTPUT)/0_installing_packages.R $(DPOUTPUT)/1_data_download.pdf $(DPOUTPUT)/2_data_cleaning.pdf $(DPOUTPUT)/3_data_exploration.pdf $(DPOUTPUT)/4_data_preparation.pdf $(DPOUTPUT)/clean-up.R
+0_installing_packages:
+    Rscript -e "source('src/data-preparation/0_installing_packages.R')"
 
-## Install packages
-$(DPOUTPUT)/0_installing_packages.R: 0_installing_packages.R
-	R --vanilla < $<
+1_data_download:
+    Rscript -e "rmarkdown::render('src/data-preparation/1_data_download.Rmd')"
 
-## Download data
-$(DPOUTPUT)/1_data_download.pdf: 1_data_download.Rmd
-	Rscript -e 'rmarkdown::render("$<")'
+2_data_cleaning:
+    Rscript -e "rmarkdown::render('src/data-preparation/2_data_cleaning.Rmd')"
 
-## Clean data
-$(DPOUTPUT)/2_data_cleaning.pdf: 2_data_cleaning.Rmd
-	Rscript -e 'rmarkdown::render("$<")'
+3_data_exploration:
+    Rscript -e "rmarkdown::render('src/data-preparation/3_data_exploration.Rmd')"
 
-## Explore data
-$(DPOUTPUT)/3_data_exploration.pdf: 3_data_exploration.Rmd
-	Rscript -e 'rmarkdown::render("$<")'
+4_data_preparation:
+    Rscript -e "rmarkdown::render('src/data-preparation/4_data_preparation.Rmd')"
 
-## Prepare data
-$(DPOUTPUT)/4_data_preparation.pdf: 4_data_preparation.Rmd
-	Rscript -e 'rmarkdown::render("$<")'
-
-## Clean up
-$(DPOUTPUT)/clean-up.R: clean-up.R
-	R --vanilla < $<
+clean-up:
+    Rscript -e "source('src/data-preparation/clean-up.R')"
