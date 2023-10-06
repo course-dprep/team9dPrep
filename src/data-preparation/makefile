@@ -1,31 +1,25 @@
+DATA = ../../data/dataset1
+DPINPUT = ../../gen/data-preparation/input
+DPCURDIR := $(CURDIR)
 
-.PHONY: all 0_installing_packages 1_data_download.Rmd 2_data_cleaning.Rmd 3_data_exploration.Rmd 4_data_preparation.Rmd clean-up.R
+.PHONY: install-packages clean-up
 
-all: 0_installing_packages 1_data_download.Rmd 2_data_cleaning.Rmd 3_data_exploration.Rmd 4_data_preparation.Rmd clean-up.R
+all: install-packages $(DATA)/milan_listings.csv $(DPINPUT)/clean_data.rds $(DPCURDIR)/3_data_exploration.pdf $(DPCURDIR)/4_data_preparation.pdf clean-up_dp
 
-0_installing_packages:
-	@echo "Executing 0_installing_packages.R..."
-	Rscript src/data-preparation/0_installing_packages.R
-	@echo "Finished executing 0_installing_packages.R."
+install-packages:
+	Rscript 0_installing_packages.R
 
-1_data_download.Rmd:
-	@echo "Executing 1_data_download.Rmd..."
-	R -e "rmarkdown::render('src/data-preparation/1_data_download.Rmd')"
-	@echo "Finished executing 1_data_download.Rmd."
+$(DATA)/milan_listings.csv: 1_data_download.Rmd
+	Rscript -e 'rmarkdown::render("1_data_download.Rmd")'
 
-2_data_cleaning.Rmd:
-	@echo "Executing 2_data_cleaning.Rmd..."
-	R -e "rmarkdown::render('src/data-preparation/2_data_cleaning.Rmd')"
-	@echo "Finished executing 2_data_cleaning.Rmd."
-3_data_exploration.Rmd:
-	@echo "Executing 3_data_exploration.Rmd..."
-	R -e "rmarkdown::render('src/data-preparation/3_data_exploration.Rmd')"
-	@echo "Finished executing 3_data_exploration.Rmd."
-4_data_preparation.Rmd:
-	@echo "Executing 4_data_preparation.Rmd..."
-	R -e "rmarkdown::render('src/data-preparation/4_data_preparation.Rmd')"
-	@echo "Finished executing 4_data_preparation.Rmd."
-clean-up.R:
-	@echo "Executing clean-up.R..."
-	Rscript src/data-preparation/clean-up.R
-	@echo "Finished executing clean-up.R."
+$(DPINPUT)/clean_data.rds: 2_data_cleaning.Rmd
+	Rscript -e 'rmarkdown::render("2_data_cleaning.Rmd")'
+
+$(DPCURDIR)/3_data_exploration.pdf: 3_data_exploration.Rmd
+	Rscript -e 'rmarkdown::render("3_data_exploration.Rmd")'
+
+$(DPCURDIR)/4_data_preparation.pdf: 4_data_preparation.Rmd
+	Rscript -e 'rmarkdown::render("4_data_preparation.Rmd")'
+
+clean-up_dp:
+	Rscript clean-up_dp.R

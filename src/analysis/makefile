@@ -1,17 +1,15 @@
+ANINPUT = ../../gen/analysis/input
+ANCURDIR := $(CURDIR)
 
-.PHONY: all 5_regression_model.Rmd 6_shinyapp.R clean-up.R
+.PHONY: shinyapp clean-up_an
 
-all: 5_regression_model.Rmd 6_shinyapp.R clean-up.R
+all: $(ANCURDIR)/5_regression_model.pdf shinyapp clean-up_an
 
-5_regression_model.Rmd:
-	@echo "Executing 5_regression_model.Rmd..."
-	R -e "rmarkdown::render('src/analysis/5_regression_model.Rmd')"
-	@echo "Finished executing 5_regression_model.Rmd."
-6_shinyapp.R:
-	@echo "Executing 6_shinyapp.R..."
-	Rscript src/analysis/6_shinyapp.R
-	@echo "Finished executing 6_shinyapp.R."
-clean-up.R:
-	@echo "Executing clean-up.R..."
-	Rscript src/analysis/clean-up.R
-	@echo "Finished executing clean-up.R."
+$(ANCURDIR)/5_regression_model.pdf: 5_regression_model.Rmd
+	Rscript -e 'rmarkdown::render("5_regression_model.Rmd")'
+
+shinyapp:
+	R --vanilla < 6_shinyapp.R
+
+clean-up_an:
+	Rscript clean-up_an.R
