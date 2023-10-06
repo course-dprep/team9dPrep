@@ -1,4 +1,3 @@
-ANINPUT = ../../gen/analysis/input
 ANCURDIR := $(CURDIR)
 
 .PHONY: shinyapp clean-up_an
