@@ -7,8 +7,8 @@ all: install-packages $(DPCURDIR)/1_data_download.pdf $(DPCURDIR)/2_data_cleanin
 install-packages:
 	Rscript 0_installing_packages.R
 
-$(DPCURDIR)/1_data_download.pdf: 0_data_download.Rmd
-	Rscript -e 'rmarkdown::render("0_data_download.Rmd")'
+$(DPCURDIR)/1_data_download.pdf: 1_data_download.Rmd
+	Rscript -e 'rmarkdown::render("1_data_download.Rmd")'
 
 $(DPCURDIR)/2_data_cleaning.pdf: 2_data_cleaning.Rmd
 	Rscript -e 'rmarkdown::render("2_data_cleaning.Rmd")'
