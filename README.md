@@ -305,7 +305,9 @@ library(rstudioapi)
 
 5. **RMarkdown** --> RMarkdown was used to convert the code from RStudio into more comprehensible pdf documents, allowing for a seamless representation of the analysis flow. Refer to the [RMarkdown Installation Guide](https://rmarkdown.rstudio.com/authoring_quick_tour.html#Installation)" for detailed instructions On how to install RMarkdown into your RStudio environment.
 
-6. **make** --> Finally, the build tool make was employed to manage the automation of the compilation of all source code files and the final paper pdf document. The guide to install make can be found at this page: [Make Installation Guide](https://tilburgsciencehub.com/building-blocks/configure-your-computer/automation-and-workflows/make/).
+6. **make** --> The build tool make was employed to manage the automation of the compilation of all source code files and the final paper pdf document. The guide to install make can be found at this page: [Make Installation Guide](https://tilburgsciencehub.com/building-blocks/configure-your-computer/automation-and-workflows/make/).
+
+7. **Pandoc** --> Finally, to make sure that your computer is able to compile the pdf document resulting from the RMarkdown source files, you should install Pandoc by following this guide: [Pandoc Installation Guide](https://pandoc.org/installing.html).
 
 
 ### Runtime
@@ -317,13 +319,7 @@ The whole set of code files were last run on a Apple MacBook Air (2020). On this
 - xgbcv.rds (10 minutes)
 ```
 
-Therefore, in case you want to save almost the entire time needed to run the whole set of source code files, follow these instructions:
-- Before running the project, go to the project's GitHub repository page.
-- Open the folder _save-time-objects_.
-- Download the 3 files you find inside this folder.
-- Store the 3 files in the following folder _gen/analysis/input_.
-
-The _5_regression_model_ file code is written in such a way as to avoid reprocessing the mentioned R objects if they are already located in the mentioned folder.
+Therefore, in case you want to save almost the entire time needed to run the whole set of source code files, follow the "Save Time Instructions" in the section "Instructions to Replicators". 
 
 
 ### Controlled Randomness
@@ -345,7 +341,8 @@ All source code files present in this repository are described in the table belo
 | **4_data_preparation**                      | .Rmd        | Set of operations needed to prepare the dataset for the regression modeling, including computation of logarithm of the DV, one-hot encoding of factor variables, centering and scaling numeric variables, and dividing the dataset into a training and a testing dataset.                 | src/data-preparation | 4_data_preparation.pdf |
 | **5_regression_model**                      | .Rmd        | Hyperparameter tuning, determining the optimal number of iterations, training the model and assessing its performance, checking regression assumptions.                  | src/analysis         | 5_regression_model.pdf |
 | **6_shinyapp**                              | .R          | Develops an interactive and user-friendly ShinyApp capable of predicting the price of an Airbnb listing located in Milan. The ShinyApp uses the previously trained and validated regression model to predict the price of a listing whose characteristics (number of rooms, beds, bathrooms, and accommodated people, location, type of apartment, etc.) can be defined a priori by the user.               | src/analysis         | ShinyApp Interface     |
-| **7_clean-up**                              | .R          | Eliminates all not relevant file, including .RHistory and .RData.                  | src/                 | N/A                    |
+| **clean-up_dp**                              | .R          | Eliminates all not relevant file, including .RHistory and .RData, from the folder _src/data-preparation_.                  | src/data-preparation                 | N/A                    |
+| **clean-up_an**                              | .R          | Eliminates all not relevant file, including .RHistory and .RData, from the folder _src/analysis_.                  | src/analysis                 | N/A                    |
 | **final_paper**                             | .pdf        | Pdf file with all results and insights gained from the anlysis.                  | gen/paper/output     | N/A                    |
 
 ---
@@ -353,23 +350,44 @@ All source code files present in this repository are described in the table belo
 # Instructions to Replicators
 
 ### Step-by-step
-To run the code, follow these instructions:
-1. Fork this repository
-2. Open your command line / terminal and run the following code:
+To automatically run all source code files of which this project is composed, pleas follow these instructions:
+1. Copy the HTML code of this GitHub repository.
+2. Open your command line / terminal and select a working directory where you want to store this project's repository. The following is an example of how to change the working directory (replace _"C:/Users/Admin/Desktop"_ with the name of your selected directory):
+```
+cd "C:/Users/Admin/Desktop"
+```
+3. Then, copy and paste the following command to your command line / terminal (you can also manually copy-and-paste the HTML code of this GitHub repository that you have previously copied in step 1):
 ```
 git clone https://github.com/course-dprep/team-project-team_9_group_project.git
 ```
-3. Set your working directory to the project repository using the following command:
+4. Set your working directory to the project repository using the following command (replace _your_repository_path_ with the directory you have selected in step 2):
 ```
 cd "your_repository_path/team-project-team_9_group_project"
 ```
-4. Run the following command:
+5. Type the following command on your terminal / command prompt:
 ```
 make
 ```
+6. When make has succesfully run all the code, directly on your terminal / command prompt it will appear a message such as the following:
+```
+Listening on http://127.0.0.1:3580
+```
 
-4. When make has succesfully run all the code, a window of RStudio with the ShinyApp will open.
+7. Open the link that appear on the screen of your terminal / command prompt in your browser (e.g. Google Chrome, Safari, etc.).
+
+8. The ShinyApp will be rendered and you will be able to start playing with it :) 
    - Note: when the command line/terminal is closed, the ShinyApp will not be available anymore.
+
+### Save Time Instructions
+In case you want to save almost the entire time needed to run the whole set of source code files of which this project is composed, follow these instructions: 
+
+- Before running the project (i.e. before proceding with "step 4" of the "Step by Step" guide, see above), go to the project's directory (following "step 1", "step 2", and "step 3" should have allowed you to clone the project's repository locally on your device).
+- Open the folder _save-time-objects_.
+- Copy the 3 files you find inside this folder (xgb_caret, xgb_mod, xgbcv).
+- Paste these 3 files in the following folder _gen/analysis/input_.
+- Continue to follow the instructions in the "Step by Step" guide (from "step 4" to "step 8").
+
+The _5_regression_model_ file code is written in such a way as to avoid reprocessing the mentioned R objects if they are already located in the mentioned folder.
 
 
 ### Alternative route
