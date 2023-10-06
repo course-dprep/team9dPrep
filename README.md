@@ -93,14 +93,17 @@ For the purposes of this project, the dataset used was “listings.csv.gz”, re
 |-- src
    |-- analysis
         |-- 5_regression_model
-        |-- 6_shinyapp
+        |-- clean-up_an
    |-- data-preparation
         |-- 0_installing_packages
         |-- 1_data_download
         |-- 2_data_cleaning
         |-- 3_data_exploration
         |-- 4_data_preparation
-   |-- 7_clean-up
+        |-- clean-up_dp
+    |-- shinyapp
+        |-- 6_shinyapp
+|-- save_time_objects
 |-- .gitignore
 |-- README.md
 |-- makefile
@@ -341,7 +344,7 @@ All source code files present in this repository are described in the table belo
 | **4_data_preparation**                      | .Rmd        | Set of operations needed to prepare the dataset for the regression modeling, including computation of logarithm of the DV, one-hot encoding of factor variables, centering and scaling numeric variables, and dividing the dataset into a training and a testing dataset.                 | src/data-preparation | 4_data_preparation.pdf |
 | **5_regression_model**                      | .Rmd        | Hyperparameter tuning, determining the optimal number of iterations, training the model and assessing its performance, checking regression assumptions.                  | src/analysis         | 5_regression_model.pdf |
 | **6_shinyapp**                              | .R          | Develops an interactive and user-friendly ShinyApp capable of predicting the price of an Airbnb listing located in Milan. The ShinyApp uses the previously trained and validated regression model to predict the price of a listing whose characteristics (number of rooms, beds, bathrooms, and accommodated people, location, type of apartment, etc.) can be defined a priori by the user.               | src/analysis         | ShinyApp Interface     |
-| **clean-up_dp**                              | .R          | Eliminates all not relevant file, including .RHistory and .RData, from the folder _src/data-preparation_.                  | src/data-preparation                 | N/A                    |
+| **clean-up_dp**                              | .R          | Eliminates all not relevant file, including .RHistory and .RData, from the folder _src/data-preparation_.                  | src/shinyapp                 | N/A                    |
 | **clean-up_an**                              | .R          | Eliminates all not relevant file, including .RHistory and .RData, from the folder _src/analysis_.                  | src/analysis                 | N/A                    |
 | **final_paper**                             | .pdf        | Pdf file with all results and insights gained from the anlysis.                  | gen/paper/output     | N/A                    |
 
@@ -388,6 +391,9 @@ In case you want to save almost the entire time needed to run the whole set of s
 - Continue to follow the instructions in the "Step by Step" guide (from "step 4" to "step 8").
 
 The _5_regression_model_ file code is written in such a way as to avoid reprocessing the mentioned R objects if they are already located in the mentioned folder.
+
+### Debugging
+For some windows users, the program may have some problem in compiling the final_paper.pdf file when it is executed using make. If so, the automation process will stop before compilying the final_paper.pdf and before executing the shinyapp. In case this happen, please do these last executions manually. MacOS users should not have any problems.
 
 
 ### Alternative route
