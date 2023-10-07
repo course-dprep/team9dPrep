@@ -392,9 +392,6 @@ In case you want to save almost the entire time needed to run the whole set of s
 
 The _5_regression_model_ file code is written in such a way as to avoid reprocessing the mentioned R objects if they are already located in the mentioned folder.
 
-### Debugging
-For some windows users, the program may have some problem in compiling the final_paper.pdf file when it is executed using make. If so, the automation process will stop before compilying the final_paper.pdf and before executing the shinyapp. In case this happen, please do these last executions manually. MacOS users should not have any problems.
-
 
 ### Alternative route
 An alternative route to run the code would be to run (or knitr) all .R (and .Rmd) files in order (follow the numbers in the files names). Note: through this alternative route, the final_paper.pdf document will not be generated automatically.
