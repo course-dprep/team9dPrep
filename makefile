@@ -1,19 +1,13 @@
-all: data-preparation analysis	open-zip compile-pdf run-pdf shinyapp
+all: data-preparation analysis paper shinyapp
 
 data-preparation:
 	make -C src/data-preparation
 
-analysis:data-preparation
+analysis: data-preparation
 	make -C src/analysis
 
-open-zip:analysis
+paper: analysis
 	make -C gen/paper/output
 
-compile-pdf: open-zip
-	make -C gen/paper/output
-
-run-pdf: compile-pdf
-	make -C gen/paper/output
-
-shinyapp:run-pdf	
+shinyapp: paper	
 	make -C src/shinyapp
