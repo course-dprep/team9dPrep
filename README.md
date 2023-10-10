@@ -39,11 +39,11 @@ V. [Instructions to Replicators](#instructions-to-replicators)
 
 | Author                                      | Contact                                     | 
 |---------------------------------------------|---------------------------------------------|
-| **Bianca Magalotti**                        | b.magalotti@tilburguniversity.it            |
-| **Emanuele Franceschini**                   | e.franceschini@tilburguniversity.it         |
-| **Tommaso Rabino**                          | t.rabino@tilburguniversity.it               |
-| **Akram Benmrit**                           | a.benmrit@tilburguniversity.it              |
-| **Colin Tan**                               | c.tan@tilburguniversity.it                  |
+| **Bianca Magalotti**                        | b.magalotti@tilburguniversity.edu            |
+| **Emanuele Franceschini**                   | e.franceschini@tilburguniversity.edu         |
+| **Tommaso Rabino**                          | t.rabino@tilburguniversity.edu               |
+| **Akram Benmrit**                           | a.benmrit@tilburguniversity.edu              |
+| **Colin Tan**                               | c.tan@tilburguniversity.edu                  |
 
 
 ### Research Motivation
