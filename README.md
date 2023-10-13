@@ -143,7 +143,7 @@ The dataset used for the present project comprises 23,142 observations, each cor
 
 It's crucial to highlight that not all listed variables will be utilized in subsequent analyses. Some will be omitted due to their lack of relevance or contribution to the analytical objectives of this project. Conversely, in the course of analysis, certain feature engineering operations were applied to create new variables. This enhances the encapsulation and representation of information in the dataset, facilitating a more comprehensive understanding of trends, patterns, and insights. Finally, due to data cleaning operations, the number of observations in the dataset may vary.
 
-Here’s an overview of what each (origianl) variable represents:
+Here’s an overview of what each (original) variable represents:
 
 | Variable                              | Description or Motivation for Removal                                         |
 |---------------------------------------|-------------------------------------------------------------------------------|
