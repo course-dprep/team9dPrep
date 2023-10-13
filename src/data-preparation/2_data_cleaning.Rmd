@@ -1,5 +1,5 @@
 ---
-title: "Data Cleansing"
+title: "Data Cleaning"
 subtitle: "SKILLS: Data Preparation and Workflow Management - Group 9"
 author:
   - "Rabino Tommaso"
