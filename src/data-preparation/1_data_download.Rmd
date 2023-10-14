@@ -143,8 +143,9 @@ target_file <- paste0(data_dir, "milan.csv.gz")
 
 download.file(url, target_file, mode = "wb")
 
-# Load the CSV file directly
-data_milan <- readr::read_csv(target_file)
+# Extract and load the CSV file
+gz_file <- gzfile(target_file, "rt")
+data_milan <- read.csv(gz_file)
 
 # Print a message to confirm loading
 print("Loaded milan.csv.gz")
