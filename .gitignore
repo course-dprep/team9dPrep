@@ -6,6 +6,7 @@
 **gen/data-preparation
 **.Rout
 *.csv
+*.zip
 .Rproj.user
 .Rproj
 team-project-team_9_group_project.Rproj
